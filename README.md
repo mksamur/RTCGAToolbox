@@ -1,3 +1,3 @@
 RTCGAToolbox
 ============
-Please visit ... or check vignette for more details!
+Please visit http://mksamur.github.io/RTCGAToolbox/ or check vignette for more details!
