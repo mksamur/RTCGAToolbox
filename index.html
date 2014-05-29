@@ -39,9 +39,25 @@
 <h3>
 <a name="how-to-install" class="anchor" href="#how-to-install"><span class="octicon octicon-link"></span></a>How to install</h3>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<p>To install RTCGAToolbox, you may use either "install_github" function from "devtools" (<a href="http://cran.r-project.org/web/packages/devtools/index.html">http://cran.r-project.org/web/packages/devtools/index.html</a>) package or you may download, build and install by yourself.</p>
+
+<h4>
+<a name="with-devtools" class="anchor" href="#with-devtools"><span class="octicon octicon-link"></span></a>With devtools:</h4>
+
+<pre><code>&gt; library("devtools") # You should install devtools package before loading it.
+&gt; install_github("mksamur/RTCGAToolbox") # This function will download, build and install RTCGAToolbox.
+</code></pre>
+
+<h4>
+<a name="manuel" class="anchor" href="#manuel"><span class="octicon octicon-link"></span></a>Manuel:</h4>
+
+<p>First you need to download archive (zip or tar.gz) by using the links above. After downloading, extract archive file into a folder. Please note that you should have all dependent packages. 
+If you have missing dependent package, you will get an error that tells you which packages you should install.
+X.Y.Z is the current version of RTCGAToolbox.</p>
+
+<pre><code>$ cd /path/to/folder/
+$ R CMD build RTCGAToolbox/
+$ R CMD install RTCGAToolbox_X.Y.Z.tar.gz
 </code></pre>
 
 <h3>
