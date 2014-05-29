@@ -1,0 +1,10 @@
+citEntry(entry="Unpublished",
+         title = "RTCGAToolbox: A new tool for exporting TCGA Firehose data",
+         author = personList( as.person("Mehmet Kemal Samur")),
+         year = 2014,
+         note = "Submmited",     
+         textVersion = 
+         paste("Mehmet Kemal Samur:", 
+               "RTCGAToolbox: A new tool for exporting TCGA Firehose data") )
+
+

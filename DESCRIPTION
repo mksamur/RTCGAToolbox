@@ -1,0 +1,12 @@
+Package: RTCGAToolbox
+Type: Package
+Title: A new tool for exporting TCGA Firehose data
+Version: 0.99.0
+Date: 2014-05-15
+Author: Mehmet Kemal Samur
+Maintainer: Mehmet Kemal Samur <samur@jimmy.harvard.edu>
+Description: Managing data from large scale projects such as The Cancer Genome Atlas (TCGA) for further analysis is an important and time consuming step for research projects. Several efforts, such as Firehose project, make TCGA pre-processed data publicly available via web services and data portals but it requires managing, downloading and preparing the data for following steps. We developed an open source and extensible R based data client for Firehose pre-processed data and demonstrated its use with sample case studies. Results showed that RTCGAToolbox could improve data management for researchers who are interested with TCGA data. In addition, it can be integrated with other analysis pipelines for following data analysis.
+License: GPL (>= 3)
+biocViews: Sequencing, DifferentialExpression
+Imports: methods,XML,limma,survival,RCircos
+Depends: R (>= 2.10)

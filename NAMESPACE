@@ -1,0 +1,16 @@
+import(methods)
+import(XML)
+import(limma)
+import(survival)
+import(RCircos)
+exportPattern("^[^\\.]")
+exportPattern("^[[:alpha:]]+")
+exportClasses(
+    "CorResult",
+     "DGEResult",
+     "FirehoseCGHArray",
+     "FirehoseData",
+     "FirehoseGISTIC",
+     "FirehoseMethylationArray",
+     "FirehosemRNAArray" 
+)
