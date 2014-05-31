@@ -1190,11 +1190,8 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
           fit2 <- contrasts.fit(fit, cont.matrix)
           fit2 <- eBayes(fit2)
           aradeger <- topTable(fit2, adjust.method="BH", genelist=fit$genes, number=length(fit2))
-          rownames(aradeger)[1:10]
           aradeger <- data.frame(aradeger[aradeger$adj.P.Val < 0.05,])
-          rownames(aradeger)[1:10]
           aradeger <- aradeger[aradeger[,1] > 2 | aradeger[,1] < -2,]
-          rownames(aradeger)[1:10]
           tmpReturn <- new("DGEResult",Dataset="RNASeq",Toptable=data.frame(aradeger))
           listResults <- c(listResults,tmpReturn)
           
@@ -1206,14 +1203,9 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
               topgenes <- rownames(aradeger)[1:100]
               bottomgenes <- rownames(aradeger)[(nrow(aradeger)-99):nrow(aradeger)]
               bluered <- colorRampPalette(c("blue","white","red"))(256)
-              print(dim(v))
-              print(topgenes)
               v <- v[c(topgenes,bottomgenes),]
               v <- apply(v,2,as.numeric)
-              print("After")
-              print(dim(v))
-              #heatmap(v,col=bluered,scale="row",main="RNASeq",Colv=NA)
-              pheatmap(v,col=bluered,scale="row",main="RNASeq",cluster_rows=TRUE,cluster_cols=FALSE)
+              try(heatmap(v,col=bluered,scale="row",main="RNASeq",Colv=NA),silent=FALSE)
             }
             else if(nrow(aradeger) > 2)
             {
@@ -1221,7 +1213,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
               bluered <- colorRampPalette(c("blue","white","red"))(256)
               v <- v[rownames(aradeger),]
               v <- apply(v,2,as.numeric)
-              heatmap(v,col=bluered,scale="row",main="RNASeq",Colv=NA)
+              try(heatmap(v,col=bluered,scale="row",main="RNASeq",Colv=NA),silent=FALSE)
             }
           }
         }
@@ -1287,7 +1279,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
               bluered <- colorRampPalette(c("blue","white","red"))(256)
               v <- v[c(topgenes,bottomgenes),]
               v <- apply(v,2,as.numeric)
-              heatmap(v,col=bluered,scale="row",main="RNASeq2",Colv=NA)
+              try(heatmap(v,col=bluered,scale="row",main="RNASeq2",Colv=NA),silent=FALSE)
             }
             else if(nrow(aradeger) > 2)
             {
@@ -1295,7 +1287,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
               bluered <- colorRampPalette(c("blue","white","red"))(256)
               v <- v[rownames(aradeger),]
               v <- apply(v,2,as.numeric)
-              heatmap(v,col=bluered,scale="row",main="RNASeq2",Colv=NA)
+              try(heatmap(v,col=bluered,scale="row",main="RNASeq2",Colv=NA),silent=FALSE)
             }
           }
         }
@@ -1382,7 +1374,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
               bluered <- colorRampPalette(c("blue","white","red"))(256)
               geneMat <- geneMat[c(topgenes,bottomgenes),]
               geneMat <- apply(geneMat,2,as.numeric)
-              heatmap(geneMat,col=bluered,scale="row",main=tmpObj@Filename,Colv=NA)
+              try(heatmap(geneMat,col=bluered,scale="row",main=tmpObj@Filename,Colv=NA),silent=FALSE)
             }
             else if(nrow(aradeger) > 2)
             {
@@ -1390,7 +1382,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
               bluered <- colorRampPalette(c("blue","white","red"))(256)
               geneMat <- geneMat[rownames(aradeger),]
               geneMat <- apply(geneMat,2,as.numeric)
-              heatmap(geneMat,col=bluered,scale="row",main=tmpObj@Filename,Colv=NA)
+              try(heatmap(geneMat,col=bluered,scale="row",main=tmpObj@Filename,Colv=NA),silent=FALSE)
             }
           }
         }
