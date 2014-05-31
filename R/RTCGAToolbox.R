@@ -1204,6 +1204,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
               bottomgenes <- rownames(aradeger)[(nrow(aradeger)-99):nrow(aradeger)]
               bluered <- colorRampPalette(c("blue","white","red"))(256)
               print(dim(v))
+              print(topgenes)
               v <- v[c(topgenes,bottomgenes),]
               v <- apply(v,2,as.numeric)
               print("After")
