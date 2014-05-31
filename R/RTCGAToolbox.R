@@ -1190,8 +1190,11 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
           fit2 <- contrasts.fit(fit, cont.matrix)
           fit2 <- eBayes(fit2)
           aradeger <- topTable(fit2, adjust.method="BH", genelist=fit$genes, number=length(fit2))
+          rownames(aradeger)[1:10]
           aradeger <- data.frame(aradeger[aradeger$adj.P.Val < 0.05,])
+          rownames(aradeger)[1:10]
           aradeger <- aradeger[aradeger[,1] > 2 | aradeger[,1] < -2,]
+          rownames(aradeger)[1:10]
           tmpReturn <- new("DGEResult",Dataset="RNASeq",Toptable=data.frame(aradeger))
           listResults <- c(listResults,tmpReturn)
           
