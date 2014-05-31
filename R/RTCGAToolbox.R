@@ -1203,8 +1203,11 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
               topgenes <- rownames(aradeger)[1:100]
               bottomgenes <- rownames(aradeger)[(nrow(aradeger)-99):nrow(aradeger)]
               bluered <- colorRampPalette(c("blue","white","red"))(256)
+              print(dim(v))
               v <- v[c(topgenes,bottomgenes),]
               v <- apply(v,2,as.numeric)
+              print("After")
+              print(dim(v))
               #heatmap(v,col=bluered,scale="row",main="RNASeq",Colv=NA)
               pheatmap(v,col=bluered,scale="row",main="RNASeq",cluster_rows=TRUE,cluster_cols=FALSE)
             }
