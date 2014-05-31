@@ -9,4 +9,4 @@ Description: Managing data from large scale projects such as The Cancer Genome A
 License: GPL (>= 2)
 biocViews: Sequencing, DifferentialExpression
 Imports: methods,XML,limma,survival,RCircos
-Depends: R (>= 3)
+Depends: R (>= 3.0)
