@@ -68,10 +68,11 @@ $ R CMD install RTCGAToolbox_X.Y.Z.tar.gz
 <h3>
 <a name="known-issues" class="anchor" href="#known-issues"><span class="octicon octicon-link"></span></a>Known Issues</h3>
 
-<ol>
-<li><p>Due to long path names currently Windows OS can not extract data from archives. You may still build and install packages but you can not use getFirehoseData function.</p></li>
-<li><p>In some cases, Mac OS Mavericks may change your tar path. </p></li>
-</ol><pre><code>$ which tar
+<p>1.Due to long path names currently Windows OS can not extract data from archives. You may still build and install packages but you can not use getFirehoseData function.</p>
+
+<p>2.In some cases, Mac OS Mavericks may change your tar path. </p>
+
+<pre><code>$ which tar
 /usr/bin/tar 
 </code></pre>
 
@@ -83,9 +84,9 @@ Error in system(cmd, intern = TRUE) : error in running command
 
 <p>you may change your R configuration and update your tar path for R by using "Sys.setenv (TAR='/usr/bin/tar')"</p>
 
-<ol>
-<li>Current version of RTCGAToolbox does not support exon and isoform level data due to high data volume. We are planning to add support for these data types in future updates.</li>
-</ol><h3>
+<p>3.Current version of RTCGAToolbox does not support exon and isoform level data due to high data volume. We are planning to add support for these data types in future updates.</p>
+
+<h3>
 <a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
 
 <p>Having trouble with RTCGAToolbox? Check out the vignette or contact <a href="mailto:rtcgatoolbox@gmail.com">rtcgatoolbox@gmail.com</a> and we’ll help you sort it out.</p>
