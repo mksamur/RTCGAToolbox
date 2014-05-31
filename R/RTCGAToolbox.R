@@ -1204,15 +1204,16 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
               bottomgenes <- rownames(aradeger)[(nrow(aradeger)-99):nrow(aradeger)]
               bluered <- colorRampPalette(c("blue","white","red"))(256)
               v <- v[c(topgenes,bottomgenes),]
-              v <- data.matrix(v)#apply(v,2,as.numeric)
-              heatmap(v,col=bluered,scale="row",main="RNASeq",Colv=NA)
+              v <- apply(v,2,as.numeric)
+              #heatmap(v,col=bluered,scale="row",main="RNASeq",Colv=NA)
+              pheatmap(v,col=bluered,scale="row",main="RNASeq",cluster_rows=TRUE,cluster_cols=FALSE)
             }
             else if(nrow(aradeger) > 2)
             {
               aradeger <- aradeger[order(aradeger[,1],decreasing=TRUE),]
               bluered <- colorRampPalette(c("blue","white","red"))(256)
               v <- v[rownames(aradeger),]
-              v <- data.matrix(v)#apply(v,2,as.numeric)
+              v <- apply(v,2,as.numeric)
               heatmap(v,col=bluered,scale="row",main="RNASeq",Colv=NA)
             }
           }
@@ -1278,7 +1279,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
               bottomgenes <- rownames(aradeger)[(nrow(aradeger)-99):nrow(aradeger)]
               bluered <- colorRampPalette(c("blue","white","red"))(256)
               v <- v[c(topgenes,bottomgenes),]
-              v <- data.matrix(v)#apply(v,2,as.numeric)
+              v <- apply(v,2,as.numeric)
               heatmap(v,col=bluered,scale="row",main="RNASeq2",Colv=NA)
             }
             else if(nrow(aradeger) > 2)
@@ -1286,7 +1287,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
               aradeger <- aradeger[order(aradeger[,1],decreasing=TRUE),]
               bluered <- colorRampPalette(c("blue","white","red"))(256)
               v <- v[rownames(aradeger),]
-              v <- data.matrix(v)#apply(v,2,as.numeric)
+              v <- apply(v,2,as.numeric)
               heatmap(v,col=bluered,scale="row",main="RNASeq2",Colv=NA)
             }
           }
@@ -1373,7 +1374,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
               bottomgenes <- rownames(aradeger)[(nrow(aradeger)-99):nrow(aradeger)]
               bluered <- colorRampPalette(c("blue","white","red"))(256)
               geneMat <- geneMat[c(topgenes,bottomgenes),]
-              geneMat <- data.matrix(geneMat)#apply(geneMat,2,as.numeric)
+              geneMat <- apply(geneMat,2,as.numeric)
               heatmap(geneMat,col=bluered,scale="row",main=tmpObj@Filename,Colv=NA)
             }
             else if(nrow(aradeger) > 2)
@@ -1381,7 +1382,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
               aradeger <- aradeger[order(aradeger[,1],decreasing=TRUE),]
               bluered <- colorRampPalette(c("blue","white","red"))(256)
               geneMat <- geneMat[rownames(aradeger),]
-              geneMat <- data.matrix(geneMat)#apply(geneMat,2,as.numeric)
+              geneMat <- apply(geneMat,2,as.numeric)
               heatmap(geneMat,col=bluered,scale="row",main=tmpObj@Filename,Colv=NA)
             }
           }

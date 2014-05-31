@@ -3,6 +3,7 @@ import(XML)
 import(limma)
 import(survival)
 import(RCircos)
+import(pheatmap)
 exportPattern("^[^\\.]")
 exportPattern("^[[:alpha:]]+")
 exportClasses(
