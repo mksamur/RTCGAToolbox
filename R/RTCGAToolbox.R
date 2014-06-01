@@ -1823,6 +1823,8 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
   
   pdf(file=paste(dataObject@Dataset,"-reportImage.pdf",sep=""),height=30,width=30)
   plotpos = 1;
+  #data(UCSC.HG19.Human.CytoBandIdeogram,package="RCircos",envir = environment())
+  #cyto.info <- UCSC.HG19.Human.CytoBandIdeogram
   data(CytoBand)
   cyto.info <- CytoBand
   RCircos.Set.Core.Components(cyto.info, chr.exclude=NULL, 3, 3);
