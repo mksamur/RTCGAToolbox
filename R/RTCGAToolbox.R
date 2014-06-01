@@ -1825,8 +1825,8 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
   plotpos = 1;
   #data(UCSC.HG19.Human.CytoBandIdeogram,package="RCircos",envir = environment())
   #cyto.info <- UCSC.HG19.Human.CytoBandIdeogram
-  data(CytoBand)
-  cyto.info <- CytoBand
+  data(cbData)
+  cyto.info <- cbData
   RCircos.Set.Core.Components(cyto.info, chr.exclude=NULL, 3, 3);
   params <- RCircos.Get.Plot.Parameters();
   params$radius.len <- 3.0;
