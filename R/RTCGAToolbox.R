@@ -1824,6 +1824,7 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
   pdf(file=paste(dataObject@Dataset,"-reportImage.pdf",sep=""),height=30,width=30)
   plotpos = 1;
   message("1")
+  require("RCircos")
   data(UCSC.HG19.Human.CytoBandIdeogram)
   message("2")
   cyto.info <- UCSC.HG19.Human.CytoBandIdeogram
