@@ -52,6 +52,8 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   
   resultClass <- new("FirehoseData", Dataset = dataset)
   
+  tryCatch({
+  
   if(!is.null(runDate))
   {
     ##build URL for getting file links
@@ -93,6 +95,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       plinks = plinks[grepl("*.Merge_rnaseq__.*._rnaseq__.*.tar[.]gz$",plinks)]
       for(i in trim(plinks))
       {
+        
         download_link = paste(fh_url,i,sep="")
         download.file(url=download_link,destfile=paste(dataset,"-RNAseqGene.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
         fileList <- untar(paste(dataset,"-RNAseqGene.tar.gz",sep=""),list=TRUE)
@@ -176,6 +179,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         rownames(tmpMat) <- names1
         
         resultClass@RNASeqGene <- tmpMat
+        
       }
     }
     
@@ -1064,6 +1068,34 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   
   return(resultClass)
   
+  
+  },
+  error=function(cond) {
+    message("")
+    message("")
+    message("Dataset download error! Please check your connection and try again!")
+    message("")
+    message("")
+    message("Detail Error Message:")
+    message(cond)
+    # Choose a return value in case of error
+    return(NA)
+  },
+  warning=function(cond) {
+    message("")
+    message("")
+    message("Dataset download error! Please check your connection and try again!")
+    message("If you keep getting this error message and you believe that your connection is stable you may use our Q&A Forum to get help from our community!")
+    message("")
+    message("")
+    #message(cond)
+    # Choose a return value in case of warning
+    return(NULL)
+  },
+  finally={
+    
+  }) 
+  
 }
 #####
 
@@ -1349,7 +1381,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
           geneMat <- geneMat[,c(normalSamples,tumorSamples)]
           rN <- rownames(geneMat)
           cN <- colnames(geneMat)
-          geneMat <- apply(geneMat,2,as.numeric)
+          suppressWarnings(geneMat <- apply(geneMat,2,as.numeric))
           rownames(geneMat) <- rN
           colnames(geneMat) <- cN
           design <- model.matrix (~0 + factor(c(rep(1,length(normalSamples)),rep(2,length(tumorSamples)))))
@@ -1504,7 +1536,9 @@ getCNGECorrelation <- function(dataObject)
           for(rs in 1:nrow(tmpMat1))
           {
             retMat[rs,1] <- rnaseqGenes2[rs]
-            corTmp <- cor.test(as.numeric(tmpMat1[rs,]),as.numeric(tmpMat2[rs,]))
+            suppressWarnings(
+              corTmp <- cor.test(as.numeric(tmpMat1[rs,]),as.numeric(tmpMat2[rs,]))
+            )
             retMat[rs,2] <- corTmp$estimate
             retMat[rs,3] <- corTmp$p.value
           }
@@ -1579,7 +1613,9 @@ getCNGECorrelation <- function(dataObject)
           for(rs in 1:nrow(tmpMat1))
           {
             retMat[rs,1] <- rnaseqGenes2[rs]
-            corTmp <- cor.test(as.numeric(tmpMat1[rs,]),as.numeric(tmpMat2[rs,]))
+            suppressWarnings(
+              corTmp <- cor.test(as.numeric(tmpMat1[rs,]),as.numeric(tmpMat2[rs,]))
+            )
             retMat[rs,2] <- corTmp$estimate
             retMat[rs,3] <- corTmp$p.value
           }
@@ -1637,9 +1673,15 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
     if(i == "RNASeq")
     {
       chkTmp <- as.numeric(dataObject@RNASeqGene[1,])
-      if(all(is.wholenumber(chkTmp)) == TRUE){warning("Current version of survival tool only works with normalized RNASeq data!")}
-      else
+      controlVal = FALSE
+      if(all(is.wholenumber(chkTmp)) == TRUE)
       {
+        #warning("Current version of survival tool only works with normalized RNASeq data!")
+        controlVal=TRUE
+      }
+      #else
+      #{
+        
         tmpMat1 <- dataObject@RNASeqGene
         rnaseqGenes <- rownames(tmpMat1)
         rnaseqGenes2 <- character()
@@ -1675,6 +1717,8 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
         colnames(tmpMat1) <- sampleIDs1
         tmpMat1 <- tmpMat1[,!duplicated(sampleIDs11)]
         colnames(tmpMat1) <- sampleIDs11[!duplicated(sampleIDs11)]
+        
+        if(controlVal){tmpMat1=voom(tmpMat1)$E}
         
         for(myG in geneSymbols)
         {
@@ -1721,7 +1765,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
           }
           
         }
-      }
+      #}
     }
     if(i == "mRNAArray")
     {
