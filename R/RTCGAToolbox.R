@@ -1536,9 +1536,7 @@ getCNGECorrelation <- function(dataObject)
           for(rs in 1:nrow(tmpMat1))
           {
             retMat[rs,1] <- rnaseqGenes2[rs]
-            suppressWarnings(
-              corTmp <- cor.test(as.numeric(tmpMat1[rs,]),as.numeric(tmpMat2[rs,]))
-            )
+            corTmp <- cor.test(as.numeric(tmpMat1[rs,]),as.numeric(tmpMat2[rs,]))
             retMat[rs,2] <- corTmp$estimate
             retMat[rs,3] <- corTmp$p.value
           }
@@ -1613,9 +1611,7 @@ getCNGECorrelation <- function(dataObject)
           for(rs in 1:nrow(tmpMat1))
           {
             retMat[rs,1] <- rnaseqGenes2[rs]
-            suppressWarnings(
-              corTmp <- cor.test(as.numeric(tmpMat1[rs,]),as.numeric(tmpMat2[rs,]))
-            )
+            corTmp <- cor.test(as.numeric(tmpMat1[rs,]),as.numeric(tmpMat2[rs,]))
             retMat[rs,2] <- corTmp$estimate
             retMat[rs,3] <- corTmp$p.value
           }
@@ -1634,6 +1630,8 @@ getCNGECorrelation <- function(dataObject)
   }
   return(listResults)
 }
+
+
 
 
 getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor)
