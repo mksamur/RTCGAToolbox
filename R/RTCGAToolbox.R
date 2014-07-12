@@ -1438,9 +1438,10 @@ getCNGECorrelation <- function(dataObject)
   
   validMatrix <- character()
   #check expression data matrices
+  if(length(dataObject@mRNAArray) > 0){validMatrix <- append(validMatrix,"mRNAArray")}
   if(dim(dataObject@RNASeqGene)[1] > 0 & dim(dataObject@RNASeqGene)[2] > 0){validMatrix <- append(validMatrix,"RNASeq")}
   if(dim(dataObject@RNASeq2GeneNorm)[1] > 0 & dim(dataObject@RNASeqGene)[2] > 0){validMatrix <- append(validMatrix,"RNASeq2")}
-  if(length(dataObject@mRNAArray) > 0){validMatrix <- append(validMatrix,"mRNAArray")}
+  
   
   if(length(validMatrix) == 0){stop("There is no valid expression data in the object!")}
   
@@ -1455,8 +1456,14 @@ getCNGECorrelation <- function(dataObject)
     if(i == "RNASeq")
     {
       chkTmp <- as.numeric(dataObject@RNASeqGene[1,])
-      if(all(is.wholenumber(chkTmp)) == TRUE){warning("Current version of correlation tool only works with normalized RNASeq data!")}
-      else
+      
+      controlVal=FALSE
+      if(all(is.wholenumber(chkTmp)) == TRUE)
+      {
+        #warning("Current version of correlation tool only works with normalized RNASeq data!")
+        controlVal=TRUE
+      }
+      if(TRUE)
       {
         sampleIDs1 <- colnames(dataObject@RNASeqGene)
         sampleIDs2 <- colnames(dataObject@GISTIC@AllByGene)
@@ -1500,8 +1507,10 @@ getCNGECorrelation <- function(dataObject)
         colnames(tmpMat2) <- sampleIDs2
         commonSamples <- intersect(sampleIDs1,sampleIDs2)
         
+        if(controlVal){tmpMat1=voom(tmpMat1)$E}
         
-        if(length(commonSamples > 5))
+        
+        if(length(commonSamples) > 5)
         {
           
           tmpMat1 <- tmpMat1[,commonSamples]
@@ -1523,27 +1532,30 @@ getCNGECorrelation <- function(dataObject)
           
           commonGenes <- intersect(rownames(tmpMat2),rownames(tmpMat1))
           tmpMat2 <- tmpMat2[commonGenes,]
-          message(dim(tmpMat2))
+          #message(dim(tmpMat2))
           tmpMat1 <- tmpMat1[commonGenes,]
-          message(dim(tmpMat1))
-          meanVal <- apply(tmpMat1,1,mean)
-          tmpMat1 <- tmpMat1[meanVal > summary(meanVal)[3],]
-          tmpMat2 <- tmpMat2[rownames(tmpMat1),]
+          #message(dim(tmpMat1))
+          #meanVal <- apply(tmpMat1,1,mean)
+          #tmpMat1 <- tmpMat1[meanVal > summary(meanVal)[3],]
+          #tmpMat2 <- tmpMat2[rownames(tmpMat1),]
           
-          retMat <- data.frame(matrix(ncol=3,nrow=nrow(tmpMat1)))
+          retMat <- data.frame(matrix(ncol=4,nrow=nrow(tmpMat1)))
           retMat[,1] <- as.character()
           rnaseqGenes2 <- rownames(tmpMat1)
           for(rs in 1:nrow(tmpMat1))
           {
             retMat[rs,1] <- rnaseqGenes2[rs]
-            corTmp <- cor.test(as.numeric(tmpMat1[rs,]),as.numeric(tmpMat2[rs,]))
+            suppressWarnings(
+              corTmp <- cor.test(as.numeric(tmpMat1[rs,]),as.numeric(tmpMat2[rs,]))
+            )
             retMat[rs,2] <- corTmp$estimate
             retMat[rs,3] <- corTmp$p.value
           }
           pvals <- retMat[,3]
-          pvals <- p.adjust(pvals, method="BH")
-          retMat[,3] <- pvals
-          colnames(retMat) <- c("GeneSymbol","Cor","BH.p.value")
+          pvalsadj <- p.adjust(pvals, method="BH")
+          retMat[,3] <- pvalsadj
+          retMat[,4] <- pvals
+          colnames(retMat) <- c("GeneSymbol","Cor","BH.p.value","raw.p.value")
           tmpReturn <- new("CorResult",Dataset="RNASeq",Correlations=retMat)
           listResults <- c(listResults,tmpReturn)
           
@@ -1591,7 +1603,7 @@ getCNGECorrelation <- function(dataObject)
         commonSamples <- intersect(sampleIDs1,sampleIDs2)
         commonGenes <- intersect(dataObject@mRNAArray[[jj]]@DataMatrix[,1],dataObject@GISTIC@AllByGene[,1])
         
-        if(commonSamples > 5)
+        if(length(commonSamples) > 5)
         {
           tmpMat1 <- dataObject@mRNAArray[[jj]]@DataMatrix
           rownames(tmpMat1) <- tmpMat1[,1]
@@ -1605,20 +1617,23 @@ getCNGECorrelation <- function(dataObject)
           colnames(tmpMat2) <- sampleIDs2
           tmpMat2 <- tmpMat2[commonGenes,commonSamples]
           
-          retMat <- data.frame(matrix(ncol=3,nrow=nrow(tmpMat1)))
+          retMat <- data.frame(matrix(ncol=4,nrow=nrow(tmpMat1)))
           retMat[,1] <- as.character()
           rnaseqGenes2 <- rownames(tmpMat2)
           for(rs in 1:nrow(tmpMat1))
           {
             retMat[rs,1] <- rnaseqGenes2[rs]
-            corTmp <- cor.test(as.numeric(tmpMat1[rs,]),as.numeric(tmpMat2[rs,]))
+            suppressWarnings(
+              corTmp <- cor.test(as.numeric(tmpMat1[rs,]),as.numeric(tmpMat2[rs,]))
+            )
             retMat[rs,2] <- corTmp$estimate
             retMat[rs,3] <- corTmp$p.value
           }
           pvals <- retMat[,3]
-          pvals <- p.adjust(pvals, method="BH")
-          retMat[,3] <- pvals
-          colnames(retMat) <- c("GeneSymbol","Cor","BH.p.value")
+          pvalsadj <- p.adjust(pvals, method="BH")
+          retMat[,3] <- pvalsadj
+          retMat[,4] <- pvals
+          colnames(retMat) <- c("GeneSymbol","Cor","BH.p.value","raw.p.value")
           tmpReturn <- new("CorResult",Dataset=dataObject@mRNAArray[[jj]]@Filename,Correlations=retMat)
           listResults <- c(listResults,tmpReturn)
           
