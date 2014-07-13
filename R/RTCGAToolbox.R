@@ -1157,7 +1157,8 @@ getFirehoseAnalyzeDates <- function(last=NULL){
 #####
 
 #Analyze functions
-getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
+getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.pval=0.05,raw.pval=0.05,logFC=2,
+                                  hmTopUpN=100,hmTopDownN=100)
 {
   if(is.null(dataObject) | class(dataObject) != "FirehoseData")
   {stop("Please set a valid object! dataObject must be set as FirehoseData class!")}
@@ -1171,6 +1172,13 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
   if(length(validMatrix) == 0){stop("There is no valid expression data in the object!")}
   
   if(class(DrawPlots) != "logical" | is.null(DrawPlots)){stop("DrawPlots must be logical!")}
+  
+  if(is.null(adj.method) | is.na(adj.method) | (tmp %in% c("BH","BY","holm","none"))){adj.method="BH"}
+  if(is.null(adj.pval) | is.na(adj.pval) | length(adj.pval) > 1 | adj.pval > 1 | adj.pval < 0){adj.pval=0.05}
+  if(is.null(raw.pval) | is.na(raw.pval) | length(raw.pval) > 1 | raw.pval > 1 | raw.pval < 0){raw.pval=0.05}
+  if(is.null(logFC) | is.na(logFC) | length(logFC) > 1 | logFC < 0 ){logFC=2}
+  if(is.null(hmTopUpN) | is.na(hmTopUpN) | length(hmTopUpN) > 1 | hmTopUpN < 0){hmTopUpN=100}
+  if(is.null(hmTopDownN) | is.na(hmTopDownN) | length(hmTopDownN) > 1 | hmTopDownN < 0){hmTopDownN=100}
   
   listResults <- list()
   
@@ -1221,31 +1229,37 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
           cont.matrix <- makeContrasts(TumorvsNormal=Tumor-Normal, levels=design)
           fit2 <- contrasts.fit(fit, cont.matrix)
           fit2 <- eBayes(fit2)
-          aradeger <- topTable(fit2, adjust.method="BH", genelist=fit$genes, number=length(fit2))
-          aradeger <- data.frame(aradeger[aradeger$adj.P.Val < 0.05,])
-          aradeger <- aradeger[aradeger[,1] > 2 | aradeger[,1] < -2,]
+          aradeger <- topTable(fit2, adjust.method=adj.method, genelist=fit$genes, number=length(fit2))
+          aradeger <- data.frame(aradeger[aradeger$adj.P.Val < adj.pval & aradeger$P.Value < raw.pval,])
+          aradeger <- aradeger[aradeger[,1] > logFC | aradeger[,1] < (-1*logFC),]
           tmpReturn <- new("DGEResult",Dataset="RNASeq",Toptable=data.frame(aradeger))
           listResults <- c(listResults,tmpReturn)
           
           if(DrawPlots)
           {
             volcanoplot(fit2,names=fit2$genes$ID,xlab="Log Fold Change",ylab="Log Odds",pch=16,cex=0.35)
-            if(nrow(aradeger) > 200){
+            if(nrow(aradeger) > 2 ){
               aradeger <- aradeger[order(aradeger[,1],decreasing=TRUE),]
-              topgenes <- rownames(aradeger)[1:100]
-              bottomgenes <- rownames(aradeger)[(nrow(aradeger)-99):nrow(aradeger)]
-              bluered <- colorRampPalette(c("blue","white","red"))(256)
-              v <- v[c(topgenes,bottomgenes),]
-              v <- apply(v,2,as.numeric)
-              try(heatmap(v,col=bluered,scale="row",main="RNASeq",Colv=NA),silent=FALSE)
-            }
-            else if(nrow(aradeger) > 2)
-            {
-              aradeger <- aradeger[order(aradeger[,1],decreasing=TRUE),]
-              bluered <- colorRampPalette(c("blue","white","red"))(256)
-              v <- v[rownames(aradeger),]
-              v <- apply(v,2,as.numeric)
-              try(heatmap(v,col=bluered,scale="row",main="RNASeq",Colv=NA),silent=FALSE)
+              if(nrow(aradeger) >= (hmTopDownN+hmTopUpN))
+              {
+                if(hmTopUpN > 0){topgenes <- rownames(aradeger)[1:hmTopUpN]}
+                else{topgenes <- NULL}
+                if(hmTopDownN > 0){bottomgenes <- rownames(aradeger)[(nrow(aradeger)- (hmTopDownN-1)):nrow(aradeger)]}
+                else{bottomgenes <- NULL}
+                bluered <- colorRampPalette(c("blue","white","red"))(256)
+                v <- v[c(topgenes,bottomgenes),]
+                v <- apply(v,2,as.numeric)
+                rownames(v) <- c(topgenes,bottomgenes)
+                try(heatmap(v,col=bluered,scale="row",main="RNASeq",Colv=NA),silent=FALSE)
+              }
+              else
+              {
+                bluered <- colorRampPalette(c("blue","white","red"))(256)
+                v <- v[rownames(aradeger),]
+                v <- apply(v,2,as.numeric)
+                rownames(v) <- rownames(aradeger)
+                try(heatmap(v,col=bluered,scale="row",main="RNASeq",Colv=NA),silent=FALSE)
+              }
             }
           }
         }
@@ -1295,31 +1309,37 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
           cont.matrix <- makeContrasts(TumorvsNormal=Tumor-Normal, levels=design)
           fit2 <- contrasts.fit(fit, cont.matrix)
           fit2 <- eBayes(fit2)
-          aradeger <- topTable(fit2, adjust.method="BH", genelist=fit$genes, number=length(fit2))
-          aradeger <- data.frame(aradeger[aradeger$adj.P.Val < 0.05,])
-          aradeger <- aradeger[aradeger[,1] > 2 | aradeger[,1] < -2,]
+          aradeger <- topTable(fit2, adjust.method=adj.method, genelist=fit$genes, number=length(fit2))
+          aradeger <- data.frame(aradeger[aradeger$adj.P.Val < adj.pval & aradeger$P.Value < raw.pval,])
+          aradeger <- aradeger[aradeger[,1] > logFC | aradeger[,1] < (-1*logFC),]
           tmpReturn <- new("DGEResult",Dataset="RNASeq2",Toptable=data.frame(aradeger))
           listResults <- c(listResults,tmpReturn)
           
           if(DrawPlots)
           {
             volcanoplot(fit2,names=fit2$genes$ID,xlab="Log Fold Change",ylab="Log Odds",pch=16,cex=0.35)
-            if(nrow(aradeger) > 200){
+            if(nrow(aradeger) > 2 ){
               aradeger <- aradeger[order(aradeger[,1],decreasing=TRUE),]
-              topgenes <- rownames(aradeger)[1:100]
-              bottomgenes <- rownames(aradeger)[(nrow(aradeger)-99):nrow(aradeger)]
-              bluered <- colorRampPalette(c("blue","white","red"))(256)
-              v <- v[c(topgenes,bottomgenes),]
-              v <- apply(v,2,as.numeric)
-              try(heatmap(v,col=bluered,scale="row",main="RNASeq2",Colv=NA),silent=FALSE)
-            }
-            else if(nrow(aradeger) > 2)
-            {
-              aradeger <- aradeger[order(aradeger[,1],decreasing=TRUE),]
-              bluered <- colorRampPalette(c("blue","white","red"))(256)
-              v <- v[rownames(aradeger),]
-              v <- apply(v,2,as.numeric)
-              try(heatmap(v,col=bluered,scale="row",main="RNASeq2",Colv=NA),silent=FALSE)
+              if(nrow(aradeger) >= (hmTopDownN+hmTopUpN))
+              {
+                if(hmTopUpN > 0){topgenes <- rownames(aradeger)[1:hmTopUpN]}
+                else{topgenes <- NULL}
+                if(hmTopDownN > 0){bottomgenes <- rownames(aradeger)[(nrow(aradeger)- (hmTopDownN-1)):nrow(aradeger)]}
+                else{bottomgenes <- NULL}
+                bluered <- colorRampPalette(c("blue","white","red"))(256)
+                v <- v[c(topgenes,bottomgenes),]
+                v <- apply(v,2,as.numeric)
+                rownames(v) <- c(topgenes,bottomgenes)
+                try(heatmap(v,col=bluered,scale="row",main="RNASeq2",Colv=NA),silent=FALSE)
+              }
+              else
+              {
+                bluered <- colorRampPalette(c("blue","white","red"))(256)
+                v <- v[rownames(aradeger),]
+                v <- apply(v,2,as.numeric)
+                rownames(v) <- rownames(aradeger)
+                try(heatmap(v,col=bluered,scale="row",main="RNASeq2",Colv=NA),silent=FALSE)
+              }
             }
           }
         }
@@ -1390,31 +1410,37 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE)
           cont.matrix <- makeContrasts(TumorvsNormal=Tumor-Normal, levels=design)
           fit2 <- contrasts.fit(fit, cont.matrix)
           fit2 <- eBayes(fit2)
-          aradeger <- topTable(fit2, adjust.method="BH", genelist=fit$genes, number=length(fit2))
-          aradeger <- data.frame(aradeger[aradeger$adj.P.Val < 0.05,])
-          aradeger <- aradeger[aradeger[,1] > 1.5 | aradeger[,1] < -1.5,]
+          aradeger <- topTable(fit2, adjust.method=adj.method, genelist=fit$genes, number=length(fit2))
+          aradeger <- data.frame(aradeger[aradeger$adj.P.Val < adj.pval & aradeger$P.Value < raw.pval,])
+          aradeger <- aradeger[aradeger[,1] > logFC | aradeger[,1] < (-1*logFC),]
           tmpReturn <- new("DGEResult",Dataset=tmpObj@Filename,Toptable=data.frame(aradeger))
           listResults <- c(listResults,tmpReturn)
           
           if(DrawPlots)
           {
             volcanoplot(fit2,names=fit2$genes$ID,xlab="Log Fold Change",ylab="Log Odds",pch=16,cex=0.35)
-            if(nrow(aradeger) > 200){
+            if(nrow(aradeger) > 2 ){
               aradeger <- aradeger[order(aradeger[,1],decreasing=TRUE),]
-              topgenes <- rownames(aradeger)[1:100]
-              bottomgenes <- rownames(aradeger)[(nrow(aradeger)-99):nrow(aradeger)]
-              bluered <- colorRampPalette(c("blue","white","red"))(256)
-              geneMat <- geneMat[c(topgenes,bottomgenes),]
-              geneMat <- apply(geneMat,2,as.numeric)
-              try(heatmap(geneMat,col=bluered,scale="row",main=tmpObj@Filename,Colv=NA),silent=FALSE)
-            }
-            else if(nrow(aradeger) > 2)
-            {
-              aradeger <- aradeger[order(aradeger[,1],decreasing=TRUE),]
-              bluered <- colorRampPalette(c("blue","white","red"))(256)
-              geneMat <- geneMat[rownames(aradeger),]
-              geneMat <- apply(geneMat,2,as.numeric)
-              try(heatmap(geneMat,col=bluered,scale="row",main=tmpObj@Filename,Colv=NA),silent=FALSE)
+              if(nrow(aradeger) >= (hmTopDownN+hmTopUpN))
+              {
+                if(hmTopUpN > 0){topgenes <- rownames(aradeger)[1:hmTopUpN]}
+                else{topgenes <- NULL}
+                if(hmTopDownN > 0){bottomgenes <- rownames(aradeger)[(nrow(aradeger)- (hmTopDownN-1)):nrow(aradeger)]}
+                else{bottomgenes <- NULL}
+                bluered <- colorRampPalette(c("blue","white","red"))(256)
+                v <- geneMat[c(topgenes,bottomgenes),]
+                v <- apply(v,2,as.numeric)
+                rownames(v) <- c(topgenes,bottomgenes)
+                try(heatmap(v,col=bluered,scale="row",main=tmpObj@Filename,Colv=NA),silent=FALSE)
+              }
+              else
+              {
+                bluered <- colorRampPalette(c("blue","white","red"))(256)
+                v <- geneMat[rownames(aradeger),]
+                v <- apply(v,2,as.numeric)
+                rownames(v) <- rownames(aradeger)
+                try(heatmap(v,col=bluered,scale="row",main=tmpObj@Filename,Colv=NA),silent=FALSE)
+              }
             }
           }
         }
@@ -1645,9 +1671,6 @@ getCNGECorrelation <- function(dataObject)
   }
   return(listResults)
 }
-
-
-
 
 getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor)
 {
