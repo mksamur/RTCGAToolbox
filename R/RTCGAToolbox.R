@@ -1154,6 +1154,7 @@ getFirehoseAnalyzeDates <- function(last=NULL){
     stop('"last" must be integer')
   }
 }
+
 #####
 
 #Analyze functions
