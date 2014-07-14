@@ -1457,7 +1457,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
   
 }
 
-getCNGECorrelation <- function(dataObject)
+getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval=0.05)
 {
   if(is.null(dataObject) | class(dataObject) != "FirehoseData")
   {stop("Please set a valid object! dataObject must be set as FirehoseData class!")}
@@ -1467,6 +1467,10 @@ getCNGECorrelation <- function(dataObject)
   if(length(dataObject@mRNAArray) > 0){validMatrix <- append(validMatrix,"mRNAArray")}
   if(dim(dataObject@RNASeqGene)[1] > 0 & dim(dataObject@RNASeqGene)[2] > 0){validMatrix <- append(validMatrix,"RNASeq")}
   if(dim(dataObject@RNASeq2GeneNorm)[1] > 0 & dim(dataObject@RNASeqGene)[2] > 0){validMatrix <- append(validMatrix,"RNASeq2")}
+  
+  if(is.null(adj.method) | is.na(adj.method) | (tmp %in% c("BH","BY","holm","none"))){adj.method="BH"}
+  if(is.null(adj.pval) | is.na(adj.pval) | length(adj.pval) > 1 | adj.pval > 1 | adj.pval < 0){adj.pval=0.05}
+  if(is.null(raw.pval) | is.na(raw.pval) | length(raw.pval) > 1 | raw.pval > 1 | raw.pval < 0){raw.pval=0.05}
   
   
   if(length(validMatrix) == 0){stop("There is no valid expression data in the object!")}
@@ -1578,10 +1582,11 @@ getCNGECorrelation <- function(dataObject)
             retMat[rs,3] <- corTmp$p.value
           }
           pvals <- retMat[,3]
-          pvalsadj <- p.adjust(pvals, method="BH")
+          pvalsadj <- p.adjust(pvals, method=adj.method)
           retMat[,3] <- pvalsadj
           retMat[,4] <- pvals
-          colnames(retMat) <- c("GeneSymbol","Cor","BH.p.value","raw.p.value")
+          colnames(retMat) <- c("GeneSymbol","Cor","adj.p.value","p.value")
+          retMat <- retMat[retMat[,3] < adj.pval & retMat[,4] < raw.pval,]
           tmpReturn <- new("CorResult",Dataset="RNASeq",Correlations=retMat)
           listResults <- c(listResults,tmpReturn)
           
@@ -1656,10 +1661,11 @@ getCNGECorrelation <- function(dataObject)
             retMat[rs,3] <- corTmp$p.value
           }
           pvals <- retMat[,3]
-          pvalsadj <- p.adjust(pvals, method="BH")
+          pvalsadj <- p.adjust(pvals, method=adj.method)
           retMat[,3] <- pvalsadj
           retMat[,4] <- pvals
-          colnames(retMat) <- c("GeneSymbol","Cor","BH.p.value","raw.p.value")
+          colnames(retMat) <- c("GeneSymbol","Cor","adj.p.value","p.value")
+          retMat <- retMat[retMat[,3] < adj.pval & retMat[,4] < raw.pval,]
           tmpReturn <- new("CorResult",Dataset=dataObject@mRNAArray[[jj]]@Filename,Correlations=retMat)
           listResults <- c(listResults,tmpReturn)
           
