@@ -1,0 +1,13 @@
+Data Type (Parameter)	Description
+Clinic	Provides clinical information for each sample. Clinical information may include stage, survival time, sex, age and more.
+RNAseq_Gene or/and  RNAseq2_Gene_Norm 	Gene level expression data from RNA-seq platforms. This parameter provides raw counts and normalized values. Firehose provides 2 different algorithms for RNAseq data processing. (Data types can be specified by using RNAseqNorm and RNAseq2Norm parameters)
+miRNASeq_Gene	miRNA expression levels from next generation sequencing platforms 
+CNA_SNP	Segmented copy number alterations (in somatic cells)
+CNV_SNP	Segmented copy number variations (in germline cells)
+CNA_Seq	Copy number alterations provided by next generation sequencing platforms
+CNA_CGH	Copy number alterations provided by CGH array platforms
+Methylation	Methylation data provided by array platforms
+Mutation	Gene level mutation information matrix 
+mRNA_Array	Gene level expression data provided by array platforms
+miRNA_Array	miRNA expression data provided by array platforms
+RPPA	Reverse phase protein array (RPPA) expression
