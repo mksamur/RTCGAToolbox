@@ -1469,7 +1469,7 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
   if(dim(dataObject@RNASeqGene)[1] > 0 & dim(dataObject@RNASeqGene)[2] > 0){validMatrix <- append(validMatrix,"RNASeq")}
   if(dim(dataObject@RNASeq2GeneNorm)[1] > 0 & dim(dataObject@RNASeqGene)[2] > 0){validMatrix <- append(validMatrix,"RNASeq2")}
   
-  if(is.null(adj.method) | is.na(adj.method) | (tmp %in% c("BH","BY","holm","none"))){adj.method="BH"}
+  if(is.null(adj.method) | is.na(adj.method) | (adj.method %in% c("BH","BY","holm","none"))){adj.method="BH"}
   if(is.null(adj.pval) | is.na(adj.pval) | length(adj.pval) > 1 | adj.pval > 1 | adj.pval < 0){adj.pval=0.05}
   if(is.null(raw.pval) | is.na(raw.pval) | length(raw.pval) > 1 | raw.pval > 1 | raw.pval < 0){raw.pval=0.05}
   
