@@ -1461,7 +1461,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
 getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval=0.05)
 {
   if(is.null(dataObject) | class(dataObject) != "FirehoseData")
-  {stop("Please set a valid object! dataObject must be set as FirehoseData class!")}
+  {stop("Please set a valid object! dataObject must be set as FirehoseData class! ")}
   
   validMatrix <- character()
   #check expression data matrices
