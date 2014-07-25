@@ -1174,7 +1174,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
   
   if(class(DrawPlots) != "logical" | is.null(DrawPlots)){stop("DrawPlots must be logical!")}
   
-  if(is.null(adj.method) | is.na(adj.method) | (tmp %in% c("BH","BY","holm","none"))){adj.method="BH"}
+  if(is.null(adj.method) | is.na(adj.method) | (adj.method %in% c("BH","BY","holm","none"))){adj.method="BH"}
   if(is.null(adj.pval) | is.na(adj.pval) | length(adj.pval) > 1 | adj.pval > 1 | adj.pval < 0){adj.pval=0.05}
   if(is.null(raw.pval) | is.na(raw.pval) | length(raw.pval) > 1 | raw.pval > 1 | raw.pval < 0){raw.pval=0.05}
   if(is.null(logFC) | is.na(logFC) | length(logFC) > 1 | logFC < 0 ){logFC=2}
