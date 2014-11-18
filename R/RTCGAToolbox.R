@@ -26,33 +26,33 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   {stop('Please set "dataset" parameter! You should specify one dataset name. Ex: dataset="BRCA"...')}
   runDatasets <- getFirehoseDatasets()
   if(!any(runDatasets==dataset)){stop('Please use valid dataset name! "getFirehoseDatasets" function gives you the vector of valid dataset names!')}
-
-
+  
+  
   if(!is.null(runDate))
   {
     if(!class(runDate)=="character" || !length(runDate) == 1 || !nchar(runDate) == 8)
     {stop('Please set "runDate" parameter! You should specify one Firehose run date. Ex: runDate="20140416"...')}
-
+    
     runDateList <- getFirehoseRunningDates()
     if(!any(runDateList==runDate)){stop('Please use valid run date! "getFirehoseRunningDates" function gives you the vector of valid dates!')}
   }
-
+  
   if(!is.null(gistic2_Date))
   {
     if(!class(gistic2_Date)=="character" || !length(gistic2_Date) == 1 || !nchar(gistic2_Date) == 8)
     {stop('Please set "gistic2_Date" parameter! You should specify one Firehose run date. Ex: gistic2_Date="20140115"...')}
-
+    
     runGisticDate <- getFirehoseAnalyzeDates()
     if(!any(runGisticDate==gistic2_Date)){stop('Please use valid analyze date for GISTIC! "getFirehoseAnalyzeDates" function gives you the vector of valid dates!')}
   }
-
+  
   if(is.null(gistic2_Date) & is.null(runDate)){stop("Please specify run date or/and gistic date!")}
-
+  
   trim <- function (x) gsub("^\\s+|\\s+$", "", x)
-
+  
   resultClass <- new("FirehoseData", Dataset = dataset)
-
-
+  
+  
   if(!is.null(runDate))
   {
     ##build URL for getting file links
@@ -60,7 +60,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     fh_url <- paste(fh_url,substr(runDate,1,4),"_",substr(runDate,5,6),"_",substr(runDate,7,8),"/data/",sep="")
     fh_url <- paste(fh_url,dataset,"/",runDate,"/",sep="")
     doc = htmlTreeParse(fh_url, useInternalNodes = T)
-
+    
     #Download clinical data
     if(Clinic)
     {
@@ -75,20 +75,17 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         fileList <- untar(paste(dataset,"-Clinical.tar.gz",sep=""),list=TRUE)
         fileList = fileList[grepl("*.clin.merged.picked.txt$",fileList)]
         untar(paste(dataset,"-Clinical.tar.gz",sep=""),files=fileList)
-
+        
         file.rename(from=fileList,to=paste(dataset,"-Clinical.txt",sep=""))
         file.remove(paste(dataset,"-Clinical.tar.gz",sep=""))
         delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
-        raw.clin <- read.delim(paste(dataset,"-Clinical.txt",sep=""),colClasses="character")
-        df.clin <- data.frame(do.call(rbind, raw.clin[, -1]))
-        colnames(df.clin) <- raw.clin[, 1]
-        resultClass@Clinical <- df.clin
+        resultClass@Clinical <- read.delim(paste(dataset,"-Clinical.txt",sep=""),colClasses="character")
         gc()
       }
     }
-
+    
     #Download RNAseq gene level data
     if(RNAseq_Gene)
     {
@@ -98,25 +95,25 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       plinks = plinks[grepl("*.Merge_rnaseq__.*._rnaseq__.*.tar[.]gz$",plinks)]
       for(i in trim(plinks))
       {
-
+        
         download_link = paste(fh_url,i,sep="")
         download.file(url=download_link,destfile=paste(dataset,"-RNAseqGene.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
         fileList <- untar(paste(dataset,"-RNAseqGene.tar.gz",sep=""),list=TRUE)
         grepSearch = paste("*.",dataset,"[.]rnaseq__.*.__Level_3__gene_expression__data.data.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
         untar(paste(dataset,"-RNAseqGene.tar.gz",sep=""),files=fileList)
-
+        
         file.rename(from=fileList,to=paste(dataset,"-RNAseqGene.txt",sep=""))
         file.remove(paste(dataset,"-RNAseqGene.tar.gz",sep=""))
         delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
-
+        
         #Get selected type only
         tmpCols = read.delim(paste(dataset,"-RNAseqGene.txt",sep=""),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
         colOrder <- colOrder[tmpCols[1,] == RNAseqNorm]
-
+        
         message("RNA-seq data will be imported! This may take some times!")
         testcon <- file(paste(dataset,"-RNAseqGene.txt",sep=""),open="r")
         readsizeof <- 1000
@@ -125,18 +122,18 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           nooflines <- nooflines+linesread )
         close(testcon)
         message(nooflines)
-
+        
         message(paste(nooflines,"genes data will be imported!"))
-
+        
         tmpMat <- data.frame()
         inputfile<-file(paste(dataset,"-RNAseqGene.txt",sep=""),open="r")
         listMat <- list()
         itemcount = 1
-
+        
         N = nooflines
         chunksize<-100
         nchunks<- ceiling(N/100)
-
+        
         for(i in 1:nchunks){
           chunk<-read.delim(inputfile,nrows=chunksize,colClasses="character",header=FALSE)
           if(i == 1)
@@ -149,7 +146,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           }
           if((chunksize*i) < nooflines){message(paste((chunksize*i),"genes data has been imported!"))}
           else{message(paste((nooflines),"genes data has been imported!"))}
-
+          
           if( ((chunksize*i) %% 1000) ==0 )
           {
             listMat[[itemcount]] <- tmpMat
@@ -157,45 +154,45 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
             itemcount = itemcount + 1
           }
         }
-
+        
         tmpMat2 <- data.frame()
         for(i in 1:length(listMat))
         {
           if(i == 1){tmpMat2 = listMat[[i]]}
           else{tmpMat2 = rbind(tmpMat2,listMat[[i]])}
-          listMat[[i]] <- 0
+          listMat[[i]] <- 0 
         }
         tmpMat <- rbind(tmpMat2,tmpMat)
         rm(tmpMat2)
-
+        
         #close(inputfile)
         closeAllConnections()
         colnames(tmpMat) <- tmpMat[1,]
         tmpMat <- tmpMat[-c(1:2),]
         removeQM <- grepl("\\?\\|",tmpMat[,1])
         tmpMat <- tmpMat[!removeQM,]
-
+        
         names1 <- tmpMat[,1]
         names2 <- sapply(names1,function(x){unlist(strsplit(x,"\\|"))[1]})
         names1 <- duplicated(names2)
         tmpMat <- tmpMat[!names1,]
         rownames(tmpMat) <- names2[!names1]
-
+        
         #names1 <- tmpMat[,1]
         tmpMat <- tmpMat[,-1]
-
+        
         cNames <- colnames(tmpMat)
         rNames <- rownames(tmpMat)
-
+        
         tmpMat <- apply(tmpMat,2,as.numeric)
         #rownames(tmpMat) <- names1
-
+        
         colnames(tmpMat) <- cNames
         rownames(tmpMat) <- rNames
-
+        
         resultClass@RNASeqGene <- tmpMat
         gc()
-
+        
       }
     }
     gc()
@@ -214,18 +211,18 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         grepSearch = paste("*.",dataset,"[.]rnaseqv2__.*.__Level_3__RSEM_genes_normalized__data.data.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
         untar(paste(dataset,"-RNAseq2GeneNorm.tar.gz",sep=""),files=fileList)
-
+        
         file.rename(from=fileList,to=paste(dataset,"-RNAseq2GeneNorm.txt",sep=""))
         file.remove(paste(dataset,"-RNAseq2GeneNorm.tar.gz",sep=""))
         delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
-
+        
         #Get selected type only
         tmpCols = read.delim(paste(dataset,"-RNAseq2GeneNorm.txt",sep=""),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
         colOrder <- colOrder[tmpCols[1,] == RNAseq2Norm]
-
+        
         message("RNA-seq2 data will be imported! This may take some times!")
         testcon <- file(paste(dataset,"-RNAseq2GeneNorm.txt",sep=""),open="r")
         readsizeof <- 1000
@@ -234,18 +231,18 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           nooflines <- nooflines+linesread )
         close(testcon)
         message(nooflines)
-
+        
         message(paste(nooflines,"genes data will be imported!"))
-
+        
         tmpMat <- data.frame()
         inputfile<-file(paste(dataset,"-RNAseq2GeneNorm.txt",sep=""),open="r")
         listMat <- list()
         itemcount = 1
-
+        
         N = nooflines
         chunksize<-100
         nchunks<- ceiling(N/100)
-
+        
         for(i in 1:nchunks){
           chunk<-read.delim(inputfile,nrows=chunksize,colClasses="character",header=FALSE)
           if(i == 1)
@@ -258,7 +255,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           }
           if((chunksize*i) < nooflines){message(paste((chunksize*i),"genes data has been imported!"))}
           else{message(paste((nooflines),"genes data has been imported!"))}
-
+          
           if( ((chunksize*i) %% 1000) ==0 )
           {
             listMat[[itemcount]] <- tmpMat
@@ -266,53 +263,53 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
             itemcount = itemcount + 1
           }
         }
-
+        
         tmpMat2 <- data.frame()
         for(i in 1:length(listMat))
         {
           if(i == 1){tmpMat2 = listMat[[i]]}
           else{tmpMat2 = rbind(tmpMat2,listMat[[i]])}
-          listMat[[i]] <- 0
+          listMat[[i]] <- 0 
         }
         tmpMat <- rbind(tmpMat2,tmpMat)
         rm(tmpMat2)
-
+        
         #close(inputfile)
         closeAllConnections()
         colnames(tmpMat) <- tmpMat[1,]
         tmpMat <- tmpMat[-c(1:2),]
         removeQM <- grepl("\\?\\|",tmpMat[,1])
         tmpMat <- tmpMat[!removeQM,]
-
-
+        
+        
         names1 <- tmpMat[,1]
         names2 <- sapply(names1,function(x){unlist(strsplit(x,"\\|"))[1]})
         names1 <- duplicated(names2)
         tmpMat <- tmpMat[!names1,]
         rownames(tmpMat) <- names2[!names1]
-
+        
         #names1 <- tmpMat[,1]
         tmpMat <- tmpMat[,-1]
-
+        
         cNames <- colnames(tmpMat)
         rNames <- rownames(tmpMat)
-
+        
         tmpMat <- apply(tmpMat,2,as.numeric)
         #rownames(tmpMat) <- names1
-
+        
         colnames(tmpMat) <- cNames
         rownames(tmpMat) <- rNames
-
-
+        
+        
         #names1 <- tmpMat[,1]
         #tmpMat <- tmpMat[,-1]
         #tmpMat <- apply(tmpMat,2,as.numeric)
         #rownames(tmpMat) <- names1
-
+        
         resultClass@RNASeq2GeneNorm <- tmpMat
         gc()
       }
-
+      
     }
     gc()
     #Download miRNAseq gene level data
@@ -332,18 +329,18 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         grepSearch = paste("*.",dataset,"[.]mirnaseq__.*.__Level_3__miR_gene_expression__data.data.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
         untar(paste(dataset,"-miRNAseqGene.tar.gz",sep=""),files=fileList)
-
+        
         file.rename(from=fileList,to=paste(dataset,"-miRNAseqGene.txt",sep=""))
         file.remove(paste(dataset,"-miRNAseqGene.tar.gz",sep=""))
         delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
-
+        
         #Get selected type only
         tmpCols = read.delim(paste(dataset,"-miRNAseqGene.txt",sep=""),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
         colOrder <- colOrder[tmpCols[1,] == "read_count"]
-
+        
         message("miRNA-seq data will be imported! This may take some times!")
         testcon <- file(paste(dataset,"-miRNAseqGene.txt",sep=""),open="r")
         readsizeof <- 1000
@@ -352,18 +349,18 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           nooflines <- nooflines+linesread )
         close(testcon)
         message(nooflines)
-
+        
         message(paste(nooflines,"genes data will be imported!"))
-
+        
         tmpMat <- data.frame()
         inputfile<-file(paste(dataset,"-miRNAseqGene.txt",sep=""),open="r")
         listMat <- list()
         itemcount = 1
-
+        
         N = nooflines
         chunksize<-100
         nchunks<- ceiling(N/100)
-
+        
         for(i in 1:nchunks){
           chunk<-read.delim(inputfile,nrows=chunksize,colClasses="character",header=FALSE)
           if(i == 1)
@@ -376,7 +373,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           }
           if((chunksize*i) < nooflines){message(paste((chunksize*i),"genes data has been imported!"))}
           else{message(paste((nooflines),"genes data has been imported!"))}
-
+          
           if( ((chunksize*i) %% 1000) ==0 )
           {
             listMat[[itemcount]] <- tmpMat
@@ -384,50 +381,50 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
             itemcount = itemcount + 1
           }
         }
-
+        
         tmpMat2 <- data.frame()
         for(i in 1:length(listMat))
         {
           if(i == 1){tmpMat2 = listMat[[i]]}
           else{tmpMat2 = rbind(tmpMat2,listMat[[i]])}
-          listMat[[i]] <- 0
+          listMat[[i]] <- 0 
         }
         tmpMat <- rbind(tmpMat2,tmpMat)
         rm(tmpMat2)
-
+        
         #close(inputfile)
         closeAllConnections()
         colnames(tmpMat) <- tmpMat[1,]
         tmpMat <- tmpMat[-c(1:2),]
         removeQM <- grepl("\\?\\|",tmpMat[,1])
         tmpMat <- tmpMat[!removeQM,]
-
-
+        
+        
         names1 <- tmpMat[,1]
         names2 <- sapply(names1,function(x){unlist(strsplit(x,"\\|"))[1]})
         names1 <- duplicated(names2)
         tmpMat <- tmpMat[!names1,]
         rownames(tmpMat) <- names2[!names1]
-
-
+        
+        
         #names1 <- tmpMat[,1]
         #names2 <- sapply(names1,function(x){unlist(strsplit(x,"\\|"))[1]})
         #names1 <- tmpMat[,1]
-
+        
         tmpMat <- tmpMat[,-1]
-
+        
         cNames <- colnames(tmpMat)
         rNames <- rownames(tmpMat)
-
+        
         tmpMat <- apply(tmpMat,2,as.numeric)
-
+        
         #tmpMat <- tmpMat[,-1]
         #tmpMat <- apply(tmpMat,2,as.numeric)
         #rownames(tmpMat) <- names1
-
+        
         colnames(tmpMat) <- cNames
         rownames(tmpMat) <- rNames
-
+        
         resultClass@miRNASeqGene <- tmpMat
         gc()
       }
@@ -448,20 +445,20 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         grepSearch = paste("*.",dataset,"[.]snp__.*.__Level_3__segmented_scna_hg19__seg.seg.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
         untar(paste(dataset,"-CNASNPHg19.tar.gz",sep=""),files=fileList)
-
+        
         file.rename(from=fileList,to=paste(dataset,"-CNASNPHg19.txt",sep=""))
         file.remove(paste(dataset,"-CNASNPHg19.tar.gz",sep=""))
         delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
-
+        
         #Get selected type only
         tmpMat = read.delim(paste(dataset,"-CNASNPHg19.txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                             "numeric","numeric"))
         resultClass@CNASNP <- tmpMat
       }
     }
-
+    
     #Download CNV SNP data
     if(CNV_SNP)
     {
@@ -477,20 +474,20 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         grepSearch = paste("*.",dataset,"[.]snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.seg.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
         untar(paste(dataset,"-CNVSNPHg19.tar.gz",sep=""),files=fileList)
-
+        
         file.rename(from=fileList,to=paste(dataset,"-CNVSNPHg19.txt",sep=""))
         file.remove(paste(dataset,"-CNVSNPHg19.tar.gz",sep=""))
         delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
-
+        
         #Get selected type only
         tmpMat = read.delim(paste(dataset,"-CNVSNPHg19.txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                              "numeric","numeric"))
         resultClass@CNVSNP <- tmpMat
       }
     }
-
+    
     #Download CNA DNAseq data
     if(CNA_Seq)
     {
@@ -506,20 +503,20 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         grepSearch = paste("*.",dataset,"[.]cna__.*.__Level_3__segmentation__seg.seg.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
         untar(paste(dataset,"-CNAseq.tar.gz",sep=""),files=fileList)
-
+        
         file.rename(from=fileList,to=paste(dataset,"-CNAseq.txt",sep=""))
         file.remove(paste(dataset,"-CNAseq.tar.gz",sep=""))
         delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
-
+        
         #Get selected type only
         tmpMat = read.delim(paste(dataset,"-CNAseq.txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                              "numeric","numeric"))
         resultClass@CNAseq <- tmpMat
       }
     }
-
+    
     #Download CNA CGH data
     if(CNA_CGH)
     {
@@ -527,7 +524,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
       plinks = xpathSApply(doc, keyWord, xmlValue)
       plinks = plinks[grepl(paste("*.",dataset,"[.]Merge_cna__.*.cgh.*.__Level_3__segmentation__seg.Level_3.*.tar[.]gz$",sep=""),plinks)]
-
+      
       dataLists <- list()
       listCount = 1
       for(i in trim(plinks))
@@ -538,13 +535,13 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         grepSearch = paste("*.",dataset,"[.]cna__.*.__Level_3__segmentation__seg.seg.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
         untar(paste(dataset,"-CNACGH.tar.gz",sep=""),files=fileList)
-
+        
         file.rename(from=fileList,to=paste(dataset,"-CNACGH-",listCount,".txt",sep=""))
         file.remove(paste(dataset,"-CNACGH.tar.gz",sep=""))
         delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
-
+        
         #Get selected type only
         tmpMat = read.delim(paste(dataset,"-CNACGH-",listCount,".txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                          "numeric","numeric"))
@@ -554,7 +551,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       }
       resultClass@CNACGH <- dataLists
     }
-
+    
     #Download methylation
     if(Methylation)
     {
@@ -648,7 +645,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       }
       resultClass@Methylation <- dataLists
     }
-
+    
     #Download mRNA array
     if(mRNA_Array)
     {
@@ -656,17 +653,17 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
       plinks1 = xpathSApply(doc, keyWord, xmlValue)
       plinks1 = plinks1[grepl(paste("*.",dataset,"[.]Merge_transcriptome__agilentg4502a_.*.__Level_3__unc_lowess_normalization_gene_level__data.Level_3.*.tar[.]gz$",sep=""),plinks1)]
-
+      
       keyWord = paste("","Merge_transcriptome__ht_hg_u133a",sep="")
       keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
       plinks2 = xpathSApply(doc, keyWord, xmlValue)
       plinks2 = plinks2[grepl(paste("*.",dataset,"[.]Merge_transcriptome__ht_hg_u133a__.*.__Level_3__gene_rma__data.Level_3.*.tar[.]gz$",sep=""),plinks2)]
-
+      
       keyWord = paste("","Merge_exon__huex_1_0_st_v2",sep="")
       keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
       plinks3 = xpathSApply(doc, keyWord, xmlValue)
       plinks3 = plinks3[grepl(paste("*.",dataset,"[.]Merge_exon__huex_1_0_st_v2__.*.__Level_3__quantile_normalization_gene__data.Level_3.*.tar[.]gz$",sep=""),plinks3)]
-
+      
       plinks = c(plinks1,plinks2,plinks3)
       plinks = unique(plinks[plinks != ""])
       dataLists <- list()
@@ -679,18 +676,18 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         grepSearch = "MANIFEST.txt"
         fileList = fileList[!grepl(grepSearch,fileList)]
         untar(paste(dataset,"-mRNAArray.tar.gz",sep=""),files=fileList)
-
+        
         file.rename(from=fileList,to=paste(dataset,"-mRNAArray-",listCount,".txt",sep=""))
         file.remove(paste(dataset,"-mRNAArray.tar.gz",sep=""))
         delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
-
+        
         #Get selected type only
         tmpCols = read.delim(paste(dataset,"-mRNAArray-",listCount,".txt",sep=""),nrows=1,colClasses="character")
         colOrder <- 2:ncol(tmpCols)
         #colOrder <- colOrder[tmpCols[1,] == "Signal"]
-
+        
         message("mRNA data will be imported! This may take some times!")
         testcon <- file(paste(dataset,"-mRNAArray-",listCount,".txt",sep=""),open="r")
         readsizeof <- 1000
@@ -699,23 +696,23 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           nooflines <- nooflines+linesread )
         close(testcon)
         message(nooflines)
-
+        
         if(nooflines > 50000)
         {
           message(paste(ii,"won't be imported due to high data volume!"))
           break
         }
         message(paste(nooflines,"rows will be imported!"))
-
+        
         tmpMat <- data.frame()
         inputfile<-file(paste(dataset,"-mRNAArray-",listCount,".txt",sep=""),open="r")
         listMat <- list()
         itemcount = 1
-
+        
         N = nooflines
         chunksize<-100
         nchunks<- ceiling(N/100)
-
+        
         for(i in 1:nchunks){
           chunk<-read.delim(inputfile,nrows=chunksize,colClasses="character",header=FALSE)
           if(i == 1)
@@ -728,7 +725,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           }
           if((chunksize*i) < nooflines){message(paste((chunksize*i),"rows have been imported!"))}
           else{message(paste((nooflines),"rows have been imported!"))}
-
+          
           if( ((chunksize*i) %% 1000) ==0 )
           {
             listMat[[itemcount]] <- tmpMat
@@ -736,17 +733,17 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
             itemcount = itemcount + 1
           }
         }
-
+        
         tmpMat2 <- data.frame()
         for(i in 1:length(listMat))
         {
           if(i == 1){tmpMat2 = listMat[[i]]}
           else{tmpMat2 = rbind(tmpMat2,listMat[[i]])}
-          listMat[[i]] <- 0
+          listMat[[i]] <- 0 
         }
         tmpMat <- rbind(tmpMat2,tmpMat)
         rm(tmpMat2)
-
+        
         #close(inputfile)
         closeAllConnections()
         colnames(tmpMat) <- c("Gene_Symbol",tmpMat[1,2:ncol(tmpMat)])
@@ -761,29 +758,29 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         #tmpMat <- cbind(tmpMat[,1],tmpMat2)
         #colnames(tmpMat) <- c("Gene_Symbol",colnames(tmpMat)[2:ncol(tmpMat)])
         #rownames(tmpMat) <- names1
-
+        
         names1 <- tmpMat[,1]
         names2 <- sapply(names1,function(x){unlist(strsplit(x,"\\|"))[1]})
         names1 <- duplicated(names2)
         tmpMat <- tmpMat[!names1,]
         rownames(tmpMat) <- names2[!names1]
-
+        
         tmpMat <- tmpMat[,-1]
         cNames <- colnames(tmpMat)
         rNames <- rownames(tmpMat)
         tmpMat <- apply(tmpMat,2,as.numeric)
         colnames(tmpMat) <- cNames
         rownames(tmpMat) <- rNames
-
-
+        
+        
         tmpReturn <- new("FirehosemRNAArray",Filename=ii,DataMatrix=tmpMat)
         dataLists[[listCount]] <- tmpReturn
         listCount = listCount + 1
       }
       resultClass@mRNAArray <- dataLists
     }
-
-
+    
+    
     #Download miRNA array
     if(miRNA_Array)
     {
@@ -791,7 +788,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
       plinks1 = xpathSApply(doc, keyWord, xmlValue)
       plinks1 = plinks1[grepl(paste("*.",dataset,"[.]Merge_mirna__h_mirna_8x15k.*.data.Level_3.*.tar[.]gz$",sep=""),plinks1)]
-
+      
       plinks = plinks1#c(plinks1,plinks2,plinks3)
       plinks = unique(plinks[plinks != ""])
       dataLists <- list()
@@ -804,18 +801,18 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         grepSearch = "MANIFEST.txt"
         fileList = fileList[!grepl(grepSearch,fileList)]
         untar(paste(dataset,"-miRNAArray.tar.gz",sep=""),files=fileList)
-
+        
         file.rename(from=fileList,to=paste(dataset,"-miRNAArray-",listCount,".txt",sep=""))
         file.remove(paste(dataset,"-miRNAArray.tar.gz",sep=""))
         delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
-
+        
         #Get selected type only
         tmpCols = read.delim(paste(dataset,"-miRNAArray-",listCount,".txt",sep=""),nrows=1,colClasses="character")
         colOrder <- 2:ncol(tmpCols)
         #colOrder <- colOrder[tmpCols[1,] == "Signal"]
-
+        
         message("mRNA data will be imported! This may take some times!")
         testcon <- file(paste(dataset,"-miRNAArray-",listCount,".txt",sep=""),open="r")
         readsizeof <- 1000
@@ -824,23 +821,23 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           nooflines <- nooflines+linesread )
         close(testcon)
         message(nooflines)
-
+        
         if(nooflines > 50000)
         {
           message(paste(ii,"won't be imported due to high data volume!"))
           break
         }
         message(paste(nooflines,"rows will be imported!"))
-
+        
         tmpMat <- data.frame()
         inputfile<-file(paste(dataset,"-miRNAArray-",listCount,".txt",sep=""),open="r")
         listMat <- list()
         itemcount = 1
-
+        
         N = nooflines
         chunksize<-100
         nchunks<- ceiling(N/100)
-
+        
         for(i in 1:nchunks){
           chunk<-read.delim(inputfile,nrows=chunksize,colClasses="character",header=FALSE)
           if(i == 1)
@@ -853,7 +850,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           }
           if((chunksize*i) < nooflines){message(paste((chunksize*i),"rows have been imported!"))}
           else{message(paste((nooflines),"rows have been imported!"))}
-
+          
           if( ((chunksize*i) %% 1000) ==0 )
           {
             listMat[[itemcount]] <- tmpMat
@@ -861,7 +858,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
             itemcount = itemcount + 1
           }
         }
-
+        
         if(nooflines > 1000)
         {
           tmpMat2 <- data.frame()
@@ -869,12 +866,12 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           {
             if(i == 1){tmpMat2 = listMat[[i]]}
             else{tmpMat2 = rbind(tmpMat2,listMat[[i]])}
-            listMat[[i]] <- 0
+            listMat[[i]] <- 0 
           }
           tmpMat <- rbind(tmpMat2,tmpMat)
           rm(tmpMat2)
         }
-
+        
         #close(inputfile)
         closeAllConnections()
         colnames(tmpMat) <- c("miRGene_Symbol",tmpMat[1,2:ncol(tmpMat)])
@@ -889,28 +886,28 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         #tmpMat <- cbind(tmpMat[,1],tmpMat2)
         #colnames(tmpMat) <- c("Gene_Symbol",colnames(tmpMat)[2:ncol(tmpMat)])
         #rownames(tmpMat) <- names1
-
+        
         names1 <- tmpMat[,1]
         names2 <- sapply(names1,function(x){unlist(strsplit(x,"\\|"))[1]})
         names1 <- duplicated(names2)
         tmpMat <- tmpMat[!names1,]
         rownames(tmpMat) <- names2[!names1]
-
+        
         tmpMat <- tmpMat[,-1]
         cNames <- colnames(tmpMat)
         rNames <- rownames(tmpMat)
         tmpMat <- apply(tmpMat,2,as.numeric)
         colnames(tmpMat) <- cNames
         rownames(tmpMat) <- rNames
-
-
+        
+        
         tmpReturn <- new("FirehosemRNAArray",Filename=ii,DataMatrix=tmpMat)
         dataLists[[listCount]] <- tmpReturn
         listCount = listCount + 1
       }
       resultClass@miRNAArray <- dataLists
     }
-
+    
     #Download RPPA array
     if(RPPA)
     {
@@ -918,7 +915,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
       plinks1 = xpathSApply(doc, keyWord, xmlValue)
       plinks1 = plinks1[grepl(paste("*.",dataset,"[.]Merge_protein_exp.*.protein_normalization__data.Level_3.*.tar[.]gz$",sep=""),plinks1)]
-
+      
       plinks = plinks1#c(plinks1,plinks2,plinks3)
       plinks = unique(plinks[plinks != ""])
       dataLists <- list()
@@ -931,18 +928,18 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         grepSearch = "MANIFEST.txt"
         fileList = fileList[!grepl(grepSearch,fileList)]
         untar(paste(dataset,"-RPPAArray.tar.gz",sep=""),files=fileList)
-
+        
         file.rename(from=fileList,to=paste(dataset,"-RPPAArray-",listCount,".txt",sep=""))
         file.remove(paste(dataset,"-RPPAArray.tar.gz",sep=""))
         delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
-
+        
         #Get selected type only
         tmpCols = read.delim(paste(dataset,"-RPPAArray-",listCount,".txt",sep=""),nrows=1,colClasses="character")
         colOrder <- 2:ncol(tmpCols)
         #colOrder <- colOrder[tmpCols[1,] == "Signal"]
-
+        
         message("mRNA data will be imported! This may take some times!")
         testcon <- file(paste(dataset,"-RPPAArray-",listCount,".txt",sep=""),open="r")
         readsizeof <- 1000
@@ -951,23 +948,23 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           nooflines <- nooflines+linesread )
         close(testcon)
         message(nooflines)
-
+        
         if(nooflines > 50000)
         {
           message(paste(ii,"won't be imported due to high data volume!"))
           break
         }
         message(paste(nooflines,"rows will be imported!"))
-
+        
         tmpMat <- data.frame()
         inputfile<-file(paste(dataset,"-RPPAArray-",listCount,".txt",sep=""),open="r")
         listMat <- list()
         itemcount = 1
-
+        
         N = nooflines
         chunksize<-100
         nchunks<- ceiling(N/100)
-
+        
         for(i in 1:nchunks){
           chunk<-read.delim(inputfile,nrows=chunksize,colClasses="character",header=FALSE)
           if(i == 1)
@@ -980,7 +977,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           }
           if((chunksize*i) < nooflines){message(paste((chunksize*i),"rows have been imported!"))}
           else{message(paste((nooflines),"rows have been imported!"))}
-
+          
           if( ((chunksize*i) %% 1000) ==0 )
           {
             listMat[[itemcount]] <- tmpMat
@@ -988,7 +985,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
             itemcount = itemcount + 1
           }
         }
-
+        
         if(nooflines > 1000)
         {
           tmpMat2 <- data.frame()
@@ -996,12 +993,12 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           {
             if(i == 1){tmpMat2 = listMat[[i]]}
             else{tmpMat2 = rbind(tmpMat2,listMat[[i]])}
-            listMat[[i]] <- 0
+            listMat[[i]] <- 0 
           }
           tmpMat <- rbind(tmpMat2,tmpMat)
           rm(tmpMat2)
         }
-
+        
         #close(inputfile)
         closeAllConnections()
         colnames(tmpMat) <- c("Protein_Symbol",tmpMat[1,2:ncol(tmpMat)])
@@ -1016,29 +1013,29 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         #tmpMat <- cbind(tmpMat[,1],tmpMat2)
         #colnames(tmpMat) <- c("Gene_Symbol",colnames(tmpMat)[2:ncol(tmpMat)])
         #rownames(tmpMat) <- names1
-
+        
         names1 <- tmpMat[,1]
         names2 <- sapply(names1,function(x){unlist(strsplit(x,"\\|"))[1]})
         names1 <- duplicated(names2)
         tmpMat <- tmpMat[!names1,]
         rownames(tmpMat) <- names2[!names1]
-
+        
         tmpMat <- tmpMat[,-1]
         cNames <- colnames(tmpMat)
         rNames <- rownames(tmpMat)
         tmpMat <- apply(tmpMat,2,as.numeric)
         colnames(tmpMat) <- cNames
         rownames(tmpMat) <- rNames
-
-
+        
+        
         tmpReturn <- new("FirehosemRNAArray",Filename=ii,DataMatrix=tmpMat)
         dataLists[[listCount]] <- tmpReturn
         listCount = listCount + 1
       }
       resultClass@RPPAArray <- dataLists
     }
-
-
+    
+    
     #Download RPPA array
     if(Mutation)
     {
@@ -1046,7 +1043,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
       plinks1 = xpathSApply(doc, keyWord, xmlValue)
       plinks1 = plinks1[grepl(paste("*.",dataset,"[.]Mutation_Packager_Calls[.]Level_3[.].*.tar[.]gz$",sep=""),plinks1)]
-
+      
       plinks = plinks1#c(plinks1,plinks2,plinks3)
       plinks = unique(plinks[plinks != ""])
       dataLists <- list()
@@ -1058,7 +1055,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         fileList <- untar(paste(dataset,"-Mutation.tar.gz",sep=""),list=TRUE)
         grepSearch = "MANIFEST.txt"
         fileList = fileList[!grepl(grepSearch,fileList)]
-
+        
         ###
         untar(paste(dataset,"-Mutation.tar.gz",sep=""),files=fileList)
         retMutations <- do.call("rbind",lapply(fileList,FUN=function(files){
@@ -1068,7 +1065,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         unlink(delFodler, recursive = TRUE)
         file.remove(paste(dataset,"-Mutation.tar.gz",sep=""))
         ###
-
+        
         #myMutFiles <- list()
         #countPos=1
         #for(myFiles in fileList)
@@ -1077,7 +1074,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         #  tmpCols = read.delim(myFiles,header=TRUE,colClasses="character")
         #  myMutFiles[[countPos]] <- tmpCols
         #  countPos = countPos + 1
-        #
+        #  
         #  delFodler <- paste(getwd(),"/",strsplit(myFiles,"/")[[1]][1],sep="")
         #  unlink(delFodler, recursive = TRUE)
         #}
@@ -1091,20 +1088,20 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         #  {
         #    retMutations = rbind(retMutations,myMutFiles[[i]])
         #  }
-        #
+        #  
         #}
-
+        
         write.table(retMutations,file=paste(dataset,"-Mutations-AllSamples.txt",sep=""),sep="\t",row.names=F,quote=F)
         resultClass@Mutations <- retMutations
       }
-
+      
     }
-
-
-
-
+    
+    
+    
+    
   }
-
+  
   if(!is.null(gistic2_Date))
   {
     ##build URL for getting file links
@@ -1112,47 +1109,47 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     fh_url <- paste(fh_url,substr(gistic2_Date,1,4),"_",substr(gistic2_Date,5,6),"_",substr(gistic2_Date,7,8),"/data/",sep="")
     fh_url <- paste(fh_url,dataset,"/",gistic2_Date,"/",sep="")
     doc = htmlTreeParse(fh_url, useInternalNodes = T)
-
+    
     keyWord = paste("","CopyNumber_Gistic2.Level_4",sep="")
     keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
     plinks = xpathSApply(doc, keyWord, xmlValue)
     plinks = plinks[grepl(paste("*.",dataset,"-TP[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$",sep=""),plinks)]
-
+    
     for(ii in trim(plinks))
     {
       download_link = paste(fh_url,ii,sep="")
       download.file(url=download_link,destfile=paste(dataset,"-Gistic2.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-
+      
       fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
       grepSearch = "all_data_by_genes.txt"
       fileList = fileList[grepl(grepSearch,fileList)]
       untar(paste(dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
       tmpCNAll = read.delim(fileList,header=TRUE,colClasses="character")
       file.rename(from=fileList,to=paste(dataset,"-all_data_by_genes.txt",sep=""))
-
+      
       fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
       grepSearch = "all_thresholded.by_genes.txt"
       fileList = fileList[grepl(grepSearch,fileList)]
       untar(paste(dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
       tmpCNThreshhold = read.delim(fileList,header=TRUE,colClasses="character")
       file.rename(from=fileList,to=paste(dataset,"-all_thresholded.by_genes.txt",sep=""))
-
-
+      
+      
       delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
       unlink(delFodler, recursive = TRUE)
-
-
+      
+      
       tmpReturn <- new("FirehoseGISTIC",Dataset=dataset,AllByGene=data.frame(tmpCNAll),
                        ThresholedByGene=data.frame(tmpCNThreshhold))
       resultClass@GISTIC <- tmpReturn
-
+      
     }
   }
-
-
+  
+  
   return(resultClass)
 
-
+  
 }
 #####
 
@@ -1220,26 +1217,26 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
 {
   if(is.null(dataObject) | class(dataObject) != "FirehoseData")
   {stop("Please set a valid object! dataObject must be set as FirehoseData class!")}
-
+  
   validMatrix <- character()
   #check expression data matrices
   if(dim(dataObject@RNASeqGene)[1] > 0 & dim(dataObject@RNASeqGene)[2] > 0){validMatrix <- append(validMatrix,"RNASeq")}
   if(dim(dataObject@RNASeq2GeneNorm)[1] > 0 & dim(dataObject@RNASeq2GeneNorm)[2] > 0){validMatrix <- append(validMatrix,"RNASeq2")}
   if(length(dataObject@mRNAArray) > 0){validMatrix <- append(validMatrix,"mRNAArray")}
-
+  
   if(length(validMatrix) == 0){stop("There is no valid expression data in the object!")}
-
+  
   if(class(DrawPlots) != "logical" | is.null(DrawPlots)){stop("DrawPlots must be logical!")}
-
+  
   if(is.null(adj.method) | is.na(adj.method) | (adj.method %in% c("BH","BY","holm","none"))){adj.method="BH"}
   if(is.null(adj.pval) | is.na(adj.pval) | length(adj.pval) > 1 | adj.pval > 1 | adj.pval < 0){adj.pval=0.05}
   if(is.null(raw.pval) | is.na(raw.pval) | length(raw.pval) > 1 | raw.pval > 1 | raw.pval < 0){raw.pval=0.05}
   if(is.null(logFC) | is.na(logFC) | length(logFC) > 1 | logFC < 0 ){logFC=2}
   if(is.null(hmTopUpN) | is.na(hmTopUpN) | length(hmTopUpN) > 1 | hmTopUpN < 0){hmTopUpN=100}
   if(is.null(hmTopDownN) | is.na(hmTopDownN) | length(hmTopDownN) > 1 | hmTopDownN < 0){hmTopDownN=100}
-
+  
   listResults <- list()
-
+  
   is.wholenumber <-
     function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
   for(i in validMatrix)
@@ -1263,7 +1260,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
         sampleIDs1 <- as.numeric(sampleIDs1)
         normalSamples <- rownames(samplesDat)[sampleIDs1 < 20 & sampleIDs1 > 9]
         tumorSamples <- rownames(samplesDat)[sampleIDs1 < 10]
-
+        
         analysisGo <- TRUE
         if(is.null(normalSamples) | length(normalSamples) < 1)
         {
@@ -1275,7 +1272,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
           warning("RNASeq data: There is no sample in the tumor group!")
           analysisGo <- FALSE
         }
-
+        
         if(analysisGo)
         {
           meanCounts <- apply(dataObject@RNASeqGene,1,mean)
@@ -1292,7 +1289,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
           aradeger <- aradeger[aradeger[,1] > logFC | aradeger[,1] < (-1*logFC),]
           tmpReturn <- new("DGEResult",Dataset="RNASeq",Toptable=data.frame(aradeger))
           listResults <- c(listResults,tmpReturn)
-
+          
           if(DrawPlots)
           {
             volcanoplot(fit2,names=fit2$genes$ID,xlab="Log Fold Change",ylab="Log Odds",pch=16,cex=0.35)
@@ -1323,7 +1320,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
         }
       }
     }
-
+    
     if(i == "RNASeq2")
     {
       chkTmp <- as.numeric(dataObject@RNASeq2GeneNorm[1,])
@@ -1343,7 +1340,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
         sampleIDs1 <- as.numeric(sampleIDs1)
         normalSamples <- rownames(samplesDat)[sampleIDs1 < 20 & sampleIDs1 > 9]
         tumorSamples <- rownames(samplesDat)[sampleIDs1 < 10]
-
+        
         analysisGo <- TRUE
         if(is.null(normalSamples) | length(normalSamples) < 1)
         {
@@ -1355,7 +1352,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
           warning("RNASeq2 data: There is no sample in the tumor group!")
           analysisGo <- FALSE
         }
-
+        
         if(analysisGo)
         {
           meanCounts <- apply(dataObject@RNASeq2GeneNorm,1,mean)
@@ -1372,7 +1369,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
           aradeger <- aradeger[aradeger[,1] > logFC | aradeger[,1] < (-1*logFC),]
           tmpReturn <- new("DGEResult",Dataset="RNASeq2",Toptable=data.frame(aradeger))
           listResults <- c(listResults,tmpReturn)
-
+          
           if(DrawPlots)
           {
             volcanoplot(fit2,names=fit2$genes$ID,xlab="Log Fold Change",ylab="Log Odds",pch=16,cex=0.35)
@@ -1403,7 +1400,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
         }
       }
     }
-
+    
     if(i == "mRNAArray")
     {
       for(j in 1:length(dataObject@mRNAArray))
@@ -1414,7 +1411,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
         #geneMat <- tmpObj@DataMatrix[tmpObj@DataMatrix[,1] %in% genes,]
         #rownames(geneMat) <- geneMat[,1]
         geneMat <- tmpObj@DataMatrix#geneMat[,2:ncol(geneMat)]
-
+        
         sampleIDs <- colnames(geneMat)#[]
         samplesDat <- data.frame(matrix(nrow=length(sampleIDs),ncol=7))
         rownames(samplesDat) <- sampleIDs
@@ -1430,7 +1427,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
             tmpRow <- unlist(strsplit(sampleIDs[j],split="-"))
             samplesDat[sampleIDs[j],] <- tmpRow
           }
-
+          
         }
         sampleIDs1 <- as.character(samplesDat[,4])
         sampleIDs1 <- substr(sampleIDs1,1,nchar(sampleIDs1)-1)
@@ -1439,7 +1436,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
         tumorSamples <- rownames(samplesDat)[sampleIDs1 < 10]
         #print(normalSamples[1:10])
         #print(tumorSamples[1:10])
-
+        
         analysisGo <- TRUE
         if(is.null(normalSamples) | length(normalSamples) < 1)
         {
@@ -1455,7 +1452,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
           warning("mRNA array data: There is no sample in the tumor group!")
           analysisGo <- FALSE
         }
-
+        
         if(analysisGo)
         {
           geneMat <- geneMat[,c(normalSamples,tumorSamples)]
@@ -1475,7 +1472,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
           aradeger <- aradeger[aradeger[,1] > logFC | aradeger[,1] < (-1*logFC),]
           tmpReturn <- new("DGEResult",Dataset=tmpObj@Filename,Toptable=data.frame(aradeger))
           listResults <- c(listResults,tmpReturn)
-
+          
           if(DrawPlots)
           {
             volcanoplot(fit2,names=fit2$genes$ID,xlab="Log Fold Change",ylab="Log Odds",pch=16,cex=0.35)
@@ -1515,41 +1512,41 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
             }
           }
         }
-
+        
       }
     }
-
-
+    
+    
   }
-
-
-
+  
+  
+  
   return(listResults)
-
+  
 }
 
 getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval=0.05)
 {
   if(is.null(dataObject) | class(dataObject) != "FirehoseData")
   {stop("Please set a valid object! dataObject must be set as FirehoseData class! ")}
-
+  
   validMatrix <- character()
   #check expression data matrices
   if(length(dataObject@mRNAArray) > 0){validMatrix <- append(validMatrix,"mRNAArray")}
   if(dim(dataObject@RNASeqGene)[1] > 0 & dim(dataObject@RNASeqGene)[2] > 0){validMatrix <- append(validMatrix,"RNASeq")}
   if(dim(dataObject@RNASeq2GeneNorm)[1] > 0 & dim(dataObject@RNASeq2GeneNorm)[2] > 0){validMatrix <- append(validMatrix,"RNASeq2")}
-
+  
   if(is.null(adj.method) | is.na(adj.method) | (adj.method %in% c("BH","BY","holm","none"))){adj.method="BH"}
   if(is.null(adj.pval) | is.na(adj.pval) | length(adj.pval) > 1 | adj.pval > 1 | adj.pval < 0){adj.pval=0.05}
   if(is.null(raw.pval) | is.na(raw.pval) | length(raw.pval) > 1 | raw.pval > 1 | raw.pval < 0){raw.pval=0.05}
-
-
+  
+  
   if(length(validMatrix) == 0){stop("There is no valid expression data in the object!")}
-
+  
   if(dim(dataObject@GISTIC@AllByGene)[1] == 0 | dim(dataObject@GISTIC@AllByGene)[2] == 0 ){stop("There is no GISTIC data!")}
-
+  
   listResults <- list()
-
+  
   is.wholenumber <-
     function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
   for(i in validMatrix)
@@ -1557,7 +1554,7 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
     if(i == "RNASeq")
     {
       chkTmp <- as.numeric(dataObject@RNASeqGene[1,])
-
+      
       controlVal=FALSE
       if(all(is.wholenumber(chkTmp)) == TRUE)
       {
@@ -1570,7 +1567,7 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
         sampleIDs2 <- colnames(dataObject@GISTIC@AllByGene)
         sampleIDs1 <- gsub(pattern="\\.",replacement="-",sampleIDs1)
         sampleIDs2 <- gsub(pattern="\\.",replacement="-",sampleIDs2)
-
+        
         samplesDat <- data.frame(matrix(nrow=length(sampleIDs1),ncol=7))
         rownames(samplesDat) <- sampleIDs1
         for(j in 1:length(sampleIDs1))
@@ -1583,7 +1580,7 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
         sampleIDs1 <- as.numeric(sampleIDs1)
         samplesDat[,4] <- sampleIDs1
         sampleIDs1 <- paste(samplesDat[,1],samplesDat[,2],samplesDat[,3],samplesDat[,4],sep="-")
-
+        
         sampleIDs2 <- sampleIDs2[4:length(sampleIDs2)]
         samplesDat <- data.frame(matrix(nrow=length(sampleIDs2),ncol=7))
         rownames(samplesDat) <- sampleIDs2
@@ -1597,7 +1594,7 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
         sampleIDs2 <- as.numeric(sampleIDs2)
         samplesDat[,4] <- sampleIDs2
         sampleIDs2 <- paste(samplesDat[,1],samplesDat[,2],samplesDat[,3],samplesDat[,4],sep="-")
-
+        
         tmpMat1 <- dataObject@RNASeqGene
         colnames(tmpMat1) <- sampleIDs1
         cnGenes <- dataObject@GISTIC@AllByGene[,1]
@@ -1607,13 +1604,13 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
         tmpMat2 <- tmpMat2[,4:ncol(tmpMat2)]
         colnames(tmpMat2) <- sampleIDs2
         commonSamples <- intersect(sampleIDs1,sampleIDs2)
-
+        
         if(controlVal){tmpMat1=voom(tmpMat1)$E}
-
-
+        
+        
         if(length(commonSamples) > 5)
         {
-
+          
           tmpMat1 <- tmpMat1[,commonSamples]
           tmpMat2 <- tmpMat2[,commonSamples]
           #rnaseqGenes <- rownames(tmpMat1)
@@ -1622,15 +1619,15 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
           #{
           #  rnaseqGenes2 <- append(rnaseqGenes2,as.character(strsplit(rg,"\\|")[[1]][1]))
           #}
-
+          
           #rnaFrame <- data.frame(rnaseqGenes,rnaseqGenes2)
           #rnaFrame <- rnaFrame[!duplicated(rnaFrame[,2]),]
           #rnaseqGenes2 <- rnaFrame[,2]
           #names(rnaseqGenes2) <- rnaFrame[,1]
-
+          
           #tmpMat1 <- tmpMat1[names(rnaseqGenes2),]
           #rownames(tmpMat1) <- rnaseqGenes2
-
+          
           commonGenes <- intersect(rownames(tmpMat2),rownames(tmpMat1))
           tmpMat2 <- tmpMat2[commonGenes,]
           #message(dim(tmpMat2))
@@ -1639,7 +1636,7 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
           #meanVal <- apply(tmpMat1,1,mean)
           #tmpMat1 <- tmpMat1[meanVal > summary(meanVal)[3],]
           #tmpMat2 <- tmpMat2[rownames(tmpMat1),]
-
+          
           retMat <- data.frame(matrix(ncol=4,nrow=nrow(tmpMat1)))
           retMat[,1] <- as.character()
           rnaseqGenes2 <- rownames(tmpMat1)
@@ -1660,9 +1657,9 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
           retMat <- retMat[retMat[,3] < adj.pval & retMat[,4] < raw.pval,]
           tmpReturn <- new("CorResult",Dataset="RNASeq",Correlations=retMat)
           listResults <- c(listResults,tmpReturn)
-
+          
         }
-
+        
       }
     }
     else if(i == "mRNAArray")
@@ -1673,7 +1670,7 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
         sampleIDs2 <- colnames(dataObject@GISTIC@AllByGene)
         sampleIDs1 <- gsub(pattern="\\.",replacement="-",sampleIDs1)
         sampleIDs2 <- gsub(pattern="\\.",replacement="-",sampleIDs2)
-
+        
         sampleIDs1 <- sampleIDs1[1:length(sampleIDs1)]
         samplesDat <- data.frame(matrix(nrow=length(sampleIDs1),ncol=7))
         rownames(samplesDat) <- sampleIDs1
@@ -1687,7 +1684,7 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
         sampleIDs1 <- as.numeric(sampleIDs1)
         samplesDat[,4] <- sampleIDs1
         sampleIDs1 <- paste(samplesDat[,1],samplesDat[,2],samplesDat[,3],samplesDat[,4],sep="-")
-
+        
         sampleIDs2 <- sampleIDs2[4:length(sampleIDs2)]
         samplesDat <- data.frame(matrix(nrow=length(sampleIDs2),ncol=7))
         rownames(samplesDat) <- sampleIDs2
@@ -1701,11 +1698,11 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
         sampleIDs2 <- as.numeric(sampleIDs2)
         samplesDat[,4] <- sampleIDs2
         sampleIDs2 <- paste(samplesDat[,1],samplesDat[,2],samplesDat[,3],samplesDat[,4],sep="-")
-
+        
         commonSamples <- intersect(sampleIDs1,sampleIDs2)
         #commonGenes <- intersect(dataObject@mRNAArray[[jj]]@DataMatrix[,1],dataObject@GISTIC@AllByGene[,1])
         commonGenes <- intersect(rownames(dataObject@mRNAArray[[jj]]@DataMatrix),dataObject@GISTIC@AllByGene[,1])
-
+        
         if(length(commonSamples) > 5)
         {
           tmpMat1 <- dataObject@mRNAArray[[jj]]@DataMatrix
@@ -1713,13 +1710,13 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
           #tmpMat1 <- tmpMat1[,2:ncol(tmpMat1)]
           colnames(tmpMat1) <- sampleIDs1
           tmpMat1 <- tmpMat1[commonGenes,commonSamples]
-
+          
           tmpMat2 <- dataObject@GISTIC@AllByGene
           rownames(tmpMat2) <- tmpMat2[,1]
           tmpMat2 <- tmpMat2[,4:ncol(tmpMat2)]
           colnames(tmpMat2) <- sampleIDs2
           tmpMat2 <- tmpMat2[commonGenes,commonSamples]
-
+          
           retMat <- data.frame(matrix(ncol=4,nrow=nrow(tmpMat1)))
           retMat[,1] <- as.character()
           rnaseqGenes2 <- rownames(tmpMat2)
@@ -1740,10 +1737,10 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
           retMat <- retMat[retMat[,3] < adj.pval & retMat[,4] < raw.pval,]
           tmpReturn <- new("CorResult",Dataset=dataObject@mRNAArray[[jj]]@Filename,Correlations=retMat)
           listResults <- c(listResults,tmpReturn)
-
+          
         }
-
-
+        
+        
       }
     }
   }
@@ -1754,19 +1751,19 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
 {
   if(is.null(dataObject) | class(dataObject) != "FirehoseData")
   {stop("Please set a valid object! dataObject must be set as FirehoseData class!")}
-
+  
   validMatrix <- character()
   #check expression data matrices
   if(dim(dataObject@RNASeqGene)[1] > 0 & dim(dataObject@RNASeqGene)[2] > 0){validMatrix <- append(validMatrix,"RNASeq")}
   if(dim(dataObject@RNASeq2GeneNorm)[1] > 0 & dim(dataObject@RNASeq2GeneNorm)[2] > 0){validMatrix <- append(validMatrix,"RNASeq2")}
   if(length(dataObject@mRNAArray) > 0){validMatrix <- append(validMatrix,"mRNAArray")}
-
+  
   if(length(validMatrix) == 0){stop("There is no valid expression data in the object!")}
-
+  
   if(class(numberofGroups)!="numeric"){stop("numberofGroups must be numeric!")}
   if(as.integer(numberofGroups) < 2 | as.integer(numberofGroups) > 3){stop("numberofGroups must be 2 or 3!")}
-
-
+  
+  
   stcs <- as.character(sampleTimeCensor[,1])
   stcs <- gsub(pattern="\\.",replacement="-",stcs)
   stcs <- toupper(stcs)
@@ -1779,11 +1776,11 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
   }
   stcs <- paste(samplesDat[,1],samplesDat[,2],samplesDat[,3],sep="-")
   rownames(sampleTimeCensor) <- stcs
-
+  
   is.wholenumber <-
     function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
   for(i in validMatrix)
-  {
+  {    
     if(i == "RNASeq")
     {
       chkTmp <- as.numeric(dataObject@RNASeqGene[1,])
@@ -1795,7 +1792,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
       }
       #else
       #{
-
+        
         tmpMat1 <- dataObject@RNASeqGene
         #rnaseqGenes <- rownames(tmpMat1)
         #rnaseqGenes2 <- character()
@@ -1803,18 +1800,18 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
         #{
         #  rnaseqGenes2 <- append(rnaseqGenes2,as.character(strsplit(rg,"\\|")[[1]][1]))
         #}
-
+        
         #rnaFrame <- data.frame(rnaseqGenes,rnaseqGenes2)
         #rnaFrame <- rnaFrame[!duplicated(rnaFrame[,2]),]
         #rnaseqGenes2 <- rnaFrame[,2]
         #names(rnaseqGenes2) <- rnaFrame[,1]
-
+        
         #tmpMat1 <- tmpMat1[names(rnaseqGenes2),]
         #rownames(tmpMat1) <- rnaseqGenes2
-
+        
         sampleIDs1 <- colnames(tmpMat1)
         sampleIDs1 <- gsub(pattern="\\.",replacement="-",sampleIDs1)
-
+        
         samplesDat <- data.frame(matrix(nrow=length(sampleIDs1),ncol=7))
         rownames(samplesDat) <- sampleIDs1
         for(j in 1:length(sampleIDs1))
@@ -1831,9 +1828,9 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
         colnames(tmpMat1) <- sampleIDs1
         tmpMat1 <- tmpMat1[,!duplicated(sampleIDs11)]
         colnames(tmpMat1) <- sampleIDs11[!duplicated(sampleIDs11)]
-
+        
         if(controlVal){tmpMat1=voom(tmpMat1)$E}
-
+        
         for(myG in geneSymbols)
         {
           if(!is.na(any(match(rownames(tmpMat1),myG))) & any(match(rownames(tmpMat1),myG)))
@@ -1875,13 +1872,13 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
                 legend("topright", legend=legTxt, col=c(2,3,4,0), lty=c(1,1),cex=0.7)
               }
             }
-
+            
           }
-
+          
         }
       #}
     }
-
+    
     if(i == "RNASeq2")
     {
       chkTmp <- as.numeric(dataObject@RNASeq2GeneNorm[1,])
@@ -1893,7 +1890,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
       }
       #else
       #{
-
+      
       tmpMat1 <- dataObject@RNASeq2GeneNorm
       #rnaseqGenes <- rownames(tmpMat1)
       #rnaseqGenes2 <- character()
@@ -1901,18 +1898,18 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
       #{
       #  rnaseqGenes2 <- append(rnaseqGenes2,as.character(strsplit(rg,"\\|")[[1]][1]))
       #}
-
+      
       #rnaFrame <- data.frame(rnaseqGenes,rnaseqGenes2)
       #rnaFrame <- rnaFrame[!duplicated(rnaFrame[,2]),]
       #rnaseqGenes2 <- rnaFrame[,2]
       #names(rnaseqGenes2) <- rnaFrame[,1]
-
+      
       #tmpMat1 <- tmpMat1[names(rnaseqGenes2),]
       #rownames(tmpMat1) <- rnaseqGenes2
-
+      
       sampleIDs1 <- colnames(tmpMat1)
       sampleIDs1 <- gsub(pattern="\\.",replacement="-",sampleIDs1)
-
+      
       samplesDat <- data.frame(matrix(nrow=length(sampleIDs1),ncol=7))
       rownames(samplesDat) <- sampleIDs1
       for(j in 1:length(sampleIDs1))
@@ -1929,9 +1926,9 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
       colnames(tmpMat1) <- sampleIDs1
       tmpMat1 <- tmpMat1[,!duplicated(sampleIDs11)]
       colnames(tmpMat1) <- sampleIDs11[!duplicated(sampleIDs11)]
-
+      
       if(controlVal){tmpMat1=voom(tmpMat1)$E}
-
+      
       for(myG in geneSymbols)
       {
         if(!is.na(any(match(rownames(tmpMat1),myG))) & any(match(rownames(tmpMat1),myG)))
@@ -1973,14 +1970,14 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
               legend("topright", legend=legTxt, col=c(2,3,4,0), lty=c(1,1),cex=0.7)
             }
           }
-
+          
         }
-
+        
       }
       #}
     }
-
-
+    
+    
     if(i == "mRNAArray")
     {
       for(jj in 1:length(dataObject@mRNAArray))
@@ -1988,10 +1985,10 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
         tmpMat1 <- dataObject@mRNAArray[[jj]]@DataMatrix
         #rownames(tmpMat1) <- tmpMat1[,1]
         #tmpMat1 <- tmpMat1[,2:ncol(tmpMat1)]
-
+        
         sampleIDs1 <- colnames(tmpMat1)
         sampleIDs1 <- gsub(pattern="\\.",replacement="-",sampleIDs1)
-
+        
         samplesDat <- data.frame(matrix(nrow=length(sampleIDs1),ncol=7))
         rownames(samplesDat) <- sampleIDs1
         for(j in 1:length(sampleIDs1))
@@ -2008,7 +2005,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
         colnames(tmpMat1) <- sampleIDs1
         tmpMat1 <- tmpMat1[,!duplicated(sampleIDs11)]
         colnames(tmpMat1) <- sampleIDs11[!duplicated(sampleIDs11)]
-
+        
         for(myG in geneSymbols)
         {
           if(!is.na(any(match(rownames(tmpMat1),myG))) & any(match(rownames(tmpMat1),myG)))
@@ -2056,29 +2053,29 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
                 legend("topright", legend=legTxt, col=c(2,3,4,0), lty=c(1,1),cex=0.7)
               }
             }
-
+            
           }
-
+          
         }
-
+        
       }
     }
   }
-
+  
 }
 
 getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
 {
 
-
+  
   if(is.null(dataObject) | class(dataObject) != "FirehoseData")
   {stop("Please set a valid object! dataObject must be set as FirehoseData class!")}
-
-
+  
+  
   if(!is.null(DGEResult1) & class(DGEResult1) != "DGEResult"){stop("DGEResult1 must be DGEResult class!")}
   if(!is.null(DGEResult2) & class(DGEResult2) != "DGEResult"){stop("DGEResult2 must be DGEResult class!")}
 
-
+  
   pdf(file=paste(dataObject@Dataset,"-reportImage.pdf",sep=""),height=30,width=30)
   plotpos = 1;
   require("RCircos")
@@ -2095,8 +2092,8 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
   RCircos.Reset.Plot.Parameters(params)
   RCircos.Set.Plot.Area();
   RCircos.Chromosome.Ideogram.Plot();
-
-
+  
+  
   if(!is.null(DGEResult1))
   {
     #if(DGEResult1@Dataset=="RNASeq" | DGEResult1@Dataset=="RNASeq2")
@@ -2107,7 +2104,7 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
       {
         rnaseqGenes2 <- append(rnaseqGenes2,as.character(strsplit(rg,"\\|")[[1]][1]))
       }
-
+      
       rnaFrame <- data.frame(rnaseqGenes,rnaseqGenes2)
       rnaFrame <- rnaFrame[!duplicated(rnaFrame[,2]),]
       rownames(rnaFrame) <- rnaFrame[,2]
@@ -2123,7 +2120,7 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
       }
     #}
   }
-
+  
   if(!is.null(DGEResult2))
   {
     #if(DGEResult1@Dataset=="RNASeq" | DGEResult1@Dataset=="RNASeq2")
@@ -2134,7 +2131,7 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
     {
       rnaseqGenes2 <- append(rnaseqGenes2,as.character(strsplit(rg,"\\|")[[1]][1]))
     }
-
+    
     rnaFrame <- data.frame(rnaseqGenes,rnaseqGenes2)
     rnaFrame <- rnaFrame[!duplicated(rnaFrame[,2]),]
     rownames(rnaFrame) <- rnaFrame[,2]
@@ -2150,7 +2147,7 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
     }
     #}
   }
-
+  
   if(!is.null(dataObject@GISTIC) & class(dataObject@GISTIC)=="FirehoseGISTIC")
   {
     cnMat <- dataObject@GISTIC@ThresholedByGene
@@ -2171,7 +2168,7 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
       plotpos = plotpos + 1
     }
   }
-
+  
   if(!is.null(dataObject@Mutations) & dim(dataObject@Mutations)[1] > 0 & dim(dataObject@Mutations)[2] > 0)
   {
     mutAll <- dataObject@Mutations
@@ -2197,11 +2194,11 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
       message(paste("Outside track mutations!"))
     }
   }
-
-
-
+  
+  
+  
   dev.off()
-
+  
 }
 
 getMutationRate <- function(dataObject)
