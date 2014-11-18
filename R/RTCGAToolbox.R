@@ -81,7 +81,10 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
-        resultClass@Clinical <- read.delim(paste(dataset,"-Clinical.txt",sep=""),colClasses="character")
+        raw.clin <- read.delim(paste(dataset,"-Clinical.txt",sep=""),colClasses="character")
+        df.clin <- data.frame(do.call(rbind, raw.clin[, -1]))
+        colnames(df.clin) <- raw.clin[, 1]
+        resultClass@Clinical <- df.clin
         gc()
       }
     }
