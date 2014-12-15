@@ -126,7 +126,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         close(testcon)
         message(nooflines)
         
-        message(paste(nooflines,"genes data will be imported!"))
+        message(paste(nooflines,"genes will be imported!"))
         
         tmpMat <- data.frame()
         inputfile<-file(paste(dataset,"-RNAseqGene.txt",sep=""),open="r")
@@ -147,8 +147,8 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           {
             tmpMat <- rbind(tmpMat,chunk[,c(1,colOrder)])
           }
-          if((chunksize*i) < nooflines){message(paste((chunksize*i),"genes data has been imported!"))}
-          else{message(paste((nooflines),"genes data has been imported!"))}
+          if((chunksize*i) < nooflines){message(paste((chunksize*i),"genes have been imported!"))}
+          else{message(paste((nooflines),"genes have been imported!"))}
           
           if( ((chunksize*i) %% 1000) ==0 )
           {
@@ -235,7 +235,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         close(testcon)
         message(nooflines)
         
-        message(paste(nooflines,"genes data will be imported!"))
+        message(paste(nooflines,"genes will be imported!"))
         
         tmpMat <- data.frame()
         inputfile<-file(paste(dataset,"-RNAseq2GeneNorm.txt",sep=""),open="r")
@@ -256,8 +256,8 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           {
             tmpMat <- rbind(tmpMat,chunk[,c(1,colOrder)])
           }
-          if((chunksize*i) < nooflines){message(paste((chunksize*i),"genes data has been imported!"))}
-          else{message(paste((nooflines),"genes data has been imported!"))}
+          if((chunksize*i) < nooflines){message(paste((chunksize*i),"genes have been imported!"))}
+          else{message(paste((nooflines),"genes have been imported!"))}
           
           if( ((chunksize*i) %% 1000) ==0 )
           {
@@ -353,7 +353,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         close(testcon)
         message(nooflines)
         
-        message(paste(nooflines,"genes data will be imported!"))
+        message(paste(nooflines,"genes will be imported!"))
         
         tmpMat <- data.frame()
         inputfile<-file(paste(dataset,"-miRNAseqGene.txt",sep=""),open="r")
@@ -374,10 +374,10 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           {
             tmpMat <- rbind(tmpMat,chunk[,c(1,colOrder)])
           }
-          if((chunksize*i) < nooflines){message(paste((chunksize*i),"genes data has been imported!"))}
-          else{message(paste((nooflines),"genes data has been imported!"))}
+          if((chunksize*i) < nooflines){message(paste((chunksize*i),"genes have been imported!"))}
+          else{message(paste((nooflines),"genes have been imported!"))}
           
-          if( ((chunksize*i) %% 1000) ==0 )
+          if( ((chunksize*i) %% 100) ==0 )
           {
             listMat[[itemcount]] <- tmpMat
             tmpMat <- data.frame()
