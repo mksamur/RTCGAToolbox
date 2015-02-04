@@ -6,7 +6,7 @@ Firehose project data client
 %%  ~~function to do ... ~~
 }
 \description{
-This function will download data from Firehose project portal for further steps. Downloaded data will be store in "FirehoseData" object and also text files will be stored in working directory.
+This function will download data from Firehose project portal for further steps. Downloaded data will be stored as a "FirehoseData" object and text files will be stored in working directory by default.
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
@@ -15,7 +15,7 @@ RNAseq_Gene = FALSE, Clinic = TRUE, miRNASeq_Gene = FALSE,
 RNAseq2_Gene_Norm = FALSE, CNA_SNP = FALSE, CNV_SNP = FALSE, 
 CNA_Seq = FALSE,CNA_CGH = FALSE, Methylation = FALSE, 
 Mutation = FALSE, mRNA_Array = FALSE,miRNA_Array = FALSE, 
-RPPA = FALSE,RNAseqNorm = "raw_counts", RNAseq2Norm = "normalized_count")
+RPPA = FALSE,RNAseqNorm = "raw_counts", RNAseq2Norm = "normalized_count", todir = NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -72,6 +72,9 @@ RPPA = FALSE,RNAseqNorm = "raw_counts", RNAseq2Norm = "normalized_count")
 }
   \item{RNAseq2Norm}{: RNAseq2 data type normalization. Default: "normalized_count". This method uses different algorithms to determine the gene expression levels. Users can set "RPKM" depends on further analysis.
 %%     ~~Describe \code{RNAseq2Norm} here~~
+}
+  \item{todir}{: The directory to download files to. It will be created if necessary. The default is to use the current working directory.  
+%%     ~~Describe \code{todir} here~~
 }
 }
 \value{

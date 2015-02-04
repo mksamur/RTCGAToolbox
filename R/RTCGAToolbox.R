@@ -19,7 +19,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                             miRNASeq_Gene=FALSE, RNAseq2_Gene_Norm=FALSE,
                             CNA_SNP=FALSE,CNV_SNP=FALSE,
                             CNA_Seq=FALSE,CNA_CGH=FALSE,Methylation=FALSE,Mutation=FALSE,mRNA_Array=FALSE,
-                            miRNA_Array=FALSE,RPPA=FALSE,RNAseqNorm="raw_counts",RNAseq2Norm="normalized_count")
+                            miRNA_Array=FALSE,RPPA=FALSE,RNAseqNorm="raw_counts",RNAseq2Norm="normalized_count", todir = NULL)
 {
   #check parameters
   if(!class(dataset)=="character" || is.null(dataset) || !length(dataset) == 1 || nchar(dataset) < 2)
@@ -47,6 +47,15 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   }
   
   if(is.null(gistic2_Date) & is.null(runDate)){stop("Please specify run date or/and gistic date!")}
+  
+  if(!is.null(todir)) {
+    if(!class(todir)=="character"){
+      stop("Please enter a valid directory path!")
+    } else if(!file.exists(todir)) {
+      cat("Directory does not exist - creating one...")
+      dir.create(todir, recursive=TRUE)
+    }
+  }else { todir <- getwd() } 
   
   trim <- function (x) gsub("^\\s+|\\s+$", "", x)
   
@@ -78,7 +87,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
         file.rename(from=fileList,to=paste(dataset,"-Clinical.txt",sep=""))
         file.remove(paste(dataset,"-Clinical.tar.gz",sep=""))
-        delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         raw.clin <- read.delim(paste(dataset,"-Clinical.txt",sep=""),colClasses="character")
@@ -108,7 +117,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
         file.rename(from=fileList,to=paste(dataset,"-RNAseqGene.txt",sep=""))
         file.remove(paste(dataset,"-RNAseqGene.tar.gz",sep=""))
-        delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
@@ -217,7 +226,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
         file.rename(from=fileList,to=paste(dataset,"-RNAseq2GeneNorm.txt",sep=""))
         file.remove(paste(dataset,"-RNAseq2GeneNorm.tar.gz",sep=""))
-        delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
@@ -335,7 +344,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
         file.rename(from=fileList,to=paste(dataset,"-miRNAseqGene.txt",sep=""))
         file.remove(paste(dataset,"-miRNAseqGene.tar.gz",sep=""))
-        delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
@@ -451,7 +460,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
         file.rename(from=fileList,to=paste(dataset,"-CNASNPHg19.txt",sep=""))
         file.remove(paste(dataset,"-CNASNPHg19.tar.gz",sep=""))
-        delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
@@ -480,7 +489,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
         file.rename(from=fileList,to=paste(dataset,"-CNVSNPHg19.txt",sep=""))
         file.remove(paste(dataset,"-CNVSNPHg19.tar.gz",sep=""))
-        delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
@@ -509,7 +518,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
         file.rename(from=fileList,to=paste(dataset,"-CNAseq.txt",sep=""))
         file.remove(paste(dataset,"-CNAseq.tar.gz",sep=""))
-        delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
@@ -541,7 +550,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
         file.rename(from=fileList,to=paste(dataset,"-CNACGH-",listCount,".txt",sep=""))
         file.remove(paste(dataset,"-CNACGH.tar.gz",sep=""))
-        delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
@@ -574,7 +583,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         untar(paste(dataset,"-Methylation.tar.gz",sep=""),files=fileList)
         file.rename(from=fileList,to=paste(dataset,"-Methylation-",listCount,".txt",sep=""))
         file.remove(paste(dataset,"-Methylation.tar.gz",sep=""))
-        delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         #Get selected type only
@@ -682,7 +691,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
         file.rename(from=fileList,to=paste(dataset,"-mRNAArray-",listCount,".txt",sep=""))
         file.remove(paste(dataset,"-mRNAArray.tar.gz",sep=""))
-        delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
@@ -807,7 +816,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
         file.rename(from=fileList,to=paste(dataset,"-miRNAArray-",listCount,".txt",sep=""))
         file.remove(paste(dataset,"-miRNAArray.tar.gz",sep=""))
-        delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
@@ -934,7 +943,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
         file.rename(from=fileList,to=paste(dataset,"-RPPAArray-",listCount,".txt",sep=""))
         file.remove(paste(dataset,"-RPPAArray.tar.gz",sep=""))
-        delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
@@ -1064,7 +1073,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         retMutations <- do.call("rbind",lapply(fileList,FUN=function(files){
           read.delim(files,header=TRUE,colClasses="character")
         }))
-        delFodler <- paste(getwd(),"/",strsplit(fileList[1],"/")[[1]][1],sep="")
+        delFodler <- paste(todir,"/",strsplit(fileList[1],"/")[[1]][1],sep="")
         unlink(delFodler, recursive = TRUE)
         file.remove(paste(dataset,"-Mutation.tar.gz",sep=""))
         ###
@@ -1078,7 +1087,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         #  myMutFiles[[countPos]] <- tmpCols
         #  countPos = countPos + 1
         #  
-        #  delFodler <- paste(getwd(),"/",strsplit(myFiles,"/")[[1]][1],sep="")
+        #  delFodler <- paste(todir,"/",strsplit(myFiles,"/")[[1]][1],sep="")
         #  unlink(delFodler, recursive = TRUE)
         #}
         #file.remove(paste(dataset,"-Mutation.tar.gz",sep=""))
@@ -1138,7 +1147,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       file.rename(from=fileList,to=paste(dataset,"-all_thresholded.by_genes.txt",sep=""))
       
       
-      delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+      delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
       unlink(delFodler, recursive = TRUE)
       
       
