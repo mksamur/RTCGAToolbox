@@ -54,14 +54,18 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     } else if(!file.exists(todir)) {
       cat("Directory does not exist - creating one...")
       dir.create(todir, recursive=TRUE)
+     }
+    if(!grepl("\\/$", todir)) {
+      todir <- paste(todir, "/", sep="")
+      }
+  } else { 
+    todir <- getwd() 
     }
-  }else { todir <- getwd() } 
   
   trim <- function (x) gsub("^\\s+|\\s+$", "", x)
   
   resultClass <- new("FirehoseData", Dataset = dataset)
-  
-  
+    
   if(!is.null(runDate))
   {
     ##build URL for getting file links
@@ -80,17 +84,17 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       for(i in trim(plinks))
       {
         download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(dataset,"-Clinical.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(dataset,"-Clinical.tar.gz",sep=""),list=TRUE)
+        download.file(url=download_link,destfile=paste(todir,dataset,"-Clinical.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste(todir,dataset,"-Clinical.tar.gz",sep=""),list=TRUE)
         fileList = fileList[grepl("*.clin.merged.picked.txt$",fileList)]
-        untar(paste(dataset,"-Clinical.tar.gz",sep=""),files=fileList)
+        untar(paste(todir,dataset,"-Clinical.tar.gz",sep=""),files=fileList)
         
-        file.rename(from=fileList,to=paste(dataset,"-Clinical.txt",sep=""))
-        file.remove(paste(dataset,"-Clinical.tar.gz",sep=""))
-        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste(todir,dataset,"-Clinical.txt",sep=""))
+        file.remove(paste(todir,dataset,"-Clinical.tar.gz",sep=""))
+        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
-        raw.clin <- read.delim(paste(dataset,"-Clinical.txt",sep=""),colClasses="character")
+        raw.clin <- read.delim(paste(todir,dataset,"-Clinical.txt",sep=""),colClasses="character")
         df.clin <- data.frame(do.call(rbind, raw.clin[, -1]))
         colnames(df.clin) <- raw.clin[, 1]
         resultClass@Clinical <- df.clin
@@ -109,25 +113,25 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       {
         
         download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(dataset,"-RNAseqGene.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(dataset,"-RNAseqGene.tar.gz",sep=""),list=TRUE)
+        download.file(url=download_link,destfile=paste(todir,dataset,"-RNAseqGene.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste(todir,dataset,"-RNAseqGene.tar.gz",sep=""),list=TRUE)
         grepSearch = paste("*.",dataset,"[.]rnaseq__.*.__Level_3__gene_expression__data.data.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(dataset,"-RNAseqGene.tar.gz",sep=""),files=fileList)
+        untar(paste(todir,dataset,"-RNAseqGene.tar.gz",sep=""),files=fileList)
         
-        file.rename(from=fileList,to=paste(dataset,"-RNAseqGene.txt",sep=""))
-        file.remove(paste(dataset,"-RNAseqGene.tar.gz",sep=""))
-        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste(todir,dataset,"-RNAseqGene.txt",sep=""))
+        file.remove(paste(todir,dataset,"-RNAseqGene.tar.gz",sep=""))
+        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpCols = read.delim(paste(dataset,"-RNAseqGene.txt",sep=""),nrows=1,colClasses="character")
+        tmpCols = read.delim(paste(todir,dataset,"-RNAseqGene.txt",sep=""),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
         colOrder <- colOrder[tmpCols[1,] == RNAseqNorm]
         
         message("RNA-seq data will be imported! This may take some times!")
-        testcon <- file(paste(dataset,"-RNAseqGene.txt",sep=""),open="r")
+        testcon <- file(paste(todir,dataset,"-RNAseqGene.txt",sep=""),open="r")
         readsizeof <- 1000
         nooflines <- 0
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
@@ -138,7 +142,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(paste(nooflines,"genes will be imported!"))
         
         tmpMat <- data.frame()
-        inputfile<-file(paste(dataset,"-RNAseqGene.txt",sep=""),open="r")
+        inputfile<-file(paste(todir,dataset,"-RNAseqGene.txt",sep=""),open="r")
         listMat <- list()
         itemcount = 1
         
@@ -218,25 +222,25 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       for(i in trim(plinks))
       {
         download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(dataset,"-RNAseq2GeneNorm.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(dataset,"-RNAseq2GeneNorm.tar.gz",sep=""),list=TRUE)
+        download.file(url=download_link,destfile=paste(todir,dataset,"-RNAseq2GeneNorm.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste(todir,dataset,"-RNAseq2GeneNorm.tar.gz",sep=""),list=TRUE)
         grepSearch = paste("*.",dataset,"[.]rnaseqv2__.*.__Level_3__RSEM_genes_normalized__data.data.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(dataset,"-RNAseq2GeneNorm.tar.gz",sep=""),files=fileList)
+        untar(paste(todir,dataset,"-RNAseq2GeneNorm.tar.gz",sep=""),files=fileList)
         
-        file.rename(from=fileList,to=paste(dataset,"-RNAseq2GeneNorm.txt",sep=""))
-        file.remove(paste(dataset,"-RNAseq2GeneNorm.tar.gz",sep=""))
-        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste(todir,dataset,"-RNAseq2GeneNorm.txt",sep=""))
+        file.remove(paste(todir,dataset,"-RNAseq2GeneNorm.tar.gz",sep=""))
+        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpCols = read.delim(paste(dataset,"-RNAseq2GeneNorm.txt",sep=""),nrows=1,colClasses="character")
+        tmpCols = read.delim(paste(todir,dataset,"-RNAseq2GeneNorm.txt",sep=""),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
         colOrder <- colOrder[tmpCols[1,] == RNAseq2Norm]
         
         message("RNA-seq2 data will be imported! This may take some times!")
-        testcon <- file(paste(dataset,"-RNAseq2GeneNorm.txt",sep=""),open="r")
+        testcon <- file(paste(todir,dataset,"-RNAseq2GeneNorm.txt",sep=""),open="r")
         readsizeof <- 1000
         nooflines <- 0
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
@@ -247,7 +251,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(paste(nooflines,"genes will be imported!"))
         
         tmpMat <- data.frame()
-        inputfile<-file(paste(dataset,"-RNAseq2GeneNorm.txt",sep=""),open="r")
+        inputfile<-file(paste(todir,dataset,"-RNAseq2GeneNorm.txt",sep=""),open="r")
         listMat <- list()
         itemcount = 1
         
@@ -336,25 +340,25 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       for(i in trim(plinks))
       {
         download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(dataset,"-miRNAseqGene.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(dataset,"-miRNAseqGene.tar.gz",sep=""),list=TRUE)
+        download.file(url=download_link,destfile=paste(todir,dataset,"-miRNAseqGene.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste(todir,dataset,"-miRNAseqGene.tar.gz",sep=""),list=TRUE)
         grepSearch = paste("*.",dataset,"[.]mirnaseq__.*.__Level_3__miR_gene_expression__data.data.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(dataset,"-miRNAseqGene.tar.gz",sep=""),files=fileList)
+        untar(paste(todir,dataset,"-miRNAseqGene.tar.gz",sep=""),files=fileList)
         
-        file.rename(from=fileList,to=paste(dataset,"-miRNAseqGene.txt",sep=""))
-        file.remove(paste(dataset,"-miRNAseqGene.tar.gz",sep=""))
-        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste(todir,dataset,"-miRNAseqGene.txt",sep=""))
+        file.remove(paste(todir,dataset,"-miRNAseqGene.tar.gz",sep=""))
+        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpCols = read.delim(paste(dataset,"-miRNAseqGene.txt",sep=""),nrows=1,colClasses="character")
+        tmpCols = read.delim(paste(todir,dataset,"-miRNAseqGene.txt",sep=""),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
         colOrder <- colOrder[tmpCols[1,] == "read_count"]
         
         message("miRNA-seq data will be imported! This may take some times!")
-        testcon <- file(paste(dataset,"-miRNAseqGene.txt",sep=""),open="r")
+        testcon <- file(paste(todir,dataset,"-miRNAseqGene.txt",sep=""),open="r")
         readsizeof <- 1000
         nooflines <- 0
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
@@ -365,7 +369,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(paste(nooflines,"genes will be imported!"))
         
         tmpMat <- data.frame()
-        inputfile<-file(paste(dataset,"-miRNAseqGene.txt",sep=""),open="r")
+        inputfile<-file(paste(todir,dataset,"-miRNAseqGene.txt",sep=""),open="r")
         listMat <- list()
         itemcount = 1
         
@@ -452,20 +456,20 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       for(i in trim(plinks))
       {
         download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(dataset,"-CNASNPHg19.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(dataset,"-CNASNPHg19.tar.gz",sep=""),list=TRUE)
+        download.file(url=download_link,destfile=paste(todir,dataset,"-CNASNPHg19.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste(todir,dataset,"-CNASNPHg19.tar.gz",sep=""),list=TRUE)
         grepSearch = paste("*.",dataset,"[.]snp__.*.__Level_3__segmented_scna_hg19__seg.seg.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(dataset,"-CNASNPHg19.tar.gz",sep=""),files=fileList)
+        untar(paste(todir,dataset,"-CNASNPHg19.tar.gz",sep=""),files=fileList)
         
-        file.rename(from=fileList,to=paste(dataset,"-CNASNPHg19.txt",sep=""))
-        file.remove(paste(dataset,"-CNASNPHg19.tar.gz",sep=""))
-        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste(todir,dataset,"-CNASNPHg19.txt",sep=""))
+        file.remove(paste(todir,dataset,"-CNASNPHg19.tar.gz",sep=""))
+        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpMat = read.delim(paste(dataset,"-CNASNPHg19.txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
+        tmpMat = read.delim(paste(todir,dataset,"-CNASNPHg19.txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                             "numeric","numeric"))
         resultClass@CNASNP <- tmpMat
       }
@@ -481,20 +485,20 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       for(i in trim(plinks))
       {
         download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(dataset,"-CNVSNPHg19.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(dataset,"-CNVSNPHg19.tar.gz",sep=""),list=TRUE)
+        download.file(url=download_link,destfile=paste(todir,dataset,"-CNVSNPHg19.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste(todir,dataset,"-CNVSNPHg19.tar.gz",sep=""),list=TRUE)
         grepSearch = paste("*.",dataset,"[.]snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.seg.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(dataset,"-CNVSNPHg19.tar.gz",sep=""),files=fileList)
+        untar(paste(todir,dataset,"-CNVSNPHg19.tar.gz",sep=""),files=fileList)
         
-        file.rename(from=fileList,to=paste(dataset,"-CNVSNPHg19.txt",sep=""))
-        file.remove(paste(dataset,"-CNVSNPHg19.tar.gz",sep=""))
-        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste(todir,dataset,"-CNVSNPHg19.txt",sep=""))
+        file.remove(paste(todir,dataset,"-CNVSNPHg19.tar.gz",sep=""))
+        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpMat = read.delim(paste(dataset,"-CNVSNPHg19.txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
+        tmpMat = read.delim(paste(todir,dataset,"-CNVSNPHg19.txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                              "numeric","numeric"))
         resultClass@CNVSNP <- tmpMat
       }
@@ -510,20 +514,20 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       for(i in trim(plinks))
       {
         download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(dataset,"-CNAseq.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(dataset,"-CNAseq.tar.gz",sep=""),list=TRUE)
+        download.file(url=download_link,destfile=paste(todir,dataset,"-CNAseq.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste(todir,dataset,"-CNAseq.tar.gz",sep=""),list=TRUE)
         grepSearch = paste("*.",dataset,"[.]cna__.*.__Level_3__segmentation__seg.seg.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(dataset,"-CNAseq.tar.gz",sep=""),files=fileList)
+        untar(paste(todir,dataset,"-CNAseq.tar.gz",sep=""),files=fileList)
         
-        file.rename(from=fileList,to=paste(dataset,"-CNAseq.txt",sep=""))
-        file.remove(paste(dataset,"-CNAseq.tar.gz",sep=""))
-        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste(todir,dataset,"-CNAseq.txt",sep=""))
+        file.remove(paste(todir,dataset,"-CNAseq.tar.gz",sep=""))
+        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpMat = read.delim(paste(dataset,"-CNAseq.txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
+        tmpMat = read.delim(paste(todir,dataset,"-CNAseq.txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                              "numeric","numeric"))
         resultClass@CNAseq <- tmpMat
       }
@@ -542,20 +546,20 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       for(i in trim(plinks))
       {
         download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(dataset,"-CNACGH.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(dataset,"-CNACGH.tar.gz",sep=""),list=TRUE)
+        download.file(url=download_link,destfile=paste(todir,dataset,"-CNACGH.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste(todir,dataset,"-CNACGH.tar.gz",sep=""),list=TRUE)
         grepSearch = paste("*.",dataset,"[.]cna__.*.__Level_3__segmentation__seg.seg.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(dataset,"-CNACGH.tar.gz",sep=""),files=fileList)
+        untar(paste(todir,dataset,"-CNACGH.tar.gz",sep=""),files=fileList)
         
-        file.rename(from=fileList,to=paste(dataset,"-CNACGH-",listCount,".txt",sep=""))
-        file.remove(paste(dataset,"-CNACGH.tar.gz",sep=""))
-        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste(todir,dataset,"-CNACGH-",listCount,".txt",sep=""))
+        file.remove(paste(todir,dataset,"-CNACGH.tar.gz",sep=""))
+        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpMat = read.delim(paste(dataset,"-CNACGH-",listCount,".txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
+        tmpMat = read.delim(paste(todir,dataset,"-CNACGH-",listCount,".txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                          "numeric","numeric"))
         tmpReturn <- new("FirehoseCGHArray",Filename=i,DataMatrix=tmpMat)
         dataLists[[listCount]] <- tmpReturn
@@ -576,22 +580,22 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       for(ii in trim(plinks))
       {
         download_link = paste(fh_url,ii,sep="")
-        download.file(url=download_link,destfile=paste(dataset,"-Methylation.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(dataset,"-Methylation.tar.gz",sep=""),list=TRUE)
+        download.file(url=download_link,destfile=paste(todir,dataset,"-Methylation.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste(todir,dataset,"-Methylation.tar.gz",sep=""),list=TRUE)
         grepSearch = paste("*.",dataset,"[.]methylation__.*.__Level_3__within_bioassay_data_set_function__data.data.txt$",sep="")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(dataset,"-Methylation.tar.gz",sep=""),files=fileList)
-        file.rename(from=fileList,to=paste(dataset,"-Methylation-",listCount,".txt",sep=""))
-        file.remove(paste(dataset,"-Methylation.tar.gz",sep=""))
-        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
+        untar(paste(todir,dataset,"-Methylation.tar.gz",sep=""),files=fileList)
+        file.rename(from=fileList,to=paste(todir,dataset,"-Methylation-",listCount,".txt",sep=""))
+        file.remove(paste(todir,dataset,"-Methylation.tar.gz",sep=""))
+        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         #Get selected type only
-        tmpCols = read.delim(paste(dataset,"-Methylation-",listCount,".txt",sep=""),nrows=1,colClasses="character")
+        tmpCols = read.delim(paste(todir,dataset,"-Methylation-",listCount,".txt",sep=""),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
         colOrder <- colOrder[tmpCols[1,] == "Beta_value"]
         message("Methylation data will be imported! This may take some times!")
-        testcon <- file(paste(dataset,"-Methylation-",listCount,".txt",sep=""),open="r")
+        testcon <- file(paste(todir,dataset,"-Methylation-",listCount,".txt",sep=""),open="r")
         readsizeof <- 1000
         nooflines <- 0
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
@@ -605,7 +609,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         }
         message(paste(nooflines,"rows will be imported!"))
         tmpMat <- data.frame()
-        inputfile<-file(paste(dataset,"-Methylation-",listCount,".txt",sep=""),open="r")
+        inputfile<-file(paste(todir,dataset,"-Methylation-",listCount,".txt",sep=""),open="r")
         listMat <- list()
         itemcount = 1
         N = nooflines
@@ -683,25 +687,25 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       for(ii in trim(plinks))
       {
         download_link = paste(fh_url,ii,sep="")
-        download.file(url=download_link,destfile=paste(dataset,"-mRNAArray.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(dataset,"-mRNAArray.tar.gz",sep=""),list=TRUE)
+        download.file(url=download_link,destfile=paste(todir,dataset,"-mRNAArray.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste(todir,dataset,"-mRNAArray.tar.gz",sep=""),list=TRUE)
         grepSearch = "MANIFEST.txt"
         fileList = fileList[!grepl(grepSearch,fileList)]
-        untar(paste(dataset,"-mRNAArray.tar.gz",sep=""),files=fileList)
+        untar(paste(todir,dataset,"-mRNAArray.tar.gz",sep=""),files=fileList)
         
-        file.rename(from=fileList,to=paste(dataset,"-mRNAArray-",listCount,".txt",sep=""))
-        file.remove(paste(dataset,"-mRNAArray.tar.gz",sep=""))
-        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste(todir,dataset,"-mRNAArray-",listCount,".txt",sep=""))
+        file.remove(paste(todir,dataset,"-mRNAArray.tar.gz",sep=""))
+        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpCols = read.delim(paste(dataset,"-mRNAArray-",listCount,".txt",sep=""),nrows=1,colClasses="character")
+        tmpCols = read.delim(paste(todir,dataset,"-mRNAArray-",listCount,".txt",sep=""),nrows=1,colClasses="character")
         colOrder <- 2:ncol(tmpCols)
         #colOrder <- colOrder[tmpCols[1,] == "Signal"]
         
         message("mRNA data will be imported! This may take some times!")
-        testcon <- file(paste(dataset,"-mRNAArray-",listCount,".txt",sep=""),open="r")
+        testcon <- file(paste(todir,dataset,"-mRNAArray-",listCount,".txt",sep=""),open="r")
         readsizeof <- 1000
         nooflines <- 0
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
@@ -717,7 +721,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(paste(nooflines,"rows will be imported!"))
         
         tmpMat <- data.frame()
-        inputfile<-file(paste(dataset,"-mRNAArray-",listCount,".txt",sep=""),open="r")
+        inputfile<-file(paste(todir,dataset,"-mRNAArray-",listCount,".txt",sep=""),open="r")
         listMat <- list()
         itemcount = 1
         
@@ -808,25 +812,25 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       for(ii in trim(plinks))
       {
         download_link = paste(fh_url,ii,sep="")
-        download.file(url=download_link,destfile=paste(dataset,"-miRNAArray.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(dataset,"-miRNAArray.tar.gz",sep=""),list=TRUE)
+        download.file(url=download_link,destfile=paste(todir,dataset,"-miRNAArray.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste(todir,dataset,"-miRNAArray.tar.gz",sep=""),list=TRUE)
         grepSearch = "MANIFEST.txt"
         fileList = fileList[!grepl(grepSearch,fileList)]
-        untar(paste(dataset,"-miRNAArray.tar.gz",sep=""),files=fileList)
+        untar(paste(todir,dataset,"-miRNAArray.tar.gz",sep=""),files=fileList)
         
-        file.rename(from=fileList,to=paste(dataset,"-miRNAArray-",listCount,".txt",sep=""))
-        file.remove(paste(dataset,"-miRNAArray.tar.gz",sep=""))
-        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste(todir,dataset,"-miRNAArray-",listCount,".txt",sep=""))
+        file.remove(paste(todir,dataset,"-miRNAArray.tar.gz",sep=""))
+        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpCols = read.delim(paste(dataset,"-miRNAArray-",listCount,".txt",sep=""),nrows=1,colClasses="character")
+        tmpCols = read.delim(paste(todir,dataset,"-miRNAArray-",listCount,".txt",sep=""),nrows=1,colClasses="character")
         colOrder <- 2:ncol(tmpCols)
         #colOrder <- colOrder[tmpCols[1,] == "Signal"]
         
         message("mRNA data will be imported! This may take some times!")
-        testcon <- file(paste(dataset,"-miRNAArray-",listCount,".txt",sep=""),open="r")
+        testcon <- file(paste(todir,dataset,"-miRNAArray-",listCount,".txt",sep=""),open="r")
         readsizeof <- 1000
         nooflines <- 0
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
@@ -842,7 +846,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(paste(nooflines,"rows will be imported!"))
         
         tmpMat <- data.frame()
-        inputfile<-file(paste(dataset,"-miRNAArray-",listCount,".txt",sep=""),open="r")
+        inputfile<-file(paste(todir,dataset,"-miRNAArray-",listCount,".txt",sep=""),open="r")
         listMat <- list()
         itemcount = 1
         
@@ -935,25 +939,25 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       for(ii in trim(plinks))
       {
         download_link = paste(fh_url,ii,sep="")
-        download.file(url=download_link,destfile=paste(dataset,"-RPPAArray.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(dataset,"-RPPAArray.tar.gz",sep=""),list=TRUE)
+        download.file(url=download_link,destfile=paste(todir,dataset,"-RPPAArray.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste(todir,dataset,"-RPPAArray.tar.gz",sep=""),list=TRUE)
         grepSearch = "MANIFEST.txt"
         fileList = fileList[!grepl(grepSearch,fileList)]
-        untar(paste(dataset,"-RPPAArray.tar.gz",sep=""),files=fileList)
+        untar(paste(todir,dataset,"-RPPAArray.tar.gz",sep=""),files=fileList)
         
-        file.rename(from=fileList,to=paste(dataset,"-RPPAArray-",listCount,".txt",sep=""))
-        file.remove(paste(dataset,"-RPPAArray.tar.gz",sep=""))
-        delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste(todir,dataset,"-RPPAArray-",listCount,".txt",sep=""))
+        file.remove(paste(todir,dataset,"-RPPAArray.tar.gz",sep=""))
+        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpCols = read.delim(paste(dataset,"-RPPAArray-",listCount,".txt",sep=""),nrows=1,colClasses="character")
+        tmpCols = read.delim(paste(todir,dataset,"-RPPAArray-",listCount,".txt",sep=""),nrows=1,colClasses="character")
         colOrder <- 2:ncol(tmpCols)
         #colOrder <- colOrder[tmpCols[1,] == "Signal"]
         
         message("mRNA data will be imported! This may take some times!")
-        testcon <- file(paste(dataset,"-RPPAArray-",listCount,".txt",sep=""),open="r")
+        testcon <- file(paste(todir,dataset,"-RPPAArray-",listCount,".txt",sep=""),open="r")
         readsizeof <- 1000
         nooflines <- 0
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
@@ -969,7 +973,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(paste(nooflines,"rows will be imported!"))
         
         tmpMat <- data.frame()
-        inputfile<-file(paste(dataset,"-RPPAArray-",listCount,".txt",sep=""),open="r")
+        inputfile<-file(paste(todir,dataset,"-RPPAArray-",listCount,".txt",sep=""),open="r")
         listMat <- list()
         itemcount = 1
         
@@ -1063,34 +1067,34 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       for(ii in trim(plinks))
       {
         download_link = paste(fh_url,ii,sep="")
-        download.file(url=download_link,destfile=paste(dataset,"-Mutation.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(dataset,"-Mutation.tar.gz",sep=""),list=TRUE)
+        download.file(url=download_link,destfile=paste(todir,dataset,"-Mutation.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste(todir,dataset,"-Mutation.tar.gz",sep=""),list=TRUE)
         grepSearch = "MANIFEST.txt"
         fileList = fileList[!grepl(grepSearch,fileList)]
         
         ###
-        untar(paste(dataset,"-Mutation.tar.gz",sep=""),files=fileList)
+        untar(paste(todir,dataset,"-Mutation.tar.gz",sep=""),files=fileList)
         retMutations <- do.call("rbind",lapply(fileList,FUN=function(files){
           read.delim(files,header=TRUE,colClasses="character")
         }))
-        delFodler <- paste(todir,"/",strsplit(fileList[1],"/")[[1]][1],sep="")
+        delFodler <- paste(strsplit(fileList[1],"/")[[1]][1],sep="")
         unlink(delFodler, recursive = TRUE)
-        file.remove(paste(dataset,"-Mutation.tar.gz",sep=""))
+        file.remove(paste(todir,dataset,"-Mutation.tar.gz",sep=""))
         ###
         
         #myMutFiles <- list()
         #countPos=1
         #for(myFiles in fileList)
         #{
-        #  untar(paste(dataset,"-Mutation.tar.gz",sep=""),files=myFiles)
+        #  untar(paste(todir,dataset,"-Mutation.tar.gz",sep=""),files=myFiles)
         #  tmpCols = read.delim(myFiles,header=TRUE,colClasses="character")
         #  myMutFiles[[countPos]] <- tmpCols
         #  countPos = countPos + 1
         #  
-        #  delFodler <- paste(todir,"/",strsplit(myFiles,"/")[[1]][1],sep="")
+        #  delFodler <- paste(strsplit(myFiles,"/")[[1]][1],sep="")
         #  unlink(delFodler, recursive = TRUE)
         #}
-        #file.remove(paste(dataset,"-Mutation.tar.gz",sep=""))
+        #file.remove(paste(todir,dataset,"-Mutation.tar.gz",sep=""))
         #
         #retMutations <- data.frame()
         #for(i in 1:length(myMutFiles))
@@ -1103,7 +1107,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         #  
         #}
         
-        write.table(retMutations,file=paste(dataset,"-Mutations-AllSamples.txt",sep=""),sep="\t",row.names=F,quote=F)
+        write.table(retMutations,file=paste(todir,dataset,"-Mutations-AllSamples.txt",sep=""),sep="\t",row.names=F,quote=F)
         resultClass@Mutations <- retMutations
       }
       
@@ -1130,24 +1134,24 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     for(ii in trim(plinks))
     {
       download_link = paste(fh_url,ii,sep="")
-      download.file(url=download_link,destfile=paste(dataset,"-Gistic2.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+      download.file(url=download_link,destfile=paste(todir,dataset,"-Gistic2.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
       
-      fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
+      fileList <- untar(paste(todir,dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
       grepSearch = "all_data_by_genes.txt"
       fileList = fileList[grepl(grepSearch,fileList)]
-      untar(paste(dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
+      untar(paste(todir,dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
       tmpCNAll = read.delim(fileList,header=TRUE,colClasses="character")
-      file.rename(from=fileList,to=paste(dataset,"-all_data_by_genes.txt",sep=""))
+      file.rename(from=fileList,to=paste(todir,dataset,"-all_data_by_genes.txt",sep=""))
       
-      fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
+      fileList <- untar(paste(todir,dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
       grepSearch = "all_thresholded.by_genes.txt"
       fileList = fileList[grepl(grepSearch,fileList)]
-      untar(paste(dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
+      untar(paste(todir,dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
       tmpCNThreshhold = read.delim(fileList,header=TRUE,colClasses="character")
-      file.rename(from=fileList,to=paste(dataset,"-all_thresholded.by_genes.txt",sep=""))
+      file.rename(from=fileList,to=paste(todir,dataset,"-all_thresholded.by_genes.txt",sep=""))
       
       
-      delFodler <- paste(todir,"/",strsplit(fileList,"/")[[1]][1],sep="")
+      delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
       unlink(delFodler, recursive = TRUE)
       
       
