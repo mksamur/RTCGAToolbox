@@ -46,7 +46,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     if(!any(runGisticDate==gistic2_Date)){stop('Please use valid analyze date for GISTIC! "getFirehoseAnalyzeDates" function gives you the vector of valid dates!')}
   }
   
-  if(is.null(gistic2_Date) & is.null(runDate)){stop("Please specify run date or/and gistic date!")}
+  if(is.null(gistic2_Date) & is.null(runDate)){stop("Please specify run date and/or gistic date!")}
   
   if(!is.null(todir)) {
     if(!class(todir)=="character"){
@@ -56,7 +56,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       dir.create(todir, recursive=TRUE)
      }
     if(!grepl("\\/$", todir)) {
-      todir <- paste(todir, "/", sep="")
+      todir <- paste0(todir, "/")
       }
   } else { 
     todir <- getwd() 
@@ -70,68 +70,77 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   {
     ##build URL for getting file links
     fh_url <- "http://gdac.broadinstitute.org/runs/stddata__"
-    fh_url <- paste(fh_url,substr(runDate,1,4),"_",substr(runDate,5,6),"_",substr(runDate,7,8),"/data/",sep="")
-    fh_url <- paste(fh_url,dataset,"/",runDate,"/",sep="")
+    fh_url <- paste0(fh_url,substr(runDate,1,4),"_",substr(runDate,5,6),"_",substr(runDate,7,8),"/data/")
+    fh_url <- paste0(fh_url,dataset,"/",runDate,"/")
     doc = htmlTreeParse(fh_url, useInternalNodes = T)
     
     #Download clinical data
     if(Clinic)
     {
-      keyWord = paste(dataset,".Clinical_Pick_Tier1.Level_4",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0(dataset,".Clinical_Pick_Tier1.Level_4")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks = xpathSApply(doc, keyWord, xmlValue)
       plinks = plinks[grepl("*.tar[.]gz$",plinks)]
+      cachefile <- paste0(todir,dataset,"-Clinical.txt")
+      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+        stop("Clinic file already downloaded!")
+      } else {
       for(i in trim(plinks))
       {
-        download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(todir,dataset,"-Clinical.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(todir,dataset,"-Clinical.tar.gz",sep=""),list=TRUE)
+        download_link = paste0(fh_url,i)
+        download.file(url=download_link,destfile=paste0(todir,dataset,"-Clinical.tar.gz"),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste0(todir,dataset,"-Clinical.tar.gz"),list=TRUE)
         fileList = fileList[grepl("*.clin.merged.picked.txt$",fileList)]
-        untar(paste(todir,dataset,"-Clinical.tar.gz",sep=""),files=fileList)
+        untar(paste0(todir,dataset,"-Clinical.tar.gz"),files=fileList)
         
-        file.rename(from=fileList,to=paste(todir,dataset,"-Clinical.txt",sep=""))
-        file.remove(paste(todir,dataset,"-Clinical.tar.gz",sep=""))
-        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste0(todir,dataset,"-Clinical.txt"))
+        file.remove(paste0(todir,dataset,"-Clinical.tar.gz"))
+        delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
-        raw.clin <- read.delim(paste(todir,dataset,"-Clinical.txt",sep=""),colClasses="character")
+        raw.clin <- read.delim(paste0(todir,dataset,"-Clinical.txt"),colClasses="character")
         df.clin <- data.frame(do.call(rbind, raw.clin[, -1]))
         colnames(df.clin) <- raw.clin[, 1]
         resultClass@Clinical <- df.clin
         gc()
       }
     }
+    }
     
     #Download RNAseq gene level data
     if(RNAseq_Gene)
     {
-      keyWord = paste("","Level_3__gene_expression__data.Level_3",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0("","Level_3__gene_expression__data.Level_3")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks = xpathSApply(doc, keyWord, xmlValue)
       plinks = plinks[grepl("*.Merge_rnaseq__.*._rnaseq__.*.tar[.]gz$",plinks)]
+      cachefile <- paste0(todir,dataset,"-RNAseqGene.txt")
+      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+        stop("RNAseqGene file already downloaded!")
+      } else {
       for(i in trim(plinks))
       {
         
-        download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(todir,dataset,"-RNAseqGene.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(todir,dataset,"-RNAseqGene.tar.gz",sep=""),list=TRUE)
-        grepSearch = paste("*.",dataset,"[.]rnaseq__.*.__Level_3__gene_expression__data.data.txt$",sep="")
+        download_link = paste0(fh_url,i)
+        download.file(url=download_link,destfile=paste0(todir,dataset,"-RNAseqGene.tar.gz"),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste0(todir,dataset,"-RNAseqGene.tar.gz"),list=TRUE)
+        grepSearch = paste0("*.",dataset,"[.]rnaseq__.*.__Level_3__gene_expression__data.data.txt$")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(todir,dataset,"-RNAseqGene.tar.gz",sep=""),files=fileList)
+        untar(paste0(todir,dataset,"-RNAseqGene.tar.gz"),files=fileList)
         
-        file.rename(from=fileList,to=paste(todir,dataset,"-RNAseqGene.txt",sep=""))
-        file.remove(paste(todir,dataset,"-RNAseqGene.tar.gz",sep=""))
-        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste0(todir,dataset,"-RNAseqGene.txt"))
+        file.remove(paste0(todir,dataset,"-RNAseqGene.tar.gz"))
+        delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpCols = read.delim(paste(todir,dataset,"-RNAseqGene.txt",sep=""),nrows=1,colClasses="character")
+        tmpCols = read.delim(paste0(todir,dataset,"-RNAseqGene.txt"),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
         colOrder <- colOrder[tmpCols[1,] == RNAseqNorm]
         
         message("RNA-seq data will be imported! This may take some times!")
-        testcon <- file(paste(todir,dataset,"-RNAseqGene.txt",sep=""),open="r")
+        testcon <- file(paste0(todir,dataset,"-RNAseqGene.txt"),open="r")
         readsizeof <- 1000
         nooflines <- 0
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
@@ -142,7 +151,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(paste(nooflines,"genes will be imported!"))
         
         tmpMat <- data.frame()
-        inputfile<-file(paste(todir,dataset,"-RNAseqGene.txt",sep=""),open="r")
+        inputfile<-file(paste0(todir,dataset,"-RNAseqGene.txt"),open="r")
         listMat <- list()
         itemcount = 1
         
@@ -211,36 +220,41 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
       }
     }
+    }
     gc()
     #Download RNAseq2 gene level data
     if(RNAseq2_Gene_Norm)
     {
-      keyWord = paste("","Level_3__RSEM_genes_normalized__data.Level_3",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0("","Level_3__RSEM_genes_normalized__data.Level_3")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks = xpathSApply(doc, keyWord, xmlValue)
       plinks = plinks[grepl("*.Merge_rnaseqv2__.*._rnaseqv2__.*.tar[.]gz$",plinks)]
+      cachefile <- paste0(todir,dataset,"-RNAseq2GeneNorm.txt")
+      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+        stop("RNAseq2GeneNorm file already downloaded!")
+      } else {
       for(i in trim(plinks))
       {
-        download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(todir,dataset,"-RNAseq2GeneNorm.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(todir,dataset,"-RNAseq2GeneNorm.tar.gz",sep=""),list=TRUE)
-        grepSearch = paste("*.",dataset,"[.]rnaseqv2__.*.__Level_3__RSEM_genes_normalized__data.data.txt$",sep="")
+        download_link = paste0(fh_url,i)
+        download.file(url=download_link,destfile=paste0(todir,dataset,"-RNAseq2GeneNorm.tar.gz"),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste0(todir,dataset,"-RNAseq2GeneNorm.tar.gz"),list=TRUE)
+        grepSearch = paste0("*.",dataset,"[.]rnaseqv2__.*.__Level_3__RSEM_genes_normalized__data.data.txt$")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(todir,dataset,"-RNAseq2GeneNorm.tar.gz",sep=""),files=fileList)
+        untar(paste0(todir,dataset,"-RNAseq2GeneNorm.tar.gz"),files=fileList)
         
-        file.rename(from=fileList,to=paste(todir,dataset,"-RNAseq2GeneNorm.txt",sep=""))
-        file.remove(paste(todir,dataset,"-RNAseq2GeneNorm.tar.gz",sep=""))
-        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste0(todir,dataset,"-RNAseq2GeneNorm.txt"))
+        file.remove(paste0(todir,dataset,"-RNAseq2GeneNorm.tar.gz"))
+        delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpCols = read.delim(paste(todir,dataset,"-RNAseq2GeneNorm.txt",sep=""),nrows=1,colClasses="character")
+        tmpCols = read.delim(paste0(todir,dataset,"-RNAseq2GeneNorm.txt"),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
         colOrder <- colOrder[tmpCols[1,] == RNAseq2Norm]
         
         message("RNA-seq2 data will be imported! This may take some times!")
-        testcon <- file(paste(todir,dataset,"-RNAseq2GeneNorm.txt",sep=""),open="r")
+        testcon <- file(paste0(todir,dataset,"-RNAseq2GeneNorm.txt"),open="r")
         readsizeof <- 1000
         nooflines <- 0
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
@@ -251,7 +265,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(paste(nooflines,"genes will be imported!"))
         
         tmpMat <- data.frame()
-        inputfile<-file(paste(todir,dataset,"-RNAseq2GeneNorm.txt",sep=""),open="r")
+        inputfile<-file(paste0(todir,dataset,"-RNAseq2GeneNorm.txt"),open="r")
         listMat <- list()
         itemcount = 1
         
@@ -325,40 +339,44 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         resultClass@RNASeq2GeneNorm <- tmpMat
         gc()
       }
-      
+      }
     }
     gc()
     #Download miRNAseq gene level data
     if(miRNASeq_Gene)
     {
-      keyWord = paste("","Level_3__miR_gene_expression__data.Level_3",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0("","Level_3__miR_gene_expression__data.Level_3")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks = xpathSApply(doc, keyWord, xmlValue)
       message(plinks)
-      plinks = plinks[grepl(paste("*.",dataset,"[.]Merge_mirnaseq__.*.hiseq_mirnaseq__.*.tar[.]gz$",sep=""),plinks)]
+      plinks = plinks[grepl(paste0("*.",dataset,"[.]Merge_mirnaseq__.*.hiseq_mirnaseq__.*.tar[.]gz$"),plinks)]
       message(plinks)
+      cachefile <- paste0(todir,dataset,"-miRNAseqGene.txt")
+      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+        stop("miRNAseqGene file already downloaded!")
+      } else {
       for(i in trim(plinks))
       {
-        download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(todir,dataset,"-miRNAseqGene.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(todir,dataset,"-miRNAseqGene.tar.gz",sep=""),list=TRUE)
-        grepSearch = paste("*.",dataset,"[.]mirnaseq__.*.__Level_3__miR_gene_expression__data.data.txt$",sep="")
+        download_link = paste0(fh_url,i)
+        download.file(url=download_link,destfile=paste0(todir,dataset,"-miRNAseqGene.tar.gz"),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste0(todir,dataset,"-miRNAseqGene.tar.gz"),list=TRUE)
+        grepSearch = paste0("*.",dataset,"[.]mirnaseq__.*.__Level_3__miR_gene_expression__data.data.txt$")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(todir,dataset,"-miRNAseqGene.tar.gz",sep=""),files=fileList)
+        untar(paste0(todir,dataset,"-miRNAseqGene.tar.gz"),files=fileList)
         
-        file.rename(from=fileList,to=paste(todir,dataset,"-miRNAseqGene.txt",sep=""))
-        file.remove(paste(todir,dataset,"-miRNAseqGene.tar.gz",sep=""))
-        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste0(todir,dataset,"-miRNAseqGene.txt"))
+        file.remove(paste0(todir,dataset,"-miRNAseqGene.tar.gz"))
+        delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpCols = read.delim(paste(todir,dataset,"-miRNAseqGene.txt",sep=""),nrows=1,colClasses="character")
+        tmpCols = read.delim(paste0(todir,dataset,"-miRNAseqGene.txt"),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
         colOrder <- colOrder[tmpCols[1,] == "read_count"]
         
         message("miRNA-seq data will be imported! This may take some times!")
-        testcon <- file(paste(todir,dataset,"-miRNAseqGene.txt",sep=""),open="r")
+        testcon <- file(paste0(todir,dataset,"-miRNAseqGene.txt"),open="r")
         readsizeof <- 1000
         nooflines <- 0
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
@@ -369,7 +387,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(paste(nooflines,"genes will be imported!"))
         
         tmpMat <- data.frame()
-        inputfile<-file(paste(todir,dataset,"-miRNAseqGene.txt",sep=""),open="r")
+        inputfile<-file(paste0(todir,dataset,"-miRNAseqGene.txt"),open="r")
         listMat <- list()
         itemcount = 1
         
@@ -445,121 +463,135 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         gc()
       }
     }
+    }
     gc()
     #Download CNA SNP data
     if(CNA_SNP)
     {
-      keyWord = paste("","Level_3__segmented_scna_hg19__seg.Level_3",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0("","Level_3__segmented_scna_hg19__seg.Level_3")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks = xpathSApply(doc, keyWord, xmlValue)
-      plinks = plinks[grepl(paste("*.",dataset,"[.]Merge_snp__.*.__Level_3__segmented_scna_hg19__seg.Level_3.*.tar[.]gz$",sep=""),plinks)]
+      plinks = plinks[grepl(paste0("*.",dataset,"[.]Merge_snp__.*.__Level_3__segmented_scna_hg19__seg.Level_3.*.tar[.]gz$"),plinks)]
+      cachefile <- paste0(todir,dataset,"-CNASNPHg19.txt")
+      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+        stop("CNASNPHg19 file already downloaded!")
+        } else {
       for(i in trim(plinks))
       {
-        download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(todir,dataset,"-CNASNPHg19.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(todir,dataset,"-CNASNPHg19.tar.gz",sep=""),list=TRUE)
-        grepSearch = paste("*.",dataset,"[.]snp__.*.__Level_3__segmented_scna_hg19__seg.seg.txt$",sep="")
+        download_link = paste0(fh_url,i)
+        download.file(url=download_link,destfile=paste0(todir,dataset,"-CNASNPHg19.tar.gz"),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste0(todir,dataset,"-CNASNPHg19.tar.gz"),list=TRUE)
+        grepSearch = paste0("*.",dataset,"[.]snp__.*.__Level_3__segmented_scna_hg19__seg.seg.txt$")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(todir,dataset,"-CNASNPHg19.tar.gz",sep=""),files=fileList)
+        untar(paste0(todir,dataset,"-CNASNPHg19.tar.gz"),files=fileList)
         
-        file.rename(from=fileList,to=paste(todir,dataset,"-CNASNPHg19.txt",sep=""))
-        file.remove(paste(todir,dataset,"-CNASNPHg19.tar.gz",sep=""))
-        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste0(todir,dataset,"-CNASNPHg19.txt"))
+        file.remove(paste0(todir,dataset,"-CNASNPHg19.tar.gz"))
+        delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpMat = read.delim(paste(todir,dataset,"-CNASNPHg19.txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
+        tmpMat = read.delim(paste0(todir,dataset,"-CNASNPHg19.txt"),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                             "numeric","numeric"))
         resultClass@CNASNP <- tmpMat
       }
     }
-    
+    }
     #Download CNV SNP data
     if(CNV_SNP)
     {
-      keyWord = paste("","Level_3__segmented_scna_minus_germline_cnv_hg19__seg.Level_3",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0("","Level_3__segmented_scna_minus_germline_cnv_hg19__seg.Level_3")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks = xpathSApply(doc, keyWord, xmlValue)
-      plinks = plinks[grepl(paste("*.",dataset,"[.]Merge_snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.Level_3.*.tar[.]gz$",sep=""),plinks)]
+      plinks = plinks[grepl(paste0("*.",dataset,"[.]Merge_snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.Level_3.*.tar[.]gz$"),plinks)]
+      cachefile <- paste0(todir,dataset,"-CNVSNPHg19.txt")
+      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+        stop("CNVSNPHg19 file already downloaded!")
+      } else {
       for(i in trim(plinks))
       {
-        download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(todir,dataset,"-CNVSNPHg19.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(todir,dataset,"-CNVSNPHg19.tar.gz",sep=""),list=TRUE)
-        grepSearch = paste("*.",dataset,"[.]snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.seg.txt$",sep="")
+        download_link = paste0(fh_url,i)
+        download.file(url=download_link,destfile=paste0(todir,dataset,"-CNVSNPHg19.tar.gz"),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste0(todir,dataset,"-CNVSNPHg19.tar.gz"),list=TRUE)
+        grepSearch = paste0("*.",dataset,"[.]snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.seg.txt$")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(todir,dataset,"-CNVSNPHg19.tar.gz",sep=""),files=fileList)
+        untar(paste0(todir,dataset,"-CNVSNPHg19.tar.gz"),files=fileList)
         
-        file.rename(from=fileList,to=paste(todir,dataset,"-CNVSNPHg19.txt",sep=""))
-        file.remove(paste(todir,dataset,"-CNVSNPHg19.tar.gz",sep=""))
-        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste0(todir,dataset,"-CNVSNPHg19.txt"))
+        file.remove(paste0(todir,dataset,"-CNVSNPHg19.tar.gz"))
+        delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpMat = read.delim(paste(todir,dataset,"-CNVSNPHg19.txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
+        tmpMat = read.delim(paste0(todir,dataset,"-CNVSNPHg19.txt"),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                              "numeric","numeric"))
         resultClass@CNVSNP <- tmpMat
       }
+    }
     }
     
     #Download CNA DNAseq data
     if(CNA_Seq)
     {
-      keyWord = paste("","__Level_3__segmentation__seg.Level_3",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0("","__Level_3__segmentation__seg.Level_3")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks = xpathSApply(doc, keyWord, xmlValue)
-      plinks = plinks[grepl(paste("*.",dataset,"[.]Merge_cna__.*.dnaseq.*.__Level_3__segmentation__seg.Level_3.*.tar[.]gz$",sep=""),plinks)]
+      plinks = plinks[grepl(paste0("*.",dataset,"[.]Merge_cna__.*.dnaseq.*.__Level_3__segmentation__seg.Level_3.*.tar[.]gz$"),plinks)]
+      cachefile <- paste0(todir,dataset,"-CNAseq.txt")
+      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+        stop("CNAseq file already downloaded!")
+      } else {
       for(i in trim(plinks))
       {
-        download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(todir,dataset,"-CNAseq.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(todir,dataset,"-CNAseq.tar.gz",sep=""),list=TRUE)
-        grepSearch = paste("*.",dataset,"[.]cna__.*.__Level_3__segmentation__seg.seg.txt$",sep="")
+        download_link = paste0(fh_url,i)
+        download.file(url=download_link,destfile=paste0(todir,dataset,"-CNAseq.tar.gz"),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste0(todir,dataset,"-CNAseq.tar.gz"),list=TRUE)
+        grepSearch = paste0("*.",dataset,"[.]cna__.*.__Level_3__segmentation__seg.seg.txt$")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(todir,dataset,"-CNAseq.tar.gz",sep=""),files=fileList)
+        untar(paste0(todir,dataset,"-CNAseq.tar.gz"),files=fileList)
         
-        file.rename(from=fileList,to=paste(todir,dataset,"-CNAseq.txt",sep=""))
-        file.remove(paste(todir,dataset,"-CNAseq.tar.gz",sep=""))
-        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste0(todir,dataset,"-CNAseq.txt"))
+        file.remove(paste0(todir,dataset,"-CNAseq.tar.gz"))
+        delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpMat = read.delim(paste(todir,dataset,"-CNAseq.txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
+        tmpMat = read.delim(paste0(todir,dataset,"-CNAseq.txt"),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                              "numeric","numeric"))
         resultClass@CNAseq <- tmpMat
       }
     }
-    
+    }
     #Download CNA CGH data
     if(CNA_CGH)
     {
-      keyWord = paste("","__Level_3__segmentation__seg.Level_3",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0("","__Level_3__segmentation__seg.Level_3")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks = xpathSApply(doc, keyWord, xmlValue)
-      plinks = plinks[grepl(paste("*.",dataset,"[.]Merge_cna__.*.cgh.*.__Level_3__segmentation__seg.Level_3.*.tar[.]gz$",sep=""),plinks)]
+      plinks = plinks[grepl(paste0("*.",dataset,"[.]Merge_cna__.*.cgh.*.__Level_3__segmentation__seg.Level_3.*.tar[.]gz$"),plinks)]
       
       dataLists <- list()
       listCount = 1
       for(i in trim(plinks))
       {
-        download_link = paste(fh_url,i,sep="")
-        download.file(url=download_link,destfile=paste(todir,dataset,"-CNACGH.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(todir,dataset,"-CNACGH.tar.gz",sep=""),list=TRUE)
-        grepSearch = paste("*.",dataset,"[.]cna__.*.__Level_3__segmentation__seg.seg.txt$",sep="")
+        download_link = paste0(fh_url,i)
+        download.file(url=download_link,destfile=paste0(todir,dataset,"-CNACGH.tar.gz"),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste0(todir,dataset,"-CNACGH.tar.gz"),list=TRUE)
+        grepSearch = paste0("*.",dataset,"[.]cna__.*.__Level_3__segmentation__seg.seg.txt$")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(todir,dataset,"-CNACGH.tar.gz",sep=""),files=fileList)
+        untar(paste0(todir,dataset,"-CNACGH.tar.gz"),files=fileList)
         
-        file.rename(from=fileList,to=paste(todir,dataset,"-CNACGH-",listCount,".txt",sep=""))
-        file.remove(paste(todir,dataset,"-CNACGH.tar.gz",sep=""))
-        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste0(todir,dataset,"-CNACGH-",listCount,".txt"))
+        file.remove(paste0(todir,dataset,"-CNACGH.tar.gz"))
+        delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpMat = read.delim(paste(todir,dataset,"-CNACGH-",listCount,".txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
+        tmpMat = read.delim(paste0(todir,dataset,"-CNACGH-",listCount,".txt"),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                          "numeric","numeric"))
         tmpReturn <- new("FirehoseCGHArray",Filename=i,DataMatrix=tmpMat)
         dataLists[[listCount]] <- tmpReturn
@@ -571,31 +603,31 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     #Download methylation
     if(Methylation)
     {
-      keyWord = paste("","__Level_3__within_bioassay_data_set_function__data.Level_3",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0("","__Level_3__within_bioassay_data_set_function__data.Level_3")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks = xpathSApply(doc, keyWord, xmlValue)
-      plinks = plinks[grepl(paste("*.",dataset,"[.]Merge_methylation__.*.methylation.*.__Level_3__within_bioassay_data_set_function__data.Level_3.*.tar[.]gz$",sep=""),plinks)]
+      plinks = plinks[grepl(paste0("*.",dataset,"[.]Merge_methylation__.*.methylation.*.__Level_3__within_bioassay_data_set_function__data.Level_3.*.tar[.]gz$"),plinks)]
       dataLists <- list()
       listCount = 1
       for(ii in trim(plinks))
       {
-        download_link = paste(fh_url,ii,sep="")
-        download.file(url=download_link,destfile=paste(todir,dataset,"-Methylation.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(todir,dataset,"-Methylation.tar.gz",sep=""),list=TRUE)
-        grepSearch = paste("*.",dataset,"[.]methylation__.*.__Level_3__within_bioassay_data_set_function__data.data.txt$",sep="")
+        download_link = paste0(fh_url,ii)
+        download.file(url=download_link,destfile=paste0(todir,dataset,"-Methylation.tar.gz"),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste0(todir,dataset,"-Methylation.tar.gz"),list=TRUE)
+        grepSearch = paste0("*.",dataset,"[.]methylation__.*.__Level_3__within_bioassay_data_set_function__data.data.txt$")
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(todir,dataset,"-Methylation.tar.gz",sep=""),files=fileList)
-        file.rename(from=fileList,to=paste(todir,dataset,"-Methylation-",listCount,".txt",sep=""))
-        file.remove(paste(todir,dataset,"-Methylation.tar.gz",sep=""))
-        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
+        untar(paste0(todir,dataset,"-Methylation.tar.gz"),files=fileList)
+        file.rename(from=fileList,to=paste0(todir,dataset,"-Methylation-",listCount,".txt"))
+        file.remove(paste0(todir,dataset,"-Methylation.tar.gz"))
+        delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         #Get selected type only
-        tmpCols = read.delim(paste(todir,dataset,"-Methylation-",listCount,".txt",sep=""),nrows=1,colClasses="character")
+        tmpCols = read.delim(paste0(todir,dataset,"-Methylation-",listCount,".txt"),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
         colOrder <- colOrder[tmpCols[1,] == "Beta_value"]
         message("Methylation data will be imported! This may take some times!")
-        testcon <- file(paste(todir,dataset,"-Methylation-",listCount,".txt",sep=""),open="r")
+        testcon <- file(paste0(todir,dataset,"-Methylation-",listCount,".txt"),open="r")
         readsizeof <- 1000
         nooflines <- 0
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
@@ -609,7 +641,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         }
         message(paste(nooflines,"rows will be imported!"))
         tmpMat <- data.frame()
-        inputfile<-file(paste(todir,dataset,"-Methylation-",listCount,".txt",sep=""),open="r")
+        inputfile<-file(paste0(todir,dataset,"-Methylation-",listCount,".txt"),open="r")
         listMat <- list()
         itemcount = 1
         N = nooflines
@@ -665,20 +697,20 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     #Download mRNA array
     if(mRNA_Array)
     {
-      keyWord = paste("","Merge_transcriptome__agilentg4502a_07",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0("","Merge_transcriptome__agilentg4502a_07")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks1 = xpathSApply(doc, keyWord, xmlValue)
-      plinks1 = plinks1[grepl(paste("*.",dataset,"[.]Merge_transcriptome__agilentg4502a_.*.__Level_3__unc_lowess_normalization_gene_level__data.Level_3.*.tar[.]gz$",sep=""),plinks1)]
+      plinks1 = plinks1[grepl(paste0("*.",dataset,"[.]Merge_transcriptome__agilentg4502a_.*.__Level_3__unc_lowess_normalization_gene_level__data.Level_3.*.tar[.]gz$"),plinks1)]
       
-      keyWord = paste("","Merge_transcriptome__ht_hg_u133a",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0("","Merge_transcriptome__ht_hg_u133a")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks2 = xpathSApply(doc, keyWord, xmlValue)
-      plinks2 = plinks2[grepl(paste("*.",dataset,"[.]Merge_transcriptome__ht_hg_u133a__.*.__Level_3__gene_rma__data.Level_3.*.tar[.]gz$",sep=""),plinks2)]
+      plinks2 = plinks2[grepl(paste0("*.",dataset,"[.]Merge_transcriptome__ht_hg_u133a__.*.__Level_3__gene_rma__data.Level_3.*.tar[.]gz$"),plinks2)]
       
-      keyWord = paste("","Merge_exon__huex_1_0_st_v2",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0("","Merge_exon__huex_1_0_st_v2")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks3 = xpathSApply(doc, keyWord, xmlValue)
-      plinks3 = plinks3[grepl(paste("*.",dataset,"[.]Merge_exon__huex_1_0_st_v2__.*.__Level_3__quantile_normalization_gene__data.Level_3.*.tar[.]gz$",sep=""),plinks3)]
+      plinks3 = plinks3[grepl(paste0("*.",dataset,"[.]Merge_exon__huex_1_0_st_v2__.*.__Level_3__quantile_normalization_gene__data.Level_3.*.tar[.]gz$"),plinks3)]
       
       plinks = c(plinks1,plinks2,plinks3)
       plinks = unique(plinks[plinks != ""])
@@ -686,26 +718,26 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       listCount = 1
       for(ii in trim(plinks))
       {
-        download_link = paste(fh_url,ii,sep="")
-        download.file(url=download_link,destfile=paste(todir,dataset,"-mRNAArray.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(todir,dataset,"-mRNAArray.tar.gz",sep=""),list=TRUE)
+        download_link = paste0(fh_url,ii)
+        download.file(url=download_link,destfile=paste0(todir,dataset,"-mRNAArray.tar.gz"),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste0(todir,dataset,"-mRNAArray.tar.gz"),list=TRUE)
         grepSearch = "MANIFEST.txt"
         fileList = fileList[!grepl(grepSearch,fileList)]
-        untar(paste(todir,dataset,"-mRNAArray.tar.gz",sep=""),files=fileList)
+        untar(paste0(todir,dataset,"-mRNAArray.tar.gz"),files=fileList)
         
-        file.rename(from=fileList,to=paste(todir,dataset,"-mRNAArray-",listCount,".txt",sep=""))
-        file.remove(paste(todir,dataset,"-mRNAArray.tar.gz",sep=""))
-        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste0(todir,dataset,"-mRNAArray-",listCount,".txt"))
+        file.remove(paste0(todir,dataset,"-mRNAArray.tar.gz"))
+        delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpCols = read.delim(paste(todir,dataset,"-mRNAArray-",listCount,".txt",sep=""),nrows=1,colClasses="character")
+        tmpCols = read.delim(paste0(todir,dataset,"-mRNAArray-",listCount,".txt"),nrows=1,colClasses="character")
         colOrder <- 2:ncol(tmpCols)
         #colOrder <- colOrder[tmpCols[1,] == "Signal"]
         
         message("mRNA data will be imported! This may take some times!")
-        testcon <- file(paste(todir,dataset,"-mRNAArray-",listCount,".txt",sep=""),open="r")
+        testcon <- file(paste0(todir,dataset,"-mRNAArray-",listCount,".txt"),open="r")
         readsizeof <- 1000
         nooflines <- 0
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
@@ -721,7 +753,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(paste(nooflines,"rows will be imported!"))
         
         tmpMat <- data.frame()
-        inputfile<-file(paste(todir,dataset,"-mRNAArray-",listCount,".txt",sep=""),open="r")
+        inputfile<-file(paste0(todir,dataset,"-mRNAArray-",listCount,".txt"),open="r")
         listMat <- list()
         itemcount = 1
         
@@ -800,10 +832,10 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     #Download miRNA array
     if(miRNA_Array)
     {
-      keyWord = paste("","h_mirna_8x15k",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0("","h_mirna_8x15k")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks1 = xpathSApply(doc, keyWord, xmlValue)
-      plinks1 = plinks1[grepl(paste("*.",dataset,"[.]Merge_mirna__h_mirna_8x15k.*.data.Level_3.*.tar[.]gz$",sep=""),plinks1)]
+      plinks1 = plinks1[grepl(paste0("*.",dataset,"[.]Merge_mirna__h_mirna_8x15k.*.data.Level_3.*.tar[.]gz$"),plinks1)]
       
       plinks = plinks1#c(plinks1,plinks2,plinks3)
       plinks = unique(plinks[plinks != ""])
@@ -811,26 +843,26 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       listCount = 1
       for(ii in trim(plinks))
       {
-        download_link = paste(fh_url,ii,sep="")
-        download.file(url=download_link,destfile=paste(todir,dataset,"-miRNAArray.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(todir,dataset,"-miRNAArray.tar.gz",sep=""),list=TRUE)
+        download_link = paste0(fh_url,ii)
+        download.file(url=download_link,destfile=paste0(todir,dataset,"-miRNAArray.tar.gz"),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste0(todir,dataset,"-miRNAArray.tar.gz"),list=TRUE)
         grepSearch = "MANIFEST.txt"
         fileList = fileList[!grepl(grepSearch,fileList)]
-        untar(paste(todir,dataset,"-miRNAArray.tar.gz",sep=""),files=fileList)
+        untar(paste0(todir,dataset,"-miRNAArray.tar.gz"),files=fileList)
         
-        file.rename(from=fileList,to=paste(todir,dataset,"-miRNAArray-",listCount,".txt",sep=""))
-        file.remove(paste(todir,dataset,"-miRNAArray.tar.gz",sep=""))
-        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste0(todir,dataset,"-miRNAArray-",listCount,".txt"))
+        file.remove(paste0(todir,dataset,"-miRNAArray.tar.gz"))
+        delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpCols = read.delim(paste(todir,dataset,"-miRNAArray-",listCount,".txt",sep=""),nrows=1,colClasses="character")
+        tmpCols = read.delim(paste0(todir,dataset,"-miRNAArray-",listCount,".txt"),nrows=1,colClasses="character")
         colOrder <- 2:ncol(tmpCols)
         #colOrder <- colOrder[tmpCols[1,] == "Signal"]
         
         message("mRNA data will be imported! This may take some times!")
-        testcon <- file(paste(todir,dataset,"-miRNAArray-",listCount,".txt",sep=""),open="r")
+        testcon <- file(paste0(todir,dataset,"-miRNAArray-",listCount,".txt"),open="r")
         readsizeof <- 1000
         nooflines <- 0
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
@@ -846,7 +878,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(paste(nooflines,"rows will be imported!"))
         
         tmpMat <- data.frame()
-        inputfile<-file(paste(todir,dataset,"-miRNAArray-",listCount,".txt",sep=""),open="r")
+        inputfile<-file(paste0(todir,dataset,"-miRNAArray-",listCount,".txt"),open="r")
         listMat <- list()
         itemcount = 1
         
@@ -927,10 +959,10 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     #Download RPPA array
     if(RPPA)
     {
-      keyWord = paste("","rppa_core",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0("","rppa_core")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks1 = xpathSApply(doc, keyWord, xmlValue)
-      plinks1 = plinks1[grepl(paste("*.",dataset,"[.]Merge_protein_exp.*.protein_normalization__data.Level_3.*.tar[.]gz$",sep=""),plinks1)]
+      plinks1 = plinks1[grepl(paste0("*.",dataset,"[.]Merge_protein_exp.*.protein_normalization__data.Level_3.*.tar[.]gz$"),plinks1)]
       
       plinks = plinks1#c(plinks1,plinks2,plinks3)
       plinks = unique(plinks[plinks != ""])
@@ -938,26 +970,26 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       listCount = 1
       for(ii in trim(plinks))
       {
-        download_link = paste(fh_url,ii,sep="")
-        download.file(url=download_link,destfile=paste(todir,dataset,"-RPPAArray.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(todir,dataset,"-RPPAArray.tar.gz",sep=""),list=TRUE)
+        download_link = paste0(fh_url,ii)
+        download.file(url=download_link,destfile=paste0(todir,dataset,"-RPPAArray.tar.gz"),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste0(todir,dataset,"-RPPAArray.tar.gz"),list=TRUE)
         grepSearch = "MANIFEST.txt"
         fileList = fileList[!grepl(grepSearch,fileList)]
-        untar(paste(todir,dataset,"-RPPAArray.tar.gz",sep=""),files=fileList)
+        untar(paste0(todir,dataset,"-RPPAArray.tar.gz"),files=fileList)
         
-        file.rename(from=fileList,to=paste(todir,dataset,"-RPPAArray-",listCount,".txt",sep=""))
-        file.remove(paste(todir,dataset,"-RPPAArray.tar.gz",sep=""))
-        delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
+        file.rename(from=fileList,to=paste0(todir,dataset,"-RPPAArray-",listCount,".txt"))
+        file.remove(paste0(todir,dataset,"-RPPAArray.tar.gz"))
+        delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         
         #Get selected type only
-        tmpCols = read.delim(paste(todir,dataset,"-RPPAArray-",listCount,".txt",sep=""),nrows=1,colClasses="character")
+        tmpCols = read.delim(paste0(todir,dataset,"-RPPAArray-",listCount,".txt"),nrows=1,colClasses="character")
         colOrder <- 2:ncol(tmpCols)
         #colOrder <- colOrder[tmpCols[1,] == "Signal"]
         
         message("mRNA data will be imported! This may take some times!")
-        testcon <- file(paste(todir,dataset,"-RPPAArray-",listCount,".txt",sep=""),open="r")
+        testcon <- file(paste0(todir,dataset,"-RPPAArray-",listCount,".txt"),open="r")
         readsizeof <- 1000
         nooflines <- 0
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
@@ -973,7 +1005,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(paste(nooflines,"rows will be imported!"))
         
         tmpMat <- data.frame()
-        inputfile<-file(paste(todir,dataset,"-RPPAArray-",listCount,".txt",sep=""),open="r")
+        inputfile<-file(paste0(todir,dataset,"-RPPAArray-",listCount,".txt"),open="r")
         listMat <- list()
         itemcount = 1
         
@@ -1055,10 +1087,10 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     #Download RPPA array
     if(Mutation)
     {
-      keyWord = paste("","Mutation_Packager_Calls",sep="")
-      keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+      keyWord = paste0("","Mutation_Packager_Calls")
+      keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks1 = xpathSApply(doc, keyWord, xmlValue)
-      plinks1 = plinks1[grepl(paste("*.",dataset,"[.]Mutation_Packager_Calls[.]Level_3[.].*.tar[.]gz$",sep=""),plinks1)]
+      plinks1 = plinks1[grepl(paste0("*.",dataset,"[.]Mutation_Packager_Calls[.]Level_3[.].*.tar[.]gz$"),plinks1)]
       
       plinks = plinks1#c(plinks1,plinks2,plinks3)
       plinks = unique(plinks[plinks != ""])
@@ -1066,35 +1098,35 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       listCount = 1
       for(ii in trim(plinks))
       {
-        download_link = paste(fh_url,ii,sep="")
-        download.file(url=download_link,destfile=paste(todir,dataset,"-Mutation.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(todir,dataset,"-Mutation.tar.gz",sep=""),list=TRUE)
+        download_link = paste0(fh_url,ii)
+        download.file(url=download_link,destfile=paste0(todir,dataset,"-Mutation.tar.gz"),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(paste0(todir,dataset,"-Mutation.tar.gz"),list=TRUE)
         grepSearch = "MANIFEST.txt"
         fileList = fileList[!grepl(grepSearch,fileList)]
         
         ###
-        untar(paste(todir,dataset,"-Mutation.tar.gz",sep=""),files=fileList)
+        untar(paste0(todir,dataset,"-Mutation.tar.gz"),files=fileList)
         retMutations <- do.call("rbind",lapply(fileList,FUN=function(files){
           read.delim(files,header=TRUE,colClasses="character")
         }))
-        delFodler <- paste(strsplit(fileList[1],"/")[[1]][1],sep="")
+        delFodler <- paste0(strsplit(fileList[1],"/")[[1]][1])
         unlink(delFodler, recursive = TRUE)
-        file.remove(paste(todir,dataset,"-Mutation.tar.gz",sep=""))
+        file.remove(paste0(todir,dataset,"-Mutation.tar.gz"))
         ###
         
         #myMutFiles <- list()
         #countPos=1
         #for(myFiles in fileList)
         #{
-        #  untar(paste(todir,dataset,"-Mutation.tar.gz",sep=""),files=myFiles)
+        #  untar(paste0(todir,dataset,"-Mutation.tar.gz"),files=myFiles)
         #  tmpCols = read.delim(myFiles,header=TRUE,colClasses="character")
         #  myMutFiles[[countPos]] <- tmpCols
         #  countPos = countPos + 1
         #  
-        #  delFodler <- paste(strsplit(myFiles,"/")[[1]][1],sep="")
+        #  delFodler <- paste0(strsplit(myFiles,"/")[[1]][1])
         #  unlink(delFodler, recursive = TRUE)
         #}
-        #file.remove(paste(todir,dataset,"-Mutation.tar.gz",sep=""))
+        #file.remove(paste0(todir,dataset,"-Mutation.tar.gz"))
         #
         #retMutations <- data.frame()
         #for(i in 1:length(myMutFiles))
@@ -1107,7 +1139,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         #  
         #}
         
-        write.table(retMutations,file=paste(todir,dataset,"-Mutations-AllSamples.txt",sep=""),sep="\t",row.names=F,quote=F)
+        write.table(retMutations,file=paste0(todir,dataset,"-Mutations-AllSamples.txt"),sep="\t",row.names=F,quote=F)
         resultClass@Mutations <- retMutations
       }
       
@@ -1122,36 +1154,36 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   {
     ##build URL for getting file links
     fh_url <- "http://gdac.broadinstitute.org/runs/analyses__"
-    fh_url <- paste(fh_url,substr(gistic2_Date,1,4),"_",substr(gistic2_Date,5,6),"_",substr(gistic2_Date,7,8),"/data/",sep="")
-    fh_url <- paste(fh_url,dataset,"/",gistic2_Date,"/",sep="")
+    fh_url <- paste0(fh_url,substr(gistic2_Date,1,4),"_",substr(gistic2_Date,5,6),"_",substr(gistic2_Date,7,8),"/data/")
+    fh_url <- paste0(fh_url,dataset,"/",gistic2_Date,"/")
     doc = htmlTreeParse(fh_url, useInternalNodes = T)
     
-    keyWord = paste("","CopyNumber_Gistic2.Level_4",sep="")
-    keyWord = paste("//a[contains(@href, '",keyWord,"')]",sep="")
+    keyWord = paste0("","CopyNumber_Gistic2.Level_4")
+    keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
     plinks = xpathSApply(doc, keyWord, xmlValue)
-    plinks = plinks[grepl(paste("*.",dataset,"-TP[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$",sep=""),plinks)]
+    plinks = plinks[grepl(paste0("*.",dataset,"-TP[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$"),plinks)]
     
     for(ii in trim(plinks))
     {
-      download_link = paste(fh_url,ii,sep="")
-      download.file(url=download_link,destfile=paste(todir,dataset,"-Gistic2.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+      download_link = paste0(fh_url,ii)
+      download.file(url=download_link,destfile=paste0(todir,dataset,"-Gistic2.tar.gz"),method="auto",quiet = FALSE, mode = "w")
       
-      fileList <- untar(paste(todir,dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
+      fileList <- untar(paste0(todir,dataset,"-Gistic2.tar.gz"),list=TRUE)
       grepSearch = "all_data_by_genes.txt"
       fileList = fileList[grepl(grepSearch,fileList)]
-      untar(paste(todir,dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
+      untar(paste0(todir,dataset,"-Gistic2.tar.gz"),files=fileList)
       tmpCNAll = read.delim(fileList,header=TRUE,colClasses="character")
-      file.rename(from=fileList,to=paste(todir,dataset,"-all_data_by_genes.txt",sep=""))
+      file.rename(from=fileList,to=paste0(todir,dataset,"-all_data_by_genes.txt"))
       
-      fileList <- untar(paste(todir,dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
+      fileList <- untar(paste0(todir,dataset,"-Gistic2.tar.gz"),list=TRUE)
       grepSearch = "all_thresholded.by_genes.txt"
       fileList = fileList[grepl(grepSearch,fileList)]
-      untar(paste(todir,dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
+      untar(paste0(todir,dataset,"-Gistic2.tar.gz"),files=fileList)
       tmpCNThreshhold = read.delim(fileList,header=TRUE,colClasses="character")
-      file.rename(from=fileList,to=paste(todir,dataset,"-all_thresholded.by_genes.txt",sep=""))
+      file.rename(from=fileList,to=paste0(todir,dataset,"-all_thresholded.by_genes.txt"))
       
       
-      delFodler <- paste(strsplit(fileList,"/")[[1]][1],sep="")
+      delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
       unlink(delFodler, recursive = TRUE)
       
       
@@ -1504,7 +1536,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
                 v <- geneMat[c(topgenes,bottomgenes),]
                 v <- apply(v,2,as.numeric)
                 rownames(v) <- c(topgenes,bottomgenes)
-                hmHead <- paste("mRNA Array #",1,sep="")
+                hmHead <- paste0("mRNA Array #",1)
                 for(pp in  1:2)
                 {
                   message("##############################")
@@ -1867,7 +1899,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
                 surv.diff <- survdiff (Surv(time.group,censor.group)~surv.group)
                 pvalue <- 1- pchisq (surv.diff$chisq[1], df=1)
                 plot(surv.fit, xlab="Time", ylab="Survival", main=paste("RNASeq -",myG), col=c(2,4))
-                pValueTxt <- paste ("p-value= ", format.pval(pvalue,digits=2), sep="")
+                pValueTxt <- paste0("p-value= ", format.pval(pvalue,digits=2))
                 legTxt <- c("< Median", ">= Median", pValueTxt)
                 legend("topright", legend=legTxt, col=c(2,4,0), lty=c(1,1),cex=0.7)
               }
@@ -1883,7 +1915,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
                 surv.diff <- survdiff (Surv(time.group,censor.group)~surv.group)
                 pvalue <- 1- pchisq (surv.diff$chisq[1], df=2)
                 plot(surv.fit, xlab="Time", ylab="Survival", main=paste("RNASeq -",myG), col=c(2,3,4))
-                pValueTxt <- paste ("p-value= ", format.pval(pvalue,digits=2), sep="")
+                pValueTxt <- paste0("p-value= ", format.pval(pvalue,digits=2))
                 legTxt <- c("< 1st Q.", "Between 1st&3rd Q.", "> 3rd. Q.", pValueTxt)
                 legend("topright", legend=legTxt, col=c(2,3,4,0), lty=c(1,1),cex=0.7)
               }
@@ -1965,7 +1997,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
               surv.diff <- survdiff (Surv(time.group,censor.group)~surv.group)
               pvalue <- 1- pchisq (surv.diff$chisq[1], df=1)
               plot(surv.fit, xlab="Time", ylab="Survival", main=paste("RNASeq2 -",myG), col=c(2,4))
-              pValueTxt <- paste ("p-value= ", format.pval(pvalue,digits=2), sep="")
+              pValueTxt <- paste0("p-value= ", format.pval(pvalue,digits=2))
               legTxt <- c("< Median", ">= Median", pValueTxt)
               legend("topright", legend=legTxt, col=c(2,4,0), lty=c(1,1),cex=0.7)
             }
@@ -1981,7 +2013,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
               surv.diff <- survdiff (Surv(time.group,censor.group)~surv.group)
               pvalue <- 1- pchisq (surv.diff$chisq[1], df=2)
               plot(surv.fit, xlab="Time", ylab="Survival", main=paste("RNASeq2 -",myG), col=c(2,3,4))
-              pValueTxt <- paste ("p-value= ", format.pval(pvalue,digits=2), sep="")
+              pValueTxt <- paste0("p-value= ", format.pval(pvalue,digits=2))
               legTxt <- c("< 1st Q.", "Between 1st&3rd Q.", "> 3rd. Q.", pValueTxt)
               legend("topright", legend=legTxt, col=c(2,3,4,0), lty=c(1,1),cex=0.7)
             }
@@ -2045,7 +2077,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
                 myFN <- gsub(x=myFN,pattern="_",replacement="@")
                 myFN <- paste(unlist(strsplit(x=myFN,split="@"))[3],unlist(strsplit(x=myFN,split="@"))[4],unlist(strsplit(x=myFN,split="@"))[5])
                 plot(surv.fit, xlab="Time", ylab="Survival", main=paste(myFN,myG,sep="-"), col=c(2,4))
-                pValueTxt <- paste ("p-value= ", format.pval(pvalue,digits=2), sep="")
+                pValueTxt <- paste0("p-value= ", format.pval(pvalue,digits=2))
                 legTxt <- c("< Median", ">= Median", pValueTxt)
                 legend("topright", legend=legTxt, col=c(2,4,0), lty=c(1,1),cex=0.7)
               }
@@ -2064,7 +2096,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
                 myFN <- gsub(x=myFN,pattern="_",replacement="@")
                 myFN <- paste(unlist(strsplit(x=myFN,split="@"))[3],unlist(strsplit(x=myFN,split="@"))[4],unlist(strsplit(x=myFN,split="@"))[5])
                 plot(surv.fit, xlab="Time", ylab="Survival", main=paste(myFN,myG,sep="-"), col=c(2,3,4))
-                pValueTxt <- paste ("p-value= ", format.pval(pvalue,digits=2), sep="")
+                pValueTxt <- paste0("p-value= ", format.pval(pvalue,digits=2))
                 legTxt <- c("< 1st Q.", "Between 1st&3rd Q.", "> 3rd. Q.", pValueTxt)
                 legend("topright", legend=legTxt, col=c(2,3,4,0), lty=c(1,1),cex=0.7)
               }
@@ -2092,7 +2124,7 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
   if(!is.null(DGEResult2) & class(DGEResult2) != "DGEResult"){stop("DGEResult2 must be DGEResult class!")}
 
   
-  pdf(file=paste(dataObject@Dataset,"-reportImage.pdf",sep=""),height=30,width=30)
+  pdf(file=paste0(dataObject@Dataset,"-reportImage.pdf"),height=30,width=30)
   plotpos = 1;
   require("RCircos")
   data(UCSC.HG19.Human.CytoBandIdeogram)
