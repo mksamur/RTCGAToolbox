@@ -83,7 +83,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       plinks = plinks[grepl("*.tar[.]gz$",plinks)]
       cachefile <- paste0(todir,dataset,"-Clinical.txt")
       if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
-        stop("Clinic file already downloaded!")
+        warning(paste0(dataset,"-","Clinic file already downloaded!"))
       } else {
       for(i in trim(plinks))
       {
@@ -116,7 +116,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       plinks = plinks[grepl("*.Merge_rnaseq__.*._rnaseq__.*.tar[.]gz$",plinks)]
       cachefile <- paste0(todir,dataset,"-RNAseqGene.txt")
       if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
-        stop("RNAseqGene file already downloaded!")
+        warning(paste0(dataset,"-","RNAseqGene file already downloaded!"))
       } else {
       for(i in trim(plinks))
       {
@@ -231,7 +231,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       plinks = plinks[grepl("*.Merge_rnaseqv2__.*._rnaseqv2__.*.tar[.]gz$",plinks)]
       cachefile <- paste0(todir,dataset,"-RNAseq2GeneNorm.txt")
       if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
-        stop("RNAseq2GeneNorm file already downloaded!")
+        warning(paste0(dataset,"-","RNAseq2GeneNorm file already downloaded!"))
       } else {
       for(i in trim(plinks))
       {
@@ -348,12 +348,12 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       keyWord = paste0("","Level_3__miR_gene_expression__data.Level_3")
       keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks = xpathSApply(doc, keyWord, xmlValue)
-      message(plinks)
+      # message(plinks)
       plinks = plinks[grepl(paste0("*.",dataset,"[.]Merge_mirnaseq__.*.hiseq_mirnaseq__.*.tar[.]gz$"),plinks)]
-      message(plinks)
+      # message(plinks)
       cachefile <- paste0(todir,dataset,"-miRNAseqGene.txt")
       if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
-        stop("miRNAseqGene file already downloaded!")
+        warning(paste0(dataset,"-","miRNAseqGene file already downloaded!"))
       } else {
       for(i in trim(plinks))
       {
@@ -474,7 +474,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       plinks = plinks[grepl(paste0("*.",dataset,"[.]Merge_snp__.*.__Level_3__segmented_scna_hg19__seg.Level_3.*.tar[.]gz$"),plinks)]
       cachefile <- paste0(todir,dataset,"-CNASNPHg19.txt")
       if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
-        stop("CNASNPHg19 file already downloaded!")
+        warning(paste0(dataset,"-","CNASNPHg19 file already downloaded!"))
         } else {
       for(i in trim(plinks))
       {
@@ -507,7 +507,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       plinks = plinks[grepl(paste0("*.",dataset,"[.]Merge_snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.Level_3.*.tar[.]gz$"),plinks)]
       cachefile <- paste0(todir,dataset,"-CNVSNPHg19.txt")
       if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
-        stop("CNVSNPHg19 file already downloaded!")
+        warning(paste0(dataset,"-","CNVSNPHg19 file already downloaded!"))
       } else {
       for(i in trim(plinks))
       {
@@ -541,7 +541,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       plinks = plinks[grepl(paste0("*.",dataset,"[.]Merge_cna__.*.dnaseq.*.__Level_3__segmentation__seg.Level_3.*.tar[.]gz$"),plinks)]
       cachefile <- paste0(todir,dataset,"-CNAseq.txt")
       if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
-        stop("CNAseq file already downloaded!")
+        warning(paste0(dataset,"-","CNAseq file already downloaded!"))
       } else {
       for(i in trim(plinks))
       {
@@ -572,9 +572,12 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks = xpathSApply(doc, keyWord, xmlValue)
       plinks = plinks[grepl(paste0("*.",dataset,"[.]Merge_cna__.*.cgh.*.__Level_3__segmentation__seg.Level_3.*.tar[.]gz$"),plinks)]
-      
-      dataLists <- list()
       listCount = 1
+      cachefile <- paste0(todir,dataset,"-CNACGH-",listCount,".txt")
+      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+        warning(paste0(dataset,"-CNACGH-", listCount,".txt", " file already downloaded!"))
+      } else {
+      dataLists <- list()
       for(i in trim(plinks))
       {
         download_link = paste0(fh_url,i)
@@ -599,7 +602,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       }
       resultClass@CNACGH <- dataLists
     }
-    
+    }
     #Download methylation
     if(Methylation)
     {
@@ -607,8 +610,12 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks = xpathSApply(doc, keyWord, xmlValue)
       plinks = plinks[grepl(paste0("*.",dataset,"[.]Merge_methylation__.*.methylation.*.__Level_3__within_bioassay_data_set_function__data.Level_3.*.tar[.]gz$"),plinks)]
-      dataLists <- list()
       listCount = 1
+      cachefile <- paste0(todir,dataset,"-Methylation-",listCount,".txt")
+      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+        warning(paste0(dataset,"-Methylation-", listCount,".txt", " file already downloaded!"))
+      } else {
+      dataLists <- list()
       for(ii in trim(plinks))
       {
         download_link = paste0(fh_url,ii)
@@ -693,7 +700,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       }
       resultClass@Methylation <- dataLists
     }
-    
+    }
     #Download mRNA array
     if(mRNA_Array)
     {
@@ -714,8 +721,12 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       
       plinks = c(plinks1,plinks2,plinks3)
       plinks = unique(plinks[plinks != ""])
-      dataLists <- list()
       listCount = 1
+      cachefile <- paste0(todir,dataset,"-mRNAArray-",listCount,".txt")
+      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+        warning(paste0(dataset,"-mRNAArray-", listCount,".txt", " file already downloaded!"))
+      } else {
+      dataLists <- list()
       for(ii in trim(plinks))
       {
         download_link = paste0(fh_url,ii)
@@ -827,7 +838,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       }
       resultClass@mRNAArray <- dataLists
     }
-    
+    }
     
     #Download miRNA array
     if(miRNA_Array)
@@ -839,8 +850,12 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       
       plinks = plinks1#c(plinks1,plinks2,plinks3)
       plinks = unique(plinks[plinks != ""])
-      dataLists <- list()
       listCount = 1
+      cachefile <- paste0(todir,dataset,"-miRNAArray-",listCount,".txt")
+      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+        warning(paste0(dataset,"-miRNAArray-", listCount,".txt", " file already downloaded!"))
+      } else {
+        dataLists <- list()
       for(ii in trim(plinks))
       {
         download_link = paste0(fh_url,ii)
@@ -955,7 +970,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       }
       resultClass@miRNAArray <- dataLists
     }
-    
+    }
     #Download RPPA array
     if(RPPA)
     {
@@ -966,9 +981,13 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       
       plinks = plinks1#c(plinks1,plinks2,plinks3)
       plinks = unique(plinks[plinks != ""])
-      dataLists <- list()
       listCount = 1
-      for(ii in trim(plinks))
+      cachefile <- paste0(todir,dataset,"-RPPAArray-",listCount,".txt")
+      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+        warning(paste0(dataset,"-RPPAArray-", listCount,".txt", " file already downloaded!"))
+      } else {
+        dataLists <- list()
+        for(ii in trim(plinks))
       {
         download_link = paste0(fh_url,ii)
         download.file(url=download_link,destfile=paste0(todir,dataset,"-RPPAArray.tar.gz"),method="auto",quiet = FALSE, mode = "w")
@@ -1082,9 +1101,9 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       }
       resultClass@RPPAArray <- dataLists
     }
+    }
     
-    
-    #Download RPPA array
+    #Download Mutation array
     if(Mutation)
     {
       keyWord = paste0("","Mutation_Packager_Calls")
@@ -1092,10 +1111,14 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       plinks1 = xpathSApply(doc, keyWord, xmlValue)
       plinks1 = plinks1[grepl(paste0("*.",dataset,"[.]Mutation_Packager_Calls[.]Level_3[.].*.tar[.]gz$"),plinks1)]
       
-      plinks = plinks1#c(plinks1,plinks2,plinks3)
+      plinks = plinks1 #c(plinks1,plinks2,plinks3)
       plinks = unique(plinks[plinks != ""])
-      dataLists <- list()
       listCount = 1
+      cachefile <- paste0(todir,dataset,"-Mutations-AllSamples.txt")
+      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+        warning(paste0(dataset,"-Mutations-AllSamples.txt", " file already downloaded!"))
+      } else {
+        dataLists <- list()
       for(ii in trim(plinks))
       {
         download_link = paste0(fh_url,ii)
@@ -1144,9 +1167,8 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       }
       
     }
-    
-    
-    
+    }    
+        
     
   }
   
@@ -1163,7 +1185,11 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     plinks = xpathSApply(doc, keyWord, xmlValue)
     plinks = plinks[grepl(paste0("*.",dataset,"-TP[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$"),plinks)]
     
-    for(ii in trim(plinks))
+    cachefile <- paste0(todir,dataset,"-all_data_by_genes.txt")
+    if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+      warning(paste0(dataset,"-all_data_by_genes.txt", " file already downloaded!"))
+    } else {
+      for(ii in trim(plinks))
     {
       download_link = paste0(fh_url,ii)
       download.file(url=download_link,destfile=paste0(todir,dataset,"-Gistic2.tar.gz"),method="auto",quiet = FALSE, mode = "w")
@@ -1193,7 +1219,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       
     }
   }
-  
+  }
   
   return(resultClass)
 
