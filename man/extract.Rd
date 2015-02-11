@@ -17,7 +17,7 @@ extract(object, type)
   \item{object}{: A "FirehoseData" object from the getFirehoseData function.
 %%     ~~Describe \code{x} here~~
 }
-  \item{type}{: The type of dataset from a list of possible datasets. Choices include: "RNAseq_Gene", "Clinic", "miRNASeq_Gene", "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP", "CNA_Seq", "CNA_CGH", "Methylation", "Mutation", "mRNA_Array", "miRNA_Array", "RPPA".
+  \item{type}{: The type of dataset from a list of possible datasets. Choices include: "RNAseq_Gene", "Clinic", "miRNASeq_Gene", "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP", "CNA_Seq", "CNA_CGH", "Methylation", "Mutation", "mRNA_Array", "miRNA_Array", "RPPA", "GISTIC_A", "GISTIC_T".
   }
 }
 \value{
@@ -27,6 +27,9 @@ This function returns an object based on the chosen dataset which can be a matri
 %%  \item{comp1 }{Description of 'comp1'}
 %%  \item{comp2 }{Description of 'comp2'}
 %% ...
+}
+\details{
+The "GISTIC_A" type of dataset represents GISTIC data by all genes. "GISTIC_T"" represents data thresholded by genes. 
 }
 \author{
 Levi Waldron
