@@ -96,7 +96,15 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         unlink(delFodler, recursive = TRUE)
         }
       } 
-      
+      if(require(data.table)){
+        raw.clin <- fread(file.path(todir,paste0(dataset,"-Clinical.txt")),colClasses="character")
+        # setkey(raw.clin, "Hybridization REF")
+        df.clin <- data.frame(do.call(rbind, data.frame(raw.clin)[, -1]))
+        # setnames(dt.clin, names(dt.clin), raw.clin[[1]])
+        colnames(df.clin) <- raw.clin[[1]]
+        resultClass@Clinical <- df.clin
+        gc()
+      }
         raw.clin <- read.delim(file.path(todir,paste0(dataset,"-Clinical.txt")),colClasses="character")
         df.clin <- data.frame(do.call(rbind, raw.clin[, -1]))
         colnames(df.clin) <- raw.clin[, 1]
