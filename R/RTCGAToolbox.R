@@ -255,8 +255,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
           nooflines <- nooflines+linesread )
         close(testcon)
-        message(nooflines)
-        
+                
         message(paste(nooflines,"genes will be imported!"))
         
         tmpMat <- data.frame()
@@ -377,8 +376,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
           nooflines <- nooflines+linesread )
         close(testcon)
-        message(nooflines)
-        
+                
         message(paste(nooflines,"genes will be imported!"))
         
         tmpMat <- data.frame()
@@ -511,7 +509,6 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         grepSearch = paste0("*.",dataset,"[.]snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.seg.txt$")
         fileList = fileList[grepl(grepSearch,fileList)]
         untar(file.path(todir,paste0(dataset,"-CNVSNPHg19.tar.gz")),files=fileList)
-        
         file.rename(from=fileList,to=file.path(todir,paste0(dataset,"-CNVSNPHg19.txt")))
         file.remove(file.path(todir,paste0(dataset,"-CNVSNPHg19.tar.gz")))
         delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
@@ -545,18 +542,21 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         grepSearch = paste0("*.",dataset,"[.]cna__.*.__Level_3__segmentation__seg.seg.txt$")
         fileList = fileList[grepl(grepSearch,fileList)]
         untar(file.path(todir,paste0(dataset,"-CNAseq.tar.gz")),files=fileList)
-        
         file.rename(from=fileList,to=file.path(todir,paste0(dataset,"-CNAseq.txt")))
         file.remove(file.path(todir,paste0(dataset,"-CNAseq.tar.gz")))
         delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
       }
-      }         
+      }
+      if(file.exists(cachefile)){
       #Get selected type only
       tmpMat = read.delim(file.path(todir,paste0(dataset,"-CNAseq.txt")),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                              "numeric","numeric"))
       resultClass@CNAseq <- tmpMat
+      }else{
+        message(paste0(dataset,"-","CNAseq file was not able to be downloaded!"))
+      }
     }
     
     #Download CNA CGH data
@@ -636,7 +636,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
           nooflines <- nooflines+linesread )
         close(testcon)
-        message(nooflines)
+        
         if(nooflines > 50000)
         {
           message(paste(ii,"won't be imported due to high data volume!"))
@@ -751,8 +751,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
           nooflines <- nooflines+linesread )
         close(testcon)
-        message(nooflines)
-        
+                
         if(nooflines > 50000)
         {
           message(paste(ii,"won't be imported due to high data volume!"))
@@ -880,8 +879,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
           nooflines <- nooflines+linesread )
         close(testcon)
-        message(nooflines)
-        
+                
         if(nooflines > 50000)
         {
           message(paste(ii,"won't be imported due to high data volume!"))
@@ -1014,8 +1012,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
           nooflines <- nooflines+linesread )
         close(testcon)
-        message(nooflines)
-        
+                
         if(nooflines > 50000)
         {
           message(paste(ii,"won't be imported due to high data volume!"))
@@ -2310,7 +2307,18 @@ extract <- function(object, type){
       }else if(identical(typematch, "CNA_Seq")){
       output <- getElement(object, "CNAseq")
     }else if(identical(typematch, "CNA_CGH")){
-      output <- getElement(object, "CNACGH")
+      if(is(object@CNACGH, "list")){
+        if(length(object@CNACGH) > 1){
+          output <- lapply(object@CNACGH, function(tmp){getElement(tmp, "DataMatrix")})
+          keeplist <- which.max(sapply(output, ncol))
+          output <- output[[keeplist]]
+          warning(paste("Taking the CNACGH array platform with the greatest number of samples:", keeplist))
+        }else if(length(object@CNACGH) == 1){
+          output <- object@CNACGH[[1]]@DataMatrix
+      }else{
+        output <- matrix(NA, nrow=0, ncol=0)
+        }
+      }
     }else if(identical(typematch, "Mutation")){
       output <- getElement(object, "Mutations")
     }else if(identical(typematch, "RPPA")){
