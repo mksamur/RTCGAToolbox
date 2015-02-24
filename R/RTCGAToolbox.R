@@ -129,7 +129,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         unlink(delFodler, recursive = TRUE)
         }
       } 
-      
+      if(file.exists(cachefile)){
       #Get selected type only
         tmpCols = read.delim(file.path(todir,paste0(dataset,"-RNAseqGene.txt")),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
@@ -212,6 +212,9 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
         resultClass@RNASeqGene <- tmpMat
         gc()
+      }else{
+        message(paste0(dataset,"-","RNAseqGene file could not be downloaded!"))
+      }
         
       }
     gc()
@@ -242,7 +245,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         unlink(delFodler, recursive = TRUE)
       }
       }  
-      
+      if(file.exists(cachefile)){
       #Get selected type only
         tmpCols = read.delim(file.path(todir,paste0(dataset,"-RNAseq2GeneNorm.txt")),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
@@ -332,6 +335,9 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
         resultClass@RNASeq2GeneNorm <- tmpMat
         gc()
+      }else{
+          message(paste0(dataset,"-","RNAseq2GeneNorm file could not be downloaded!"))
+        }
       }
     gc()
     #Download miRNAseq gene level data
@@ -363,7 +369,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         unlink(delFodler, recursive = TRUE)
         }
       } 
-
+      if(file.exists(cachefile)){
       #Get selected type only
         tmpCols = read.delim(file.path(todir,paste0(dataset,"-miRNAseqGene.txt")),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
@@ -454,6 +460,9 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         
         resultClass@miRNASeqGene <- tmpMat
         gc()
+      }else{
+        message(paste0(dataset,"-","miRNAseqGene file could not be downloaded!"))
+      }
       }
     gc()
     #Download CNA SNP data
@@ -483,11 +492,14 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         unlink(delFodler, recursive = TRUE)
         }
       } 
-      
+      if(file.exists(cachefile)){
         #Get selected type only
         tmpMat = read.delim(file.path(todir,paste0(dataset,"-CNASNPHg19.txt")),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                             "numeric","numeric"))
         resultClass@CNASNP <- tmpMat
+      }else{
+        message(paste0(dataset,"-","CNASNPHg19 file could not be downloaded!"))
+      }
     }
         
     #Download CNV SNP data
@@ -516,11 +528,14 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         unlink(delFodler, recursive = TRUE)
         }
       } 
-        
+      if(file.exists(cachefile)){
       #Get selected type only
         tmpMat = read.delim(file.path(todir,paste0(dataset,"-CNVSNPHg19.txt")),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                              "numeric","numeric"))
         resultClass@CNVSNP <- tmpMat
+      }else{
+        message(paste0(dataset,"-","CNVSNPHg19 file could not be downloaded!"))
+      }
     }
     
     #Download CNA DNAseq data
@@ -555,7 +570,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                                                                                              "numeric","numeric"))
       resultClass@CNAseq <- tmpMat
       }else{
-        message(paste0(dataset,"-","CNAseq file was not able to be downloaded!"))
+        message(paste0(dataset,"-","CNAseq file could not be downloaded!"))
       }
     }
     
@@ -568,11 +583,11 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       plinks = plinks[grepl(paste0("*.",dataset,"[.]Merge_cna__.*.cgh.*.__Level_3__segmentation__seg.Level_3.*.tar[.]gz$"),plinks)]
       listCount = 1
       dataLists <- list()
-      cachefile <- file.path(todir,paste0(dataset,"-CNACGH-",listCount,".txt"))
-      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate){
-        message(paste0(dataset,"-CNACGH-", listCount,".txt", " file already downloaded! Loading data...")) 
-      } else if(!file.exists(cachefile)) {
       for(i in trim(plinks)) {
+          cachefile <- file.path(todir,paste0(dataset,"-CNACGH-",listCount,".txt"))
+          if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate){
+          message(paste0(dataset,"-CNACGH-", listCount,".txt", " file already downloaded! Loading data...")) 
+          }else{
         download_link = paste0(fh_url,i)
         download.file(url=download_link,destfile=file.path(todir,paste0(dataset,"-CNACGH.tar.gz")),method="auto",quiet = FALSE, mode = "w")
         fileList <- untar(file.path(todir,paste0(dataset,"-CNACGH.tar.gz")),list=TRUE)
@@ -586,14 +601,14 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         }
-      } 
-      for (i in trim(plinks)) {
-      #Get selected type only
-      tmpMat = read.delim(file.path(todir,paste0(dataset,"-CNACGH-",listCount,".txt")),header=TRUE,colClasses=c("character","numeric","numeric",
-                                                                                         "numeric","numeric"))
-      tmpReturn <- new("FirehoseCGHArray",Filename=i,DataMatrix=tmpMat)
-      dataLists[[listCount]] <- tmpReturn
+        if(!file.exists(cachefile)){
+          message(paste0(dataset, "-CNACGH-", listCount, ".txt", " was not found!"))
+        }else{
+        tmpMat = read.delim(file.path(cachefile),header=TRUE,colClasses=c("character","numeric","numeric","numeric","numeric"))
+        tmpReturn <- new("FirehoseCGHArray",Filename=i,DataMatrix=tmpMat)
+        dataLists[[listCount]] <- tmpReturn
         listCount = listCount + 1
+      }
       }
       resultClass@CNACGH <- dataLists
     } 
@@ -605,7 +620,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
       plinks = xpathSApply(doc, keyWord, xmlValue)
       plinks = plinks[grepl(paste0("*.",dataset,"[.]Merge_methylation__.*.methylation.*.__Level_3__within_bioassay_data_set_function__data.Level_3.*.tar[.]gz$"),plinks)]
-      listCount = 1
+      listCount <- 1
       cachefile <- file.path(todir,paste0(dataset,"-Methylation-",listCount,".txt"))
       if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) { 
         message(paste0(dataset,"-Methylation-", listCount,".txt", " file already downloaded! Loading data...")) 
@@ -623,9 +638,18 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
         }
-      } 
+      }
+      if(file.exists(cachefile)){
       for(ii in trim(plinks)) {  
-        #Get selected type only
+        # Get selected type only
+#         if(require(data.table))
+#         {
+#         tmpCols = read.delim(file.path(todir,paste0(dataset,"-Methylation-",listCount,".txt")),nrows=1,colClasses="character")
+#         colOrder <- 1:ncol(tmpCols)
+#         colOrder <- colOrder[tmpCols[1,] == "Beta_value"]
+#         tmpMat1 <- fread(file.path(todir,paste0(dataset,"-Methylation-",1,".txt")), select=c(1,3,4,5,colOrder))
+#         tmpMat2 <- fread(file.path(todir,paste0(dataset,"-Methylation-",2,".txt")))
+#       }
         tmpCols = read.delim(file.path(todir,paste0(dataset,"-Methylation-",listCount,".txt")),nrows=1,colClasses="character")
         colOrder <- 1:ncol(tmpCols)
         colOrder <- colOrder[tmpCols[1,] == "Beta_value"]
@@ -695,6 +719,9 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         listCount = listCount + 1
       }
       resultClass@Methylation <- dataLists
+      }else{
+        message(paste0(dataset,"-","Methylation file could not be downloaded!"))
+      }
     }
     
     #Download mRNA array
@@ -719,119 +746,120 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       plinks = unique(plinks[plinks != ""])
       listCount = 1
       dataLists <- list()
-      cachefile <- file.path(todir,paste0(dataset,"-mRNAArray-",listCount,".txt"))
-      if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate){
-        message(paste0(dataset,"-mRNAArray-", listCount,".txt", " file already downloaded! Loading data...")) 
-      } else if(!file.exists(cachefile)) {
-        for(ii in trim(plinks)) {
-        download_link = paste0(fh_url,ii)
-        download.file(url=download_link,destfile=file.path(todir,paste0(dataset,"-mRNAArray.tar.gz")),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(file.path(todir,paste0(dataset,"-mRNAArray.tar.gz")),list=TRUE)
-        grepSearch = "MANIFEST.txt"
-        fileList = fileList[!grepl(grepSearch,fileList)]
-        untar(file.path(todir,paste0(dataset,"-mRNAArray.tar.gz")),files=fileList)
-        
-        file.rename(from=fileList,to=file.path(todir,paste0(dataset,"-mRNAArray-",listCount,".txt")))
-        file.remove(file.path(todir,paste0(dataset,"-mRNAArray.tar.gz")))
-        delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
-        message(delFodler)
-        unlink(delFodler, recursive = TRUE)
-        }
-      } 
       for(ii in trim(plinks)) {
-      #Get selected type only
-        tmpCols = read.delim(file.path(todir,paste0(dataset,"-mRNAArray-",listCount,".txt")),nrows=1,colClasses="character")
-        colOrder <- 2:ncol(tmpCols)
-        #colOrder <- colOrder[tmpCols[1,] == "Signal"]
-        
-        message("mRNA data will be imported! This may take some time!")
-        testcon <- file(file.path(todir,paste0(dataset,"-mRNAArray-",listCount,".txt")),open="r")
-        readsizeof <- 1000
-        nooflines <- 0
-        ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
-          nooflines <- nooflines+linesread )
-        close(testcon)
-                
-        if(nooflines > 50000)
-        {
-          message(paste(ii,"won't be imported due to high data volume!"))
-          break
-        }
-        message(paste(nooflines,"rows will be imported!"))
-        
-        tmpMat <- data.frame()
-        inputfile<-file(file.path(todir,paste0(dataset,"-mRNAArray-",listCount,".txt")),open="r")
-        listMat <- list()
-        itemcount = 1
-        
-        N = nooflines
-        chunksize<-100
-        nchunks<- ceiling(N/100)
-        
-        for(i in 1:nchunks){
-          chunk<-read.delim(inputfile,nrows=chunksize,colClasses="character",header=FALSE)
-          if(i == 1)
-          {
-            tmpMat <- chunk[,c(1,colOrder)]
-          }
-          else
-          {
-            tmpMat <- rbind(tmpMat,chunk[,c(1,colOrder)])
-          }
-          if((chunksize*i) < nooflines){message(paste((chunksize*i),"rows have been imported!"))}
-          else{message(paste((nooflines),"rows have been imported!"))}
+        cachefile <- file.path(todir,paste0(dataset,"-mRNAArray-",listCount,".txt"))
+        if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate){
+          message(paste0(dataset,"-mRNAArray-", listCount,".txt", " file already downloaded! Loading data...")) 
+        }else{
+          download_link = paste0(fh_url,ii)
+          download.file(url=download_link,destfile=file.path(todir,paste0(dataset,"-mRNAArray.tar.gz")),method="auto",quiet = FALSE, mode = "w")
+          fileList <- untar(file.path(todir,paste0(dataset,"-mRNAArray.tar.gz")),list=TRUE)
+          grepSearch = "MANIFEST.txt"
+          fileList = fileList[!grepl(grepSearch,fileList)]
+          untar(paste0(dataset,"-mRNAArray.tar.gz"),files=fileList)
           
-          if( ((chunksize*i) %% 1000) ==0 )
+          file.rename(from=fileList,to=paste0(dataset,"-mRNAArray-",listCount,".txt"))
+          file.remove(file.path(todir,paste0(dataset,"-mRNAArray.tar.gz")))
+          delFodler <- paste0(strsplit(fileList,"/")[[1]][1])
+          message(delFodler)
+          unlink(delFodler, recursive = TRUE)
+        }
+        if(!file.exists(cachefile)){
+          message(paste0(dataset, "-mRNAArray-", listCount, ".txt", " was not found!"))
+        }else{
+          tmpCols = read.delim(file.path(todir,paste0(dataset,"-mRNAArray-",listCount,".txt")),nrows=1,colClasses="character")
+          colOrder <- 2:ncol(tmpCols)
+          #colOrder <- colOrder[tmpCols[1,] == "Signal"]
+          
+          message("mRNA data will be imported! This may take some time!")
+          testcon <- file(file.path(todir,paste0(dataset,"-mRNAArray-",listCount,".txt")),open="r")
+          readsizeof <- 1000
+          nooflines <- 0
+          ( while((linesread <- length(readLines(testcon,readsizeof))) > 0 )
+            nooflines <- nooflines+linesread )
+          close(testcon)
+          
+          if(nooflines > 50000)
           {
-            listMat[[itemcount]] <- tmpMat
-            tmpMat <- data.frame()
-            itemcount = itemcount + 1
+            message(paste(ii,"won't be imported due to high data volume!"))
+            break
           }
+          message(paste(nooflines,"rows will be imported!"))
+          
+          tmpMat <- data.frame()
+          inputfile<-file(file.path(todir,paste0(dataset,"-mRNAArray-",listCount,".txt")),open="r")
+          listMat <- list()
+          itemcount = 1
+          
+          N = nooflines
+          chunksize<-100
+          nchunks<- ceiling(N/100)
+          
+          for(i in 1:nchunks){
+            chunk<-read.delim(inputfile,nrows=chunksize,colClasses="character",header=FALSE)
+            if(i == 1)
+            {
+              tmpMat <- chunk[,c(1,colOrder)]
+            }
+            else
+            {
+              tmpMat <- rbind(tmpMat,chunk[,c(1,colOrder)])
+            }
+            if((chunksize*i) < nooflines){message(paste((chunksize*i),"rows have been imported!"))}
+            else{message(paste((nooflines),"rows have been imported!"))}
+            
+            if( ((chunksize*i) %% 1000) ==0 )
+            {
+              listMat[[itemcount]] <- tmpMat
+              tmpMat <- data.frame()
+              itemcount = itemcount + 1
+            }
+          }
+          
+          tmpMat2 <- data.frame()
+          for(i in 1:length(listMat))
+          {
+            if(i == 1){tmpMat2 = listMat[[i]]}
+            else{tmpMat2 = rbind(tmpMat2,listMat[[i]])}
+            listMat[[i]] <- 0 
+          }
+          tmpMat <- rbind(tmpMat2,tmpMat)
+          rm(tmpMat2)
+          
+          #close(inputfile)
+          closeAllConnections()
+          colnames(tmpMat) <- c("Gene_Symbol",tmpMat[1,2:ncol(tmpMat)])
+          tmpMat <- tmpMat[-c(1:2),]
+          removeQM <- grepl("\\?\\|",tmpMat[,1])
+          tmpMat <- tmpMat[!removeQM,]
+          #names1 <- tmpMat[,1]
+          #names2 <- sapply(names1,function(x){unlist(strsplit(x,"\\|"))[1]})
+          #names1 <- tmpMat[,1]
+          #tmpMat <- tmpMat[,-1]
+          #tmpMat2 <- apply(tmpMat[,2:ncol(tmpMat)],2,as.numeric)
+          #tmpMat <- cbind(tmpMat[,1],tmpMat2)
+          #colnames(tmpMat) <- c("Gene_Symbol",colnames(tmpMat)[2:ncol(tmpMat)])
+          #rownames(tmpMat) <- names1
+          
+          names1 <- tmpMat[,1]
+          names2 <- sapply(names1,function(x){unlist(strsplit(x,"\\|"))[1]})
+          names1 <- duplicated(names2)
+          tmpMat <- tmpMat[!names1,]
+          rownames(tmpMat) <- names2[!names1]
+          
+          tmpMat <- tmpMat[,-1]
+          cNames <- colnames(tmpMat)
+          rNames <- rownames(tmpMat)
+          tmpMat <- apply(tmpMat,2,as.numeric)
+          colnames(tmpMat) <- cNames
+          rownames(tmpMat) <- rNames
+          
+          
+          tmpReturn <- new("FirehosemRNAArray",Filename=ii,DataMatrix=tmpMat)
+          dataLists[[listCount]] <- tmpReturn
+          listCount = listCount + 1
         }
-        
-        tmpMat2 <- data.frame()
-        for(i in 1:length(listMat))
-        {
-          if(i == 1){tmpMat2 = listMat[[i]]}
-          else{tmpMat2 = rbind(tmpMat2,listMat[[i]])}
-          listMat[[i]] <- 0 
-        }
-        tmpMat <- rbind(tmpMat2,tmpMat)
-        rm(tmpMat2)
-        
-        #close(inputfile)
-        closeAllConnections()
-        colnames(tmpMat) <- c("Gene_Symbol",tmpMat[1,2:ncol(tmpMat)])
-        tmpMat <- tmpMat[-c(1:2),]
-        removeQM <- grepl("\\?\\|",tmpMat[,1])
-        tmpMat <- tmpMat[!removeQM,]
-        #names1 <- tmpMat[,1]
-        #names2 <- sapply(names1,function(x){unlist(strsplit(x,"\\|"))[1]})
-        #names1 <- tmpMat[,1]
-        #tmpMat <- tmpMat[,-1]
-        #tmpMat2 <- apply(tmpMat[,2:ncol(tmpMat)],2,as.numeric)
-        #tmpMat <- cbind(tmpMat[,1],tmpMat2)
-        #colnames(tmpMat) <- c("Gene_Symbol",colnames(tmpMat)[2:ncol(tmpMat)])
-        #rownames(tmpMat) <- names1
-        
-        names1 <- tmpMat[,1]
-        names2 <- sapply(names1,function(x){unlist(strsplit(x,"\\|"))[1]})
-        names1 <- duplicated(names2)
-        tmpMat <- tmpMat[!names1,]
-        rownames(tmpMat) <- names2[!names1]
-        
-        tmpMat <- tmpMat[,-1]
-        cNames <- colnames(tmpMat)
-        rNames <- rownames(tmpMat)
-        tmpMat <- apply(tmpMat,2,as.numeric)
-        colnames(tmpMat) <- cNames
-        rownames(tmpMat) <- rNames
-        
-        
-        tmpReturn <- new("FirehosemRNAArray",Filename=ii,DataMatrix=tmpMat)
-        dataLists[[listCount]] <- tmpReturn
-        listCount = listCount + 1
-      }
+      }      
       resultClass@mRNAArray <- dataLists
     }
     
@@ -866,6 +894,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         unlink(delFodler, recursive = TRUE)
         }
       } 
+      if(file.exists(cachefile)){
       for(ii in trim(plinks)) {
         #Get selected type only
         tmpCols = read.delim(file.path(todir,paste0(dataset,"-miRNAArray-",listCount,".txt")),nrows=1,colClasses="character")
@@ -964,6 +993,9 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         listCount = listCount + 1
       }
       resultClass@miRNAArray <- dataLists
+      }else{
+        message(paste0(dataset,"-","miRNAArray file could not be downloaded!"))
+      }
     }
     
     #Download RPPA array
@@ -997,7 +1029,8 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         message(delFodler)
         unlink(delFodler, recursive = TRUE)
       }
-    }     
+    }   
+    if(file.exists(cachefile)){
         for(ii in trim(plinks))
         {
         #Get selected type only
@@ -1097,6 +1130,9 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         listCount = listCount + 1
       }
       resultClass@RPPAArray <- dataLists
+    }else{
+      message(paste0(dataset,"-","RPPAArray file could not be downloaded!"))
+    }
     }
      
     #Download Mutation array
@@ -1120,7 +1156,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         download.file(url=download_link,destfile=file.path(todir,paste0(dataset,"-Mutation.tar.gz")),method="auto",quiet = FALSE, mode = "w")
         } 
       } 
-      
+      if(file.exists(cachefile)){
         fileList <- untar(file.path(todir,paste0(dataset,"-Mutation.tar.gz")),list=TRUE)
         grepSearch = "MANIFEST.txt"
         fileList = fileList[!grepl(grepSearch,fileList)]
@@ -1132,7 +1168,9 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         unlink(delFodler, recursive = TRUE)
         write.table(retMutations,file=file.path(todir,paste0(dataset,"-Mutations-AllSamples.txt")),sep="\t",row.names=F,quote=F)
         resultClass@Mutations <- retMutations
-        
+      }else{
+        message(paste0(dataset,"-","miRNAseqGene file could not be downloaded!"))
+      }
       # file.remove(file.path(todir,paste0(dataset,"-Mutation.tar.gz")))
         ###
         #myMutFiles <- list()
@@ -1176,7 +1214,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     plinks = plinks[grepl(paste0("*.",dataset,"-TP[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$"),plinks)]
     
     cachefile <- file.path(todir,paste0(dataset,"-all_data_by_genes.txt"))
-    if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseRunningDates(last=1) == runDate) {
+    if(file.exists(cachefile) && file.info(cachefile)$size > 0 && getFirehoseAnalyzeDates(last=1) == gistic2_Date) {
       message(paste0(dataset,"-all_data_by_genes.txt", " file already downloaded! Loading data..."))
     } else if(!file.exists(cachefile)) {
      for(ii in trim(plinks)) {
@@ -1199,12 +1237,15 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       unlink(delFodler, recursive = TRUE)
       }
     } 
-    
+    if(file.exists(cachefile)){
     tmpCNAll = read.delim(file.path(todir,paste0(dataset,"-all_data_by_genes.txt")),header=TRUE,colClasses="character")
     tmpCNThreshhold = read.delim(file.path(todir,paste0(dataset,"-all_thresholded.by_genes.txt")),header=TRUE,colClasses="character")
     tmpReturn <- new("FirehoseGISTIC",Dataset=dataset,AllByGene=data.frame(tmpCNAll),
                        ThresholedByGene=data.frame(tmpCNThreshhold))
     resultClass@GISTIC <- tmpReturn
+    }else{
+      message(paste0(dataset,"-","Gistic file could not be downloaded!"))
+    }
       
   } #close gistic date
   
