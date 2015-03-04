@@ -1868,79 +1868,77 @@ getMutationRate <- function(dataObject)
 # Data Extractor Function 
 extract <- function(object, type){
   typematch <- match.arg(type,
-                         choices=c("RNAseq_Gene", "Clinic", "miRNASeq_Gene",
+                         choices=c("RNAseq_Gene", "miRNASeq_Gene",
                                    "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP", "CNA_Seq",
                                    "CNA_CGH", "Methylation", "Mutation", "mRNA_Array",
                                    "miRNA_Array", "RPPA", "GISTIC_A", "GISTIC_T"))
   if(identical(typematch, "RNAseq_Gene")){
     output <- getElement(object, "RNASeqGene")
-  }else if(identical(typematch, "Clinic")){
-    output <- getElement(object, "Clinical")
   }else if(identical(typematch, "RNAseq2_Gene_Norm")){
     output <- getElement(object, "RNASeq2GeneNorm")
   }else if(identical(typematch, "miRNASeq_Gene")){
     output <- getElement(object, "miRNASeqGene")
-    }else if(identical(typematch, "CNA_SNP")){
-      output <- getElement(object, "CNASNP")
-    }else if(identical(typematch, "CNV_SNP")){
-      output <- getElement(object, "CNVSNP")
-      }else if(identical(typematch, "CNA_Seq")){
-      output <- getElement(object, "CNAseq")
-    }else if(identical(typematch, "CNA_CGH")){
-      if(is(object@CNACGH, "list")){
-        if(length(object@CNACGH) > 1){
-          output <- lapply(object@CNACGH, function(tmp){getElement(tmp, "DataMatrix")})
-          keeplist <- which.max(sapply(output, ncol))
-          output <- output[[keeplist]]
-          warning(paste("Taking the CNACGH array platform with the greatest number of samples:", keeplist))
-        }else if(length(object@CNACGH) == 1){
-          output <- object@CNACGH[[1]]@DataMatrix
+  }else if(identical(typematch, "CNA_SNP")){
+    output <- getElement(object, "CNASNP")
+  }else if(identical(typematch, "CNV_SNP")){
+    output <- getElement(object, "CNVSNP")
+  }else if(identical(typematch, "CNA_Seq")){
+    output <- getElement(object, "CNAseq")
+  }else if(identical(typematch, "CNA_CGH")){
+    if(is(object@CNACGH, "list")){
+      if(length(object@CNACGH) > 1){
+        output <- lapply(object@CNACGH, function(tmp){getElement(tmp, "DataMatrix")})
+        keeplist <- which.max(sapply(output, ncol))
+        output <- output[[keeplist]]
+        warning(paste("Taking the CNACGH array platform with the greatest number of samples:", keeplist))
+      }else if(length(object@CNACGH) == 1){
+        output <- object@CNACGH[[1]]@DataMatrix
       }else{
         output <- matrix(NA, nrow=0, ncol=0)
-        }
       }
-    }else if(identical(typematch, "Mutation")){
-      output <- getElement(object, "Mutations")
-    }else if(identical(typematch, "RPPA")){
-      if(is(object@RPPAArray, "list")){
-        if(length(object@RPPAArray) > 1){
-          output <- lapply(object@RPPAArray, function(tmp){getElement(tmp, "DataMatrix")})
-          keeplist <- which.max(sapply(output, ncol))
-          output <- output[[keeplist]]
-          warning(paste("Taking the RPPA array platform with the greatest number of samples:", keeplist))
-        }else if(length(object@RPPAArray) == 1){
-          output <- object@RPPAArray[[1]]@DataMatrix
-        }else{
-          output <- matrix(NA, nrow=0, ncol=0)
-        }
+    }
+  }else if(identical(typematch, "Mutation")){
+    output <- getElement(object, "Mutations")
+  }else if(identical(typematch, "RPPA")){
+    if(is(object@RPPAArray, "list")){
+      if(length(object@RPPAArray) > 1){
+        output <- lapply(object@RPPAArray, function(tmp){getElement(tmp, "DataMatrix")})
+        keeplist <- which.max(sapply(output, ncol))
+        output <- output[[keeplist]]
+        warning(paste("Taking the RPPA array platform with the greatest number of samples:", keeplist))
+      }else if(length(object@RPPAArray) == 1){
+        output <- object@RPPAArray[[1]]@DataMatrix
+      }else{
+        output <- matrix(NA, nrow=0, ncol=0)
       }
-    }else if(identical(typematch, "Methylation")){
-      if(is(object@Methylation, "list")){
-        if(length(object@Methylation) > 1){
-          output <- lapply(object@Methylation, function(tmp){getElement(tmp, "DataMatrix")})
-          keeplist <- which.max(sapply(output, ncol))
-          output <- output[[keeplist]]
-          warning(paste("Taking the Methylation array platform with the greatest number of samples:", keeplist))
-        }else if(length(object@Methylation)==1){
-          output <- object@Methylation[[1]]@DataMatrix
-        }else{
-          output <- matrix(NA, nrow=0, ncol=0)
-        }
+    }
+  }else if(identical(typematch, "Methylation")){
+    if(is(object@Methylation, "list")){
+      if(length(object@Methylation) > 1){
+        output <- lapply(object@Methylation, function(tmp){getElement(tmp, "DataMatrix")})
+        keeplist <- which.max(sapply(output, ncol))
+        output <- output[[keeplist]]
+        warning(paste("Taking the Methylation array platform with the greatest number of samples:", keeplist))
+      }else if(length(object@Methylation)==1){
+        output <- object@Methylation[[1]]@DataMatrix
+      }else{
+        output <- matrix(NA, nrow=0, ncol=0)
       }
-    }else if(identical(typematch, "miRNA_Array")){
-      if(is(object@miRNAArray, "list")){
-        if(length(object@miRNAArray)>1){
-          output <- lapply(object@miRNAArray, function(tmp){getElement(tmp, "DataMatrix")})
-          keeplist <- which.max(sapply(output, ncol))
-          output <- output[[keeplist]]
-          warning(paste("Taking the miRNA array platform with the greatest number of samples:", keeplist))
-        }else if(length(object@miRNAArray)==1){
-      output <- object@miRNAArray[[1]]@DataMatrix
-        }else{
-          output <- matrix(NA, nrow=0, ncol=0)
-        }
+    }
+  }else if(identical(typematch, "miRNA_Array")){
+    if(is(object@miRNAArray, "list")){
+      if(length(object@miRNAArray)>1){
+        output <- lapply(object@miRNAArray, function(tmp){getElement(tmp, "DataMatrix")})
+        keeplist <- which.max(sapply(output, ncol))
+        output <- output[[keeplist]]
+        warning(paste("Taking the miRNA array platform with the greatest number of samples:", keeplist))
+      }else if(length(object@miRNAArray)==1){
+        output <- object@miRNAArray[[1]]@DataMatrix
+      }else{
+        output <- matrix(NA, nrow=0, ncol=0)
       }
-    }else if(identical(typematch, "mRNA_Array")){
+    }
+  }else if(identical(typematch, "mRNA_Array")){
     if(is(object@mRNAArray, "list")){
       if(length(object@mRNAArray) > 1){
         output <- lapply(object@mRNAArray, function(tmp){getElement(tmp, "DataMatrix")})
@@ -1952,13 +1950,23 @@ extract <- function(object, type){
       }else{
         output <- matrix(NA, nrow=0, ncol=0)
       }
-      }
-    }else if(identical(typematch, "GISTIC_A")){
-      output <- getElement(object@GISTIC, "AllByGene")
-    }else if(identical(typematch, "GISTIC_T")){
-      output <- getElement(object@GISTIC, "ThresholedByGene")
-    }else{
+    }
+  }else if(identical(typematch, "GISTIC_A")){
+    output <- getElement(object@GISTIC, "AllByGene")
+  }else if(identical(typematch, "GISTIC_T")){
+    output <- getElement(object@GISTIC, "ThresholedByGene")
+  }else{
     stop(paste("Type", typematch, "not yet supported."))
   }
-  return(output)
+  if(dim(output)[1] == 0 | dim(output)[2] == 0){
+    message("There is no data for that data type!")
+  } else {
+    
+    pd <- getElement(object, "Clinical")
+    pd <- data.frame(do.call(rbind, pd))
+    
+    eset <- ExpressionSet(output, AnnotatedDataFrame(pd))
+    
+    return(eset)
+  }
 }
