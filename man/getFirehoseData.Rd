@@ -15,17 +15,17 @@ RNAseq_Gene = FALSE, Clinic = TRUE, miRNASeq_Gene = FALSE,
 RNAseq2_Gene_Norm = FALSE, CNA_SNP = FALSE, CNV_SNP = FALSE, 
 CNA_Seq = FALSE,CNA_CGH = FALSE, Methylation = FALSE, 
 Mutation = FALSE, mRNA_Array = FALSE,miRNA_Array = FALSE, 
-RPPA = FALSE,RNAseqNorm = "raw_counts", RNAseq2Norm = "normalized_count", todir = NULL)
+RPPA = FALSE,RNAseqNorm = "raw_counts", RNAseq2Norm = "normalized_count", todir = NULL, datefile=NULL, maxsize=2.5)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{dataset}{: Dataset TCGA alias. A valid list can be accessible with "getFirehoseDatasets" funtion. 
 %%     ~~Describe \code{dataset} here~~
 }
-  \item{runDate}{: Firehose data run date. A valid dates can be accessible with "getFirehoseRunningDates" function.
+  \item{runDate}{: Firehose data run date or logical indicating date use from provided file in "datefile" argument. Valid dates can be accessed with the "getFirehoseRunningDates" function.
 %%     ~~Describe \code{runDate} here~~
 }
-  \item{gistic2_Date}{: Firehose data analyze run date. A valid dates can be accessible with "getFirehoseAnalyzeDates" function.
+  \item{gistic2_Date}{: Firehose data analyze date or logical indicating date use from provided file in "datefile" argument. Valid dates can be accessed with the "getFirehoseAnalyzeDates" function.
 %%     ~~Describe \code{gistic2_Date} here~~
 }
   \item{RNAseq_Gene}{: If "TRUE" client will donwload gene lebel RNASeq data.
@@ -75,6 +75,12 @@ RPPA = FALSE,RNAseqNorm = "raw_counts", RNAseq2Norm = "normalized_count", todir 
 }
   \item{todir}{: The directory to download files to. It will be created if necessary. The default is to use the current working directory.  
 %%     ~~Describe \code{todir} here~~
+}
+  \item{datefile}{: A text file indicating run and/or analyze dates from the output of the "firehose_get -r" command.
+%%     ~~Describe \code{datefile} here~~
+}
+\item{maxsize}{: A numeric vector indicating the maxium file size to be read in gigabytes (Gb).
+%%     ~~Describe \code{maxsize} here~~
 }
 }
 \value{
