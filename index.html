@@ -32,26 +32,32 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         <h3>
-<a name="welcome-to-rtcgatoolbox" class="anchor" href="#welcome-to-rtcgatoolbox"><span class="octicon octicon-link"></span></a>Welcome to RTCGAToolbox.</h3>
+<a id="welcome-to-rtcgatoolbox" class="anchor" href="#welcome-to-rtcgatoolbox" aria-hidden="true"><span class="octicon octicon-link"></span></a>Welcome to RTCGAToolbox.</h3>
 
 <p>Managing data from large scale projects such as The Cancer Genome Atlas (TCGA) for further analysis is an important and time consuming step for research projects. Several efforts, such as Firehose project, make TCGA pre-processed data publicly available via web services and data portals but it requires managing, downloading and preparing the data for following steps. We developed an open source and extensible R based data client for Firehose pre-processed data and demonstrated its use with sample case studies. Results showed that RTCGAToolbox could improve data management for researchers who are interested with TCGA data. In addition, it can be integrated with other analysis pipelines for further data analysis.</p>
 
-<hr><p><a href="https://github.com/mksamur/RTCGAToolbox/wiki/Updates-and-Release-Notes">Update and release notes</a></p>
+<hr>
 
-<hr><h3>
-<a name="how-to-install" class="anchor" href="#how-to-install"><span class="octicon octicon-link"></span></a>How to install</h3>
+<p>Server upgrade has been completed! All functions should be normal. If you have problems please do not hesitate to contact with me. <br></p>
+
+<p><a href="https://github.com/mksamur/RTCGAToolbox/wiki/Updates-and-Release-Notes">Update and release notes</a></p>
+
+<hr>
+
+<h3>
+<a id="how-to-install" class="anchor" href="#how-to-install" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to install</h3>
 
 <p>To install RTCGAToolbox, you may use either "install_github" function from "devtools" (<a href="http://cran.r-project.org/web/packages/devtools/index.html">http://cran.r-project.org/web/packages/devtools/index.html</a>) package or you may download, build and install by yourself.</p>
 
 <h4>
-<a name="with-devtools" class="anchor" href="#with-devtools"><span class="octicon octicon-link"></span></a>With devtools:</h4>
+<a id="with-devtools" class="anchor" href="#with-devtools" aria-hidden="true"><span class="octicon octicon-link"></span></a>With devtools:</h4>
 
 <pre><code>&gt; library("devtools") # You should install devtools package before loading it.
 &gt; install_github("mksamur/RTCGAToolbox") # This function will download, build and install RTCGAToolbox.
 </code></pre>
 
 <h4>
-<a name="manuel" class="anchor" href="#manuel"><span class="octicon octicon-link"></span></a>Manuel:</h4>
+<a id="manuel" class="anchor" href="#manuel" aria-hidden="true"><span class="octicon octicon-link"></span></a>Manuel:</h4>
 
 <p>First you need to download archive (zip or tar.gz) by using the links above. After downloading, extract archive file into a folder. Please note that you should have all dependent packages. 
 If you have missing dependent package, you will get an error that tells you which packages you should install.
@@ -63,12 +69,12 @@ $ R CMD install RTCGAToolbox_X.Y.Z.tar.gz
 </code></pre>
 
 <h3>
-<a name="how-to-use" class="anchor" href="#how-to-use"><span class="octicon octicon-link"></span></a>How to use</h3>
+<a id="how-to-use" class="anchor" href="#how-to-use" aria-hidden="true"><span class="octicon octicon-link"></span></a>How to use</h3>
 
 <p><a href="https://github.com/mksamur/RTCGAToolbox/blob/master/UserGuide.pdf?raw=true">User guide</a> can be accessible via the link. </p>
 
 <h3>
-<a name="known-issues" class="anchor" href="#known-issues"><span class="octicon octicon-link"></span></a>Known Issues</h3>
+<a id="known-issues" class="anchor" href="#known-issues" aria-hidden="true"><span class="octicon octicon-link"></span></a>Known Issues</h3>
 
 <p>1.Due to long path names currently Windows OS can not extract data from archives. You may still build and install packages but you can not use getFirehoseData function.</p>
 
@@ -89,7 +95,7 @@ Error in system(cmd, intern = TRUE) : error in running command
 <p>3.Current version of RTCGAToolbox does not support exon and isoform level data due to high data volume. We are planning to add support for these data types in future updates.</p>
 
 <h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
+<a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
 
 <p>Having trouble with RTCGAToolbox? Check out the vignette or contact <a href="mailto:rtcgatoolbox@gmail.com">rtcgatoolbox@gmail.com</a> and we’ll help you sort it out.</p>
 
