@@ -19,7 +19,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                             miRNASeq_Gene=FALSE, RNAseq2_Gene_Norm=FALSE,
                             CNA_SNP=FALSE,CNV_SNP=FALSE,
                             CNA_Seq=FALSE,CNA_CGH=FALSE,Methylation=FALSE,Mutation=FALSE,mRNA_Array=FALSE,
-                            miRNA_Array=FALSE,RPPA=FALSE,RNAseqNorm="raw_counts",RNAseq2Norm="normalized_count", todir = NULL)
+                            miRNA_Array=FALSE,RPPA=FALSE,RNAseqNorm="raw_counts",RNAseq2Norm="normalized_count", todir = NULL, datefile = NULL, maxsize = 2.5)
 {
   #check parameters
   if(!class(dataset)=="character" || is.null(dataset) || !length(dataset) == 1 || nchar(dataset) < 2)
@@ -27,30 +27,80 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   runDatasets <- getFirehoseDatasets()
   if(!any(runDatasets==dataset)){stop('Please use valid dataset name! "getFirehoseDatasets" function gives you the vector of valid dataset names!')}
   
-  
-  if(!is.null(runDate))
-  {
-    if(!class(runDate)=="character" || !length(runDate) == 1 || !nchar(runDate) == 8)
-    {stop('Please set "runDate" parameter! You should specify one Firehose run date. Ex: runDate="20140416"...')}
-    
-    runDateList <- getFirehoseRunningDates()
-    if(!any(runDateList==runDate)){stop('Please use valid run date! "getFirehoseRunningDates" function gives you the vector of valid dates!')}
+  fdate <- function(dat){
+    dat <- gsub("([0-9]{4})([0-9]{2})", "\\1-\\2-", dat)
+    return(dat)
   }
   
-  if(!is.null(gistic2_Date))
-  {
-    if(!class(gistic2_Date)=="character" || !length(gistic2_Date) == 1 || !nchar(gistic2_Date) == 8)
-    {stop('Please set "gistic2_Date" parameter! You should specify one Firehose run date. Ex: gistic2_Date="20140115"...')}
-    
-    runGisticDate <- getFirehoseAnalyzeDates()
-    if(!any(runGisticDate==gistic2_Date)){stop('Please use valid analyze date for GISTIC! "getFirehoseAnalyzeDates" function gives you the vector of valid dates!')}
+  if(!is.null(datefile)) {
+    if(!class(datefile)=="character"){
+      stop("Please provide a valid date file path!")
+    } else if(file.exists(datefile)){
+        dfile <- readLines(datefile)
+        getDate <- function(dfile, strings=c("stddata", "analyses"), FUN=which.max){
+          dfile.list <- as.integer(gsub("[a-z\\_]+", "", dfile))
+          dfile.list <- lapply(strings, function(string) dfile.list[grepl(string, dfile)])
+          dfile.date <- sapply(dfile.list, function(dfile.vec) as.character(dfile.vec[FUN(dfile.vec)]))
+          names(dfile.date) <- strings
+          return(dfile.date)
+        }
+        
+        if(is.logical(runDate)){
+          if(runDate){
+            runDate <- getDate(dfile)[1]
+          }
+        } else if(!is.null(runDate)){
+          if(!class(runDate)=="character" || !length(runDate) == 1 || !nchar(runDate) == 8)
+          {stop('Please set "runDate" parameter! You should specify one Firehose run date. Ex: runDate="20140416"...')}
+          
+          runDateList <- getFirehoseRunningDates()
+          if(!any(runDateList==runDate)){stop('Please use valid run date! "getFirehoseRunningDates" function gives you the vector of valid dates!')}
+        }
+        
+        if(is.logical(gistic2_Date)){
+          if(gistic2_Date){
+            gistic2_Date <- getDate(dfile)[2]
+          }
+        } else if(!is.null(gistic2_Date)){
+          if(!class(gistic2_Date)=="character" || !length(gistic2_Date) == 1 || !nchar(gistic2_Date) == 8)
+          {stop('Please set "gistic2_Date" parameter! You should specify one Firehose run date. Ex: gistic2_Date="20140115"...')}
+          
+          runGisticDate <- getFirehoseAnalyzeDates()
+          if(!any(runGisticDate==gistic2_Date)){stop('Please use valid analyze date for GISTIC! "getFirehoseAnalyzeDates" function gives you the vector of valid dates!')}
+        } 
+        
+        if(is.null(runDate) & is.null(gistic2_Date)){
+          stop("Please indicate which date type(s) to retrieve by setting to TRUE!")
+        }
+        
+        message("Using these date(s)! ", paste("runDate:", fdate(runDate),"gistic2_Date:", fdate(gistic2_Date), sep=" "))
+    } else { 
+      stop("Date file not found! : ", datefile) 
+    }
+  } else {
+    if(is.null(runDate) & is.null(gistic2_Date)){
+      stop("Please set a valid runDate and/or gistic2_Date parameter if not providing a date file!")
+    } else {
+      if(!is.null(gistic2_Date)) {
+        if(!class(gistic2_Date)=="character" || !length(gistic2_Date) == 1 || !nchar(gistic2_Date) == 8)
+        {stop('Please set "gistic2_Date" parameter! You should specify one Firehose run date. Ex: gistic2_Date="20140115"...')}
+        
+        runGisticDate <- getFirehoseAnalyzeDates()
+        if(!any(runGisticDate==gistic2_Date)){stop('Please use valid analyze date for GISTIC! "getFirehoseAnalyzeDates" function gives you the vector of valid dates!')}
+      }
+      if(!is.null(runDate)) {
+        if(!class(runDate)=="character" || !length(runDate) == 1 || !nchar(runDate) == 8)
+        {stop('Please set "runDate" parameter! You should specify one Firehose run date. Ex: runDate="20140416"...')}
+        
+        runDateList <- getFirehoseRunningDates()
+        if(!any(runDateList==runDate)){stop('Please use valid run date! "getFirehoseRunningDates" function gives you the vector of valid dates!')}
+      }
+    }
   }
-  
-  if(is.null(gistic2_Date) & is.null(runDate)){stop("Please specify run date and/or gistic date!")}
-  
+    
   if(!is.null(todir)) {
     if(!class(todir)=="character"){
-      stop("Please enter a valid directory path!")
+      stop("Please provide a valid directory path!")
     } else if(!file.exists(todir)) {
       cat("Directory does not exist - creating one...")
       dir.create(todir, recursive=TRUE)
@@ -463,7 +513,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       }else{
       # Get selected type only
         cachefile <- file.path(todir,paste0(dataset,"-Methylation-",listCount,".txt"))
-        if(file.info(cachefile)$size/1024^3 < 2.5){
+        if(file.info(cachefile)$size/1024^3 < maxsize){
         tmpCols <- fread(file.path(todir, paste0(dataset, "-Methylation-", listCount,".txt")),nrows=1, colClasses = "character", data.table=FALSE)
         colIndex <- c(1,3,4,5, which(tmpCols[1,]=="Beta_value"))
         dt <- fread(file.path(todir, paste0(dataset, "-Methylation-", listCount,".txt")), colClasses = "character", select = colIndex, skip=1)
