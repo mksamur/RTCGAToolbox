@@ -2013,14 +2013,12 @@ extract <- function(object, type){
     message("There is no data for that data type!")
   } else {
     
-    pd <- getElement(object, "Clinical")
-    pd <- data.frame(do.call(rbind, pd))
+    # pd <- getElement(object, "Clinical")
     
-    output
+    return(output)
+        
+    # eset <- ExpressionSet(output, AnnotatedDataFrame(pd))
     
-    
-    eset <- ExpressionSet(output, AnnotatedDataFrame(pd))
-    
-    return(eset)
+    # return(eset)
   }
 }
