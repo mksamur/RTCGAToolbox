@@ -15,7 +15,8 @@ RNAseq_Gene = FALSE, Clinic = TRUE, miRNASeq_Gene = FALSE,
 RNAseq2_Gene_Norm = FALSE, CNA_SNP = FALSE, CNV_SNP = FALSE, 
 CNA_Seq = FALSE,CNA_CGH = FALSE, Methylation = FALSE, 
 Mutation = FALSE, mRNA_Array = FALSE,miRNA_Array = FALSE, 
-RPPA = FALSE,RNAseqNorm = "raw_counts", RNAseq2Norm = "normalized_count", todir = NULL, datefile=NULL, maxsize=2.5)
+RPPA = FALSE,RNAseqNorm = "raw_counts", RNAseq2Norm = "normalized_count", 
+todir = NULL, datefile=NULL, maxsize=2.5)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
