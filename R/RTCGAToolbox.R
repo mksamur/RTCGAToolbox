@@ -28,8 +28,12 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   if(!any(runDatasets==dataset)){stop('Please use valid dataset name! "getFirehoseDatasets" function gives you the vector of valid dataset names!')}
   
   fdate <- function(dat){
+    if(is.null(dat)){
+      return("None specified")
+    } else {
     dat <- gsub("([0-9]{4})([0-9]{2})", "\\1-\\2-", dat)
     return(dat)
+    }
   }
   
   if(!is.null(datefile)) {
@@ -51,7 +55,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           }
         } else if(!is.null(runDate)){
           if(!class(runDate)=="character" || !length(runDate) == 1 || !nchar(runDate) == 8)
-          {stop('Please set "runDate" parameter! You should specify one Firehose run date. Ex: runDate="20140416"...')}
+          {stop('Please set the "runDate" parameter! You should specify one Firehose run date. Ex: runDate="20140416" or provide a date file.')}
           
           runDateList <- getFirehoseRunningDates()
           if(!any(runDateList==runDate)){stop('Please use valid run date! "getFirehoseRunningDates" function gives you the vector of valid dates!')}
@@ -67,13 +71,12 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           
           runGisticDate <- getFirehoseAnalyzeDates()
           if(!any(runGisticDate==gistic2_Date)){stop('Please use valid analyze date for GISTIC! "getFirehoseAnalyzeDates" function gives you the vector of valid dates!')}
-        } 
+        }
         
         if(is.null(runDate) & is.null(gistic2_Date)){
           stop("Please indicate which date type(s) to retrieve by setting to TRUE!")
         }
-        
-        message("Using these date(s)! ", paste("runDate:", fdate(runDate),"gistic2_Date:", fdate(gistic2_Date), sep=" "))
+          message("Using this/these date(s): ", "\n", paste0("runDate: ", fdate(runDate)), "\n", paste0("gistic2_Date: ", fdate(gistic2_Date)))
     } else { 
       stop("Date file not found! : ", datefile) 
     }
@@ -617,7 +620,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       listCount = 1
       dataLists <- list()
       for(ii in trim(plinks)) {
-      cachefile <- file.path(todir,paste0(dataset,"-miRNAArray-",listCount, "-", runDate, ".txt"))
+        cachefile <- file.path(todir,paste0(dataset,"-miRNAArray-",listCount, "-", runDate, ".txt"))
       if(file.exists(cachefile) && file.info(cachefile)$size > 0) {
         message(paste0(dataset,"-miRNAArray-", listCount,"-", runDate, " file already downloaded! Loading data..."))
       } else {
@@ -2012,13 +2015,6 @@ extract <- function(object, type){
   if(dim(output)[1] == 0 | dim(output)[2] == 0){
     message("There is no data for that data type!")
   } else {
-    
-    # pd <- getElement(object, "Clinical")
-    
     return(output)
-        
-    # eset <- ExpressionSet(output, AnnotatedDataFrame(pd))
-    
-    # return(eset)
-  }
+    }
 }
