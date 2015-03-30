@@ -45,6 +45,24 @@ setClass("FirehoseData", representation(Dataset = "character", Clinical = "data.
                                         CNVSNP="data.frame",CNAseq="data.frame",CNACGH="list",Methylation="list",
                                         mRNAArray="list",miRNAArray="list",RPPAArray="list",Mutations="data.frame",
                                         GISTIC="FirehoseGISTIC"))
+setMethod("show", "FirehoseData",function(object){
+  message(paste0(object@Dataset," FirehoseData object"))
+  message("Available slots:")
+  if(dim(object@Clinical)[1] > 0 & dim(object@Clinical)[2] > 0){message("@Clinical: A data frame, dim: ",paste(dim(object@Clinical),collapse = "\t"))}
+  if(dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0){message("@RNASeqGene: A matrix withraw read counts or normalaized data, dim: ",paste(dim(object@RNASeqGene),collapse = "\t"))}
+  if(dim(object@RNASeq2GeneNorm)[1] > 0 & dim(object@RNASeq2GeneNorm)[2] > 0){message("@RNASeq2GeneNorm: A matrix withraw read counts or normalaized data, dim: ",paste(dim(object@RNASeq2GeneNorm),collapse = "\t"))}
+  if(dim(object@miRNASeqGene)[1] > 0 & dim(object@miRNASeqGene)[2] > 0){message("@miRNASeqGene: A matrix, dim: ",paste(dim(object@miRNASeqGene),collapse = "\t"))}
+  if(dim(object@CNASNP)[1] > 0 & dim(object@CNASNP)[2] > 0){message("@CNASNP: A data.frame, dim: ",paste(dim(object@CNASNP),collapse = "\t"))}
+  if(dim(object@CNVSNP)[1] > 0 & dim(object@CNVSNP)[2] > 0){message("@CNVSNP: A data.frame, dim: ",paste(dim(object@CNVSNP),collapse = "\t"))}
+  if(dim(object@CNAseq)[1] > 0 & dim(object@CNAseq)[2] > 0){message("@CNAseq: A data.frame, dim: ",paste(dim(object@CNAseq),collapse = "\t"))}
+  if(length(object@CNACGH) > 0 ){message("@CNACGH: A list contains FirehoseCGHArray object(s), length: ",length(object@CNACGH))}
+  if(length(object@Methylation) > 0 ){message("@Methylation: A list contains FirehoseMethylationArray object(s), length: ",length(object@Methylation))}
+  if(length(object@mRNAArray) > 0 ){message("@mRNAArray: A list contains FirehosemRNAArray object(s), length: ",length(object@mRNAArray))}
+  if(length(object@miRNAArray) > 0 ){message("@miRNAArray: A list contains FirehosemRNAArray object(s), length: ",length(object@miRNAArray))}
+  if(length(object@RPPAArray) > 0 ){message("@RPPAArray: A list contains FirehosemRNAArray object(s), length: ",length(object@RPPAArray))}
+  if(length(object@GISTIC@Dataset) > 0){message("@GISTIC: A FirehoseGISTIC object to store copy number data")}
+}
+)
 
 #' An S4 class to store differential gene expression results
 #'
