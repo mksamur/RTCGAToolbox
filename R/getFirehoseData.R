@@ -2,7 +2,7 @@
 #'
 #' \code{getFirehoseData} returns \code{FirehoseData} object that stores TCGA data.
 #'
-#' This is a main client fruntion to download data from Firehose TCGA portal.
+#' This is a main client function to download data from Firehose TCGA portal.
 #'
 #' @param dataset A cohort name. All dataset names can be accessible via \code{\link{getFirehoseDatasets}}
 #' @param runDate Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}

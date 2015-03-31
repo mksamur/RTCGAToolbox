@@ -1,12 +1,21 @@
-#' @title Extract function.
+#' Extract function.
 #' 
-#' @description
-#' \code{extract} returns an S4 Expression Set object from a "FirehoseData" RTCGAToolbox object. 
+#' \code{extract} returns an S4 ExpressionSet object from "FirehoseData" object. 
 #' 
-#' @details
 #' This function serves to extract and reorganize data into a structured S4 
 #' object for genomic analysis. An option is available to retreive additional
 #' clinical data and include it as featureData. See \code{\link{ExpressionSet}}
+#' 
+#' @param object A \code{FirehoseData} object from which to extract data. 
+#' @param type The type of data to extract from the "FirehoseData" object.
+#' @param phenoData Logical (default TRUE) includes clinic data if available.
+#' @return A \code{\link{ExpressionSet}} object for the selected data type.
+#' @examples 
+#' 
+#' \dontrun{
+#' b2 <- extract(a2, "Methylation", phenoData=TRUE)
+#' }
+#' 
 extract <- function(object, type, phenoData = TRUE){
   typematch <- match.arg(type,
                          choices=c("RNAseq_Gene", "miRNASeq_Gene",
