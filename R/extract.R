@@ -1,6 +1,4 @@
-#' Extract function.
-#' 
-#' \code{extract} returns an S4 ExpressionSet object from "FirehoseData" object. 
+#' Extract data from \code{FirehoseData} object into S4 \code{ExpressionSet}
 #' 
 #' This function serves to extract and reorganize data into a structured S4 
 #' object for genomic analysis. An option is available to retreive additional
@@ -8,8 +6,11 @@
 #' 
 #' @param object A \code{FirehoseData} object from which to extract data. 
 #' @param type The type of data to extract from the "FirehoseData" object.
-#' @param phenoData Logical (default TRUE) includes clinic data if available.
-#' @return A \code{\link{ExpressionSet}} object for the selected data type.
+#' @param phenoData Logical (default TRUE) includes additional clinic data, if available.
+#' @return An \code{\link{ExpressionSet}} object for the selected data type. 
+#' Choices include: "RNAseq_Gene", "Clinic", "miRNASeq_Gene", "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP", "CNA_Seq", "CNA_CGH", "Methylation", "Mutation", "mRNA_Array", "miRNA_Array", "RPPA", "GISTIC_A", "GISTIC_T".
+#' The "GISTIC_A" type of dataset represents GISTIC data by all genes. "GISTIC_T"" represents data thresholded by genes.
+#' 
 #' @examples 
 #' 
 #' \dontrun{

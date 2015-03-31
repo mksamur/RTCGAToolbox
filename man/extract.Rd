@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract.R
 \name{extract}
 \alias{extract}
-\title{Extract function.}
+\title{Extract data from \code{FirehoseData} object into S4 \code{ExpressionSet}}
 \usage{
 extract(object, type, phenoData = TRUE)
 }
@@ -11,15 +11,14 @@ extract(object, type, phenoData = TRUE)
 
 \item{type}{The type of data to extract from the "FirehoseData" object.}
 
-\item{phenoData}{Logical (default TRUE) includes clinic data if available.}
+\item{phenoData}{Logical (default TRUE) includes additional clinic data, if available.}
 }
 \value{
-A \code{\link{ExpressionSet}} object for the selected data type.
+An \code{\link{ExpressionSet}} object for the selected data type.
+Choices include: "RNAseq_Gene", "Clinic", "miRNASeq_Gene", "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP", "CNA_Seq", "CNA_CGH", "Methylation", "Mutation", "mRNA_Array", "miRNA_Array", "RPPA", "GISTIC_A", "GISTIC_T".
+The "GISTIC_A" type of dataset represents GISTIC data by all genes. "GISTIC_T"" represents data thresholded by genes.
 }
 \description{
-\code{extract} returns an S4 ExpressionSet object from "FirehoseData" object.
-}
-\details{
 This function serves to extract and reorganize data into a structured S4
 object for genomic analysis. An option is available to retreive additional
 clinical data and include it as featureData. See \code{\link{ExpressionSet}}
