@@ -142,14 +142,15 @@ extract <- function(object, type, phenoData = TRUE){
     rownames(centerbc) <- bcID(colnames(output))[-c(1:3)]
     
     pd <- getElement(object, "Clinical")
+    rownames(pd) <- gsub("\\.", "-", rownames(pd))
     if(length(pd)==0){
       stop("No clinical data available!")
     }
     
     npd <- pd[na.omit(match(colnames(dm), rownames(pd))),]
-    npd <- cbind(npd, centerbc[match(rownames(npd), rownames(centerbc)),])
+    npd <- cbind(npd, centerbc[na.omit(match(rownames(npd), rownames(centerbc))),])
     
-    ndm <- dm[,na.omit(match(rownames(pd), colnames(dm)))]
+    ndm <- dm[,na.omit(match(rownames(npd), colnames(dm)))]
     
     if(identical(all.equal(rownames(npd), colnames(ndm)), TRUE)){
       eset <- ExpressionSet(ndm, AnnotatedDataFrame(npd))
@@ -158,14 +159,15 @@ extract <- function(object, type, phenoData = TRUE){
     }
     
     
-      ovextraclin <- fread("extraclinfilehere")
-      ovextraclin[grep("patient_barcode", ovextraclin[, 1]),][-1]
-      colnames(ovextraclin)[-1] <- ovextraclin[grep("patient_barcode", ovextraclin[, 1]),][-1]
-      rownames(ovextraclin) <- ovextraclin[, 1]
-      
-      jj <- ovextraclin[,match(rownames(npd), colnames(ovextraclin))]
-      featureData(eset) <- AnnotatedDataFrame(jj)
-      return(eset)
+    return(eset)
+#       ovextraclin <- fread("extraclinfilehere")
+#       ovextraclin[grep("patient_barcode", ovextraclin[, 1]),][-1]
+#       colnames(ovextraclin)[-1] <- ovextraclin[grep("patient_barcode", ovextraclin[, 1]),][-1]
+#       rownames(ovextraclin) <- ovextraclin[, 1]
+#       
+#       jj <- ovextraclin[,match(rownames(npd), colnames(ovextraclin))]
+#       featureData(eset) <- AnnotatedDataFrame(jj)
+#       return(eset)
     } else {
       return(output)
     }
