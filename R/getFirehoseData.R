@@ -36,9 +36,9 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                             miRNASeq_Gene=FALSE, RNAseq2_Gene_Norm=FALSE,
                             CNA_SNP=FALSE,CNV_SNP=FALSE,
                             CNA_Seq=FALSE,CNA_CGH=FALSE,Methylation=FALSE,Mutation=FALSE,mRNA_Array=FALSE,
-                            miRNA_Array=FALSE,RPPA=FALSE,RNAseqNorm="raw_counts",RNAseq2Norm="normalized_count",forceDownload=FALSE)
+                            miRNA_Array=FALSE,RPPA=FALSE,RNAseqNorm="raw_counts",RNAseq2Norm="normalized_count", 
+                            todir = NULL, forceDownload=FALSE)
 {
-  
   #check input parameters
   if(!class(dataset)=="character" || is.null(dataset) || !length(dataset) == 1 || nchar(dataset) < 2)
   {stop('Please set "dataset" parameter! You should specify one dataset name. Ex: dataset="BRCA"...')}
@@ -62,10 +62,19 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   
   trim <- function (x) gsub("^\\s+|\\s+$", "", x)
   
+  if(!is.null(todir)) {
+    if(!class(todir)=="character"){
+      stop("Please provide a valid directory path!")
+    } else if(!file.exists(todir)) {
+      cat("Directory does not exist - creating one...")
+      dir.create(todir, recursive=TRUE)
+    }
+  } else { todir <- getwd() }
+    
   makeExprMat <- function(dataset,fileExt,normMethod,dataType,mergeSize=1000,arrayData=FALSE)
   {
     #Get selected type only
-    tmpCols = read.delim(paste0(runDate,"-",dataset,fileExt),nrows=1,colClasses="character")
+    tmpCols = read.delim(file.path(todir, paste0(runDate,"-",dataset,fileExt)),nrows=1,colClasses="character")
     if(!arrayData)
     {
       colOrder <- 1:ncol(tmpCols)
@@ -76,9 +85,9 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       colOrder <- 2:ncol(tmpCols) 
     }
     closeAllConnections()
-    message(paste(dataType,"data will be imported! This may take a while!",sep=" "))
+    message(paste0(dataType,"data will be imported! This may take a while!"))
     message(paste0("Start: ",Sys.time()))
-    tmpMat <- fread(paste0(runDate,"-",dataset,fileExt),header=F,colClasses = "character", select=c(1,colOrder), data.table = FALSE)
+    tmpMat <- fread(file.path(todir, paste0(runDate,"-",dataset,fileExt)),header=F,colClasses = "character", select=c(1,colOrder), data.table = FALSE)
     message(paste0("Done: " ,Sys.time()))
     closeAllConnections()
     if(!arrayData)
@@ -108,7 +117,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   
   getLinks <- function(keyWord1,keyWord2,dataset=NULL)
   {
-    keyWord = keyWord1#paste0(dataset,keyWord1)
+    keyWord = keyWord1 #paste0(dataset,keyWord1)
     keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
     plinks = xpathSApply(doc, keyWord, xmlValue)
     if(is.null(dataset))
@@ -125,9 +134,9 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   
   exportFiles <- function(fileLink,dataset,fileExt,searchName,subSearch=FALSE,exportName,manifest=FALSE)
   {
-    if(forceDownload || !file.exists(paste0(runDate,"-",dataset,exportName)))
+    if(forceDownload || !file.exists(file.path(todir, paste0(runDate,"-",dataset,exportName))))
     {
-      download.file(url=fileLink,destfile=paste(dataset,fileExt,sep=""),method="auto",quiet = FALSE, mode = "w")
+      download.file(url=fileLink,destfile=file.path(todir, paste0(dataset,fileExt)),method="auto",quiet = FALSE, mode = "w")
       fileList <- untar(paste(dataset,fileExt,sep=""),list=TRUE)
       if(!subSearch)
       {
@@ -145,10 +154,10 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           fileList = fileList[!grepl("MANIFEST.txt",fileList)]
         }
       }
-      untar(paste(dataset,fileExt,sep=""),files=fileList)
-      file.rename(from=fileList,to=paste0(runDate,"-",dataset,exportName))
-      file.remove(paste(dataset,fileExt,sep=""))
-      delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+      untar(file.path(todir, paste0(dataset,fileExt)),files=fileList)
+      file.rename(from=fileList,to=file.path(todir, paste0(runDate,"-",dataset,exportName)))
+      file.remove(file.path(todir, paste0(dataset,fileExt)))
+      delFodler <- paste0(todir,"/",strsplit(fileList,"/")[[1]][1])
       message(delFodler)
       unlink(delFodler, recursive = TRUE)
     }
@@ -160,10 +169,10 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   {
     ##build URL for getting file links
     fh_url <- "http://gdac.broadinstitute.org/runs/stddata__"
-    fh_url <- paste(fh_url,substr(runDate,1,4),"_",substr(runDate,5,6),"_",substr(runDate,7,8),"/data/",sep="")
-    fh_url <- paste(fh_url,dataset,"/",runDate,"/",sep="")
+    fh_url <- paste0(fh_url,substr(runDate,1,4),"_",substr(runDate,5,6),"_",substr(runDate,7,8),"/data/")
+    fh_url <- paste0(fh_url,dataset,"/",runDate,"/")
     doc = htmlTreeParse(fh_url, useInternalNodes = T)
-    
+## DOC not working ##    
     #Download clinical data
     if(Clinic)
     {

@@ -18,158 +18,112 @@
 #' }
 #' 
 extract <- function(object, type, phenoData = TRUE){
-  typematch <- match.arg(type,
-                         choices=c("RNAseq_Gene", "miRNASeq_Gene",
-                                   "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP", "CNA_Seq",
-                                   "CNA_CGH", "Methylation", "Mutation", "mRNA_Array",
-                                   "miRNA_Array", "RPPA", "GISTIC_A", "GISTIC_T"))
-  if(identical(typematch, "RNAseq_Gene")){
-    output <- getElement(object, "RNASeqGene")
-  }else if(identical(typematch, "RNAseq2_Gene_Norm")){
-    output <- getElement(object, "RNASeq2GeneNorm")
-  }else if(identical(typematch, "miRNASeq_Gene")){
-    output <- getElement(object, "miRNASeqGene")
-  }else if(identical(typematch, "CNA_SNP")){
-    output <- getElement(object, "CNASNP")
-  }else if(identical(typematch, "CNV_SNP")){
-    output <- getElement(object, "CNVSNP")
-  }else if(identical(typematch, "CNA_Seq")){
-    output <- getElement(object, "CNAseq")
-  }else if(identical(typematch, "CNA_CGH")){
-    if(is(object@CNACGH, "list")){
-      if(length(object@CNACGH) > 1){
-        output <- lapply(object@CNACGH, function(tmp){getElement(tmp, "DataMatrix")})
+  choices <- c("RNAseq_Gene", "miRNASeq_Gene",
+               "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP", "CNA_Seq",
+               "CNA_CGH", "Methylation", "Mutation", "mRNA_Array",
+               "miRNA_Array", "RPPA") 
+  if(type %in% choices){
+    slotreq <- grep(paste0("^", gsub("_", "", type))  , slotNames(object), 
+                    ignore.case=TRUE, perl=TRUE, value=TRUE)
+    elemlength <- length(getElement(object, slotreq))
+    if(is(getElement(object, slotreq), "list")){
+      if(elemlength > 1){
+        output <- lapply(getElement(object, slotreq), function(tmp){getElement(tmp, "DataMatrix")})
         keeplist <- which.max(sapply(output, ncol))
         output <- output[[keeplist]]
-        warning(paste("Taking the CNACGH array platform with the greatest number of samples:", keeplist))
-      }else if(length(object@CNACGH) == 1){
-        output <- object@CNACGH[[1]]@DataMatrix
-      }else{
+        warning(paste("Taking the array platform with the greatest number of samples:", keeplist))
+      } else if(elemlength == 1){
+        output <- getElement(object, slotreq)[[1]]@DataMatrix
+      } else if(elemlength == 0){
         output <- matrix(NA, nrow=0, ncol=0)
       }
+    } else {
+      output <- getElement(object, slotreq)
     }
-  }else if(identical(typematch, "Mutation")){
-    output <- getElement(object, "Mutations")
-  }else if(identical(typematch, "RPPA")){
-    if(is(object@RPPAArray, "list")){
-      if(length(object@RPPAArray) > 1){
-        output <- lapply(object@RPPAArray, function(tmp){getElement(tmp, "DataMatrix")})
-        keeplist <- which.max(sapply(output, ncol))
-        output <- output[[keeplist]]
-        warning(paste("Taking the RPPA array platform with the greatest number of samples:", keeplist))
-      }else if(length(object@RPPAArray) == 1){
-        output <- object@RPPAArray[[1]]@DataMatrix
-      }else{
-        output <- matrix(NA, nrow=0, ncol=0)
-      }
+  } else if(type %in% c("GISTIC_A", "GISTIC_T")) {
+    if(type=="GISTIC_A"){
+      output <- getElement(object@GISTIC, "AllByGene")
+    } else {
+      output <- getElement(object@GISTIC, "ThresholedByGene")
     }
-  }else if(identical(typematch, "Methylation")){
-    if(is(object@Methylation, "list")){
-      if(length(object@Methylation) > 1){
-        output <- lapply(object@Methylation, function(tmp){getElement(tmp, "DataMatrix")})
-        keeplist <- which.max(sapply(output, ncol))
-        output <- output[[keeplist]]
-        warning(paste("Taking the Methylation array platform with the greatest number of samples:", keeplist))
-      }else if(length(object@Methylation)==1){
-        output <- object@Methylation[[1]]@DataMatrix
-      }else{
-        output <- matrix(NA, nrow=0, ncol=0)
-      }
-    }
-  }else if(identical(typematch, "miRNA_Array")){
-    if(is(object@miRNAArray, "list")){
-      if(length(object@miRNAArray)>1){
-        output <- lapply(object@miRNAArray, function(tmp){getElement(tmp, "DataMatrix")})
-        keeplist <- which.max(sapply(output, ncol))
-        output <- output[[keeplist]]
-        warning(paste("Taking the miRNA array platform with the greatest number of samples:", keeplist))
-      }else if(length(object@miRNAArray)==1){
-        output <- object@miRNAArray[[1]]@DataMatrix
-      }else{
-        output <- matrix(NA, nrow=0, ncol=0)
-      }
-    }
-  }else if(identical(typematch, "mRNA_Array")){
-    if(is(object@mRNAArray, "list")){
-      if(length(object@mRNAArray) > 1){
-        output <- lapply(object@mRNAArray, function(tmp){getElement(tmp, "DataMatrix")})
-        keeplist <- which.max(sapply(output, ncol))
-        output <- output[[keeplist]]
-        warning(paste("Taking the mRNA array platform with the greatest number of samples:", keeplist))
-      }else if(length(object@mRNAArray)==1){
-        output <- object@mRNAArray[[1]]@DataMatrix
-      }else{
-        output <- matrix(NA, nrow=0, ncol=0)
-      }
-    }
-  }else if(identical(typematch, "GISTIC_A")){
-    output <- getElement(object@GISTIC, "AllByGene")
-  }else if(identical(typematch, "GISTIC_T")){
-    output <- getElement(object@GISTIC, "ThresholedByGene")
-  }else{
-    stop(paste("Type", typematch, "not yet supported."))
+  } else {
+    stop(paste("Type not yet supported or could not be matched."))
   }
   if(dim(output)[1] == 0 | dim(output)[2] == 0){
     message("There is no data for that data type!")
   } else {
-    
-    if (phenoData){
-    bcID <- function(barcodes, center=FALSE){
-      if(center){
-        bcc <- sapply(strsplit(barcodes, "-"), "[", c(4:7))
-        bcc <- tolower(t(bcc))
-      } else {
-        bcc <- lapply(strsplit(barcodes, "-"), "[", c(1:3))
-        bcc <- tolower(sapply(bcc, paste, collapse="-"))
-        bcc <- as.vector(bcc)
+    if(phenoData){
+      bcID <- function(barcodes, center=FALSE, sample=FALSE){
+        barcodes <- gsub("\\.", "-", barcodes)
+        if(center){
+          if(!sample){
+            bcc <- sapply(strsplit(barcodes, "-"),"[", c(5:7))
+            bcc <- tolower(t(bcc))
+            return(bcc)
+          } else {
+          bcc <- sapply(strsplit(barcodes, "-"), "[", c(4:7))
+          bcc <- tolower(t(bcc))
+          }
+        } else {
+          bcc <- lapply(strsplit(barcodes, "-"), "[", c(1:3))
+          bcc <- tolower(sapply(bcc, paste, collapse="-"))
+          bcc <- as.vector(bcc)
+          if(sample){
+            samp <- tolower(sapply(strsplit(barcodes, "-"), "[", 4))
+            return(samp)
+          }
+        }
+        return(bcc)
       }
-      return(bcc)
-    }
-    
-    dm <- apply(output[4:ncol(output)], 2, as.numeric, as.matrix)
-    rownames(dm) <- rownames(output)
-    dups <- bcID(colnames(dm))[duplicated(bcID(colnames(dm)))]
-    
-    d <- c()
-    for (cc in 1:length(dups)){
-      d <- cbind(d, apply(dm[,colnames(dm) %in% dups[cc]], 1, mean))
-    }
-    colnames(d) <- dups
-    dm <- cbind(dm[,!(bcID(colnames(dm)) %in% dups)], d)
-    
-    centerbc <- bcID(colnames(output)[-c(1:3)], center=TRUE)
-    colnames(centerbc) <- c("sample", "portion", "plate", "center")
-    rownames(centerbc) <- bcID(colnames(output))[-c(1:3)]
-    
-    pd <- getElement(object, "Clinical")
-    rownames(pd) <- gsub("\\.", "-", rownames(pd))
-    if(length(pd)==0){
-      stop("No clinical data available!")
-    }
-    
-    npd <- pd[na.omit(match(colnames(dm), rownames(pd))),]
-    npd <- cbind(npd, centerbc[na.omit(match(rownames(npd), rownames(centerbc))),])
-    
-    ndm <- dm[,na.omit(match(rownames(npd), colnames(dm)))]
-    
-    if(identical(all.equal(rownames(npd), colnames(ndm)), TRUE)){
-      eset <- ExpressionSet(ndm, AnnotatedDataFrame(npd))
-    }else{
-      stop("Couldn't match up rownames of phenodata to colnames of numeric data")
-    }
-    
-    
-    return(eset)
-#       ovextraclin <- fread("extraclinfilehere")
-#       ovextraclin[grep("patient_barcode", ovextraclin[, 1]),][-1]
-#       colnames(ovextraclin)[-1] <- ovextraclin[grep("patient_barcode", ovextraclin[, 1]),][-1]
-#       rownames(ovextraclin) <- ovextraclin[, 1]
-#       
-#       jj <- ovextraclin[,match(rownames(npd), colnames(ovextraclin))]
-#       featureData(eset) <- AnnotatedDataFrame(jj)
-#       return(eset)
+      
+      dm <- apply(output[4:ncol(output)], 2, as.numeric, as.matrix)
+      rownames(dm) <- rownames(output)
+      # address duplicates tumor/normal
+      
+      dups <- bcID(colnames(dm))[duplicated(bcID(colnames(dm)))]
+      
+      if(length(dups) != 0){
+        d <- c()
+        for (cc in 1:length(dups)){
+          d <- cbind(d, apply(dm[,colnames(dm) %in% dups[cc]], 1, mean))
+        }
+        colnames(d) <- dups
+        dm <- cbind(dm[,!(bcID(colnames(dm)) %in% dups)], d)
+      } 
+      
+      centerbc <- bcID(colnames(output)[-c(1:3)], center=TRUE)
+      colnames(centerbc) <- c("sample", "portion", "plate", "center")
+      rownames(centerbc) <- bcID(colnames(output))[-c(1:3)]
+      
+      pd <- getElement(object, "Clinical")
+      rownames(pd) <- gsub("\\.", "-", rownames(pd))
+      if(length(pd)==0){
+        stop("No clinical data available!")
+      }
+      
+      npd <- pd[na.omit(match(colnames(dm), rownames(pd))),]
+      npd <- cbind(npd, centerbc[na.omit(match(rownames(npd), rownames(centerbc))),])
+      
+      ndm <- dm[,na.omit(match(rownames(npd), colnames(dm)))]
+      
+      if(identical(all.equal(rownames(npd), colnames(ndm)), TRUE)){
+        eset <- ExpressionSet(ndm, AnnotatedDataFrame(npd))
+      }else{
+        stop("Couldn't match up rownames of phenodata to colnames of numeric data")
+      }
+      
+      return(eset)
+      #       ovextraclin <- fread("extraclinfilehere")
+      #       ovextraclin[grep("patient_barcode", ovextraclin[, 1]),][-1]
+      #       colnames(ovextraclin)[-1] <- ovextraclin[grep("patient_barcode", ovextraclin[, 1]),][-1]
+      #       rownames(ovextraclin) <- ovextraclin[, 1]
+      #       
+      #       jj <- ovextraclin[,match(rownames(npd), colnames(ovextraclin))]
+      #       featureData(eset) <- AnnotatedDataFrame(jj)
+      #       return(eset)
     } else {
       return(output)
     }
   }
 }
+  
