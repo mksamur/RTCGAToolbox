@@ -10,7 +10,7 @@
 #' @examples
 #' 
 #' \dontrun{
-#' clinicData = brcaData@@Clinical
+#' clinicData = data.frame(lapply(brcaData@@Clinical, as.character), stringsAsFactors=FALSE,row.names = rownames(brcaData@@Clinical))
 #' clinicData = clinicData[,3:5]
 #' clinicData[is.na(clinicData[,3]),3] = clinicData[is.na(clinicData[,3]),2]
 #' survData <- data.frame(Samples=rownames(clinicData),Time=as.numeric(clinicData[,3]),

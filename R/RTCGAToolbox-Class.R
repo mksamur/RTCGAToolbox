@@ -61,6 +61,7 @@ setMethod("show", "FirehoseData",function(object){
   if(length(object@miRNAArray) > 0 ){message("@miRNAArray: A list contains FirehosemRNAArray object(s), length: ",length(object@miRNAArray))}
   if(length(object@RPPAArray) > 0 ){message("@RPPAArray: A list contains FirehosemRNAArray object(s), length: ",length(object@RPPAArray))}
   if(length(object@GISTIC@Dataset) > 0){message("@GISTIC: A FirehoseGISTIC object to store copy number data")}
+  if(dim(object@Mutations)[1] > 0 & dim(object@Mutations)[2] > 0){message("@Mutations: A data.frame, dim: ",paste(dim(object@Mutations),collapse = "\t"))}
 }
 )
 
