@@ -23,8 +23,8 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
   if(!is.null(DGEResult2) & class(DGEResult2) != "DGEResult"){stop("DGEResult2 must be DGEResult class!")}
   pdf(file=paste(dataObject@Dataset,"-reportImage.pdf",sep=""),height=30,width=30)
   plotpos = 1;
-  require("RCircos")
-  data(UCSC.HG19.Human.CytoBandIdeogram)
+  #require("RCircos")
+  data(UCSC.HG19.Human.CytoBandIdeogram,package = "RCircos")
   cyto.info <- UCSC.HG19.Human.CytoBandIdeogram
   RCircos.Set.Core.Components(cyto.info, chr.exclude=NULL, 3, 3);
   params <- RCircos.Get.Plot.Parameters();
@@ -87,7 +87,7 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
     }
     #}
   }
-  if(!is.null(dataObject@GISTIC) & class(dataObject@GISTIC)=="FirehoseGISTIC")
+  if(!is.null(dataObject@GISTIC) & class(dataObject@GISTIC)=="FirehoseGISTIC" & length(dataObject@GISTIC@Dataset) > 0)
   {
     cnMat <- dataObject@GISTIC@ThresholedByGene
     rownames(cnMat) <- cnMat[,1]
