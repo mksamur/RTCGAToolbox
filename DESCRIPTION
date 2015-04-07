@@ -16,7 +16,7 @@ Description: Managing data from large scale projects such as The Cancer Genome
     researchers who are interested with TCGA data. In addition, it can be
     integrated with other analysis pipelines for following data analysis.
 License: GPL (>= 2)
-biocViews: Sequencing, DifferentialExpression
+biocViews: Sequencing, DifferentialExpression, GeneExpression
 VignetteBuilder: knitr
 Suggests:
     BiocStyle,

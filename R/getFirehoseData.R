@@ -527,7 +527,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
             delFodler <- paste(getwd(),"/",strsplit(fileList[1],"/")[[1]][1],sep="")
             unlink(delFodler, recursive = TRUE)
             file.remove(paste(dataset,"-Mutation.tar.gz",sep=""))
-            write.table(retMutations,file=paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"),sep="\t",row.names=F,quote=F)
+            write.table(retMutations,file=paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"),sep="\t",row.names=FALSE,quote=FALSE)
           }
           else
           {
@@ -575,7 +575,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         }
         else
         {
-          tmpCNThreshhold = fread(paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"),header=T,colClasses = "character", data.table = FALSE)
+          tmpCNThreshhold = fread(paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"),header=TRUE,colClasses = "character", data.table = FALSE)
           tmpCNAll = fread(paste0(gistic2_Date,"-",dataset,"-all_data_by_genes.txt"),header=TRUE,colClasses="character", data.table = FALSE)
         }
         tmpReturn <- new("FirehoseGISTIC",Dataset=dataset,AllByGene=data.frame(tmpCNAll),
