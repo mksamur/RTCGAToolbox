@@ -22,8 +22,8 @@ Returns a list that stores results for each dataset
 \code{getCNGECorrelation} returns a list that stores the results correlation between gene expression and copy number data.
 }
 \examples{
-\dontrun{
 data(RTCGASample)
+\dontrun{
 corRes = getCNGECorrelation(a2)
 }
 }

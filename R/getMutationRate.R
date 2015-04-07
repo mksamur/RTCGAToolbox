@@ -3,10 +3,9 @@
 #' @param dataObject This must be \code{FirehoseData} object.
 #' @return Returns a data table
 #' @examples
-#'
-#' \dontrun{
 #' data(RTCGASample)
 #' mutRate = getMutationRate(dataObject=a2)
+#' \dontrun{
 #' }
 getMutationRate <- function(dataObject)
 {

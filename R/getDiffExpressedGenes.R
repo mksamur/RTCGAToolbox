@@ -13,10 +13,9 @@
 #' @param meanFilter Mean read counts for each gene to filter not expressed genes (Default 10)
 #' @return Returns a list that stores results for each dataset
 #' @examples
-#'
-#' \dontrun{
 #' data(RTCGASample)
 #' dgegenes = getDiffExpressedGenes(a2)
+#' \dontrun{
 #' }
 
 getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.pval=0.05,raw.pval=0.05,logFC=2,

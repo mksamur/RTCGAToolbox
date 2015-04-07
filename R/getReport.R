@@ -8,11 +8,10 @@
 #' @param geneLocations Gene coordinates.
 #' @return Draws a circle plot
 #' @examples
-#'
-#' \dontrun{
 #' data(RTCGASample)
 #' data(hg19.ucsc.gene.locations)
 #' t1=getDiffExpressedGenes(a2)
+#' \dontrun{
 #' getReport(dataObject=a2,DGEResult1=t1[[1]],geneLocations=hg19.ucsc.gene.locations)
 #' }
 getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)

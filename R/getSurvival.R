@@ -8,8 +8,13 @@
 #' @param sampleTimeCensor a data frame that stores clinical data. First column should store sample IDs, second column should have time and third column should have event information. For more information please see vignette.
 #' @return Draws a KM plot
 #' @examples
-#' 
+#' ## get data with  getFirehoseData() function and call survival analysis
+#' ## Always check clinical data file for structural changes
+#' getFirehoseDatasets()
+#' getFirehoseAnalyzeDates()
 #' \dontrun{
+#' brcaData = getFirehoseData (dataset="BRCA", runDate="20140416", gistic2_Date="20140115",
+#' Clinic=TRUE, RNAseq_Gene=TRUE, mRNA_Array=TRUE, Mutation=TRUE)
 #' clinicData = data.frame(lapply(brcaData@@Clinical, as.character), stringsAsFactors=FALSE,row.names = rownames(brcaData@@Clinical))
 #' clinicData = clinicData[,3:5]
 #' clinicData[is.na(clinicData[,3]),3] = clinicData[is.na(clinicData[,3]),2]
