@@ -53,7 +53,7 @@ extract <- function(object, type, phenoData = TRUE){
     message("There is no data for that data type!")
   } else {
     if(phenoData){
-      bcID <- function(barcodes, center=FALSE, sample=FALSE){
+      bcID <- function(barcodes, center=FALSE, sample=FALSE, collapse=FALSE){
         barcodes <- gsub("\\.", "-", barcodes)
         if(center){
           if(!sample){
@@ -61,15 +61,20 @@ extract <- function(object, type, phenoData = TRUE){
             bcc <- tolower(t(bcc))
             return(bcc)
           } else {
-          bcc <- sapply(strsplit(barcodes, "-"), "[", c(4:7))
-          bcc <- tolower(t(bcc))
+            bcc <- sapply(strsplit(barcodes, "-"), "[", c(4:7))
+            bcc <- tolower(t(bcc))
           }
         } else {
           bcc <- lapply(strsplit(barcodes, "-"), "[", c(1:3))
           bcc <- tolower(sapply(bcc, paste, collapse="-"))
-          bcc <- as.vector(bcc)
-          if(sample){
+          if(sample & collapse){
+            samp <- lapply(strsplit(barcodes, "-"), "[", c(1:4))
+            samp <- tolower(sapply(samp, paste, collapse="-"))
+            samp <- substr(samp, 1, nchar(samp)[1]-1)
+            return(samp)
+          }else if(sample & !collapse){
             samp <- tolower(sapply(strsplit(barcodes, "-"), "[", 4))
+            samp <- substr(samp, 1,2)
             return(samp)
           }
         }
@@ -80,9 +85,10 @@ extract <- function(object, type, phenoData = TRUE){
       rownames(dm) <- rownames(output)
       # address duplicates tumor/normal
       
-      dups <- bcID(colnames(dm))[duplicated(bcID(colnames(dm)))]
+      dups <- colnames(dm)[duplicated(bcID(colnames(dm)))]
+      repeated <- dm[, bcID(colnames(dm)) %in% bcID(dups)]
       
-      if(length(dups) != 0){
+      if(length(dups) != 0 & identical(bcID(colnames(repeated), sample = TRUE)[1], bcID(colnames(repeated), sample = TRUE)[2])) {
         d <- c()
         for (cc in 1:length(dups)){
           d <- cbind(d, apply(dm[,colnames(dm) %in% dups[cc]], 1, mean))
@@ -116,8 +122,7 @@ extract <- function(object, type, phenoData = TRUE){
       #       ovextraclin <- fread("extraclinfilehere")
       #       ovextraclin[grep("patient_barcode", ovextraclin[, 1]),][-1]
       #       colnames(ovextraclin)[-1] <- ovextraclin[grep("patient_barcode", ovextraclin[, 1]),][-1]
-      #       rownames(ovextraclin) <- ovextraclin[, 1]
-      #       
+      #       rownames(ovextraclin) <- ovextraclin[, 1]      
       #       jj <- ovextraclin[,match(rownames(npd), colnames(ovextraclin))]
       #       featureData(eset) <- AnnotatedDataFrame(jj)
       #       return(eset)
