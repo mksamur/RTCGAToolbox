@@ -49,8 +49,8 @@ setMethod("show", "FirehoseData",function(object){
   message(paste0(object@Dataset," FirehoseData object"))
   message("Available slots:")
   if(dim(object@Clinical)[1] > 0 & dim(object@Clinical)[2] > 0){message("@Clinical: A data frame, dim: ",paste(dim(object@Clinical),collapse = "\t"))}
-  if(dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0){message("@RNASeqGene: A matrix withraw read counts or normalaized data, dim: ",paste(dim(object@RNASeqGene),collapse = "\t"))}
-  if(dim(object@RNASeq2GeneNorm)[1] > 0 & dim(object@RNASeq2GeneNorm)[2] > 0){message("@RNASeq2GeneNorm: A matrix withraw read counts or normalaized data, dim: ",paste(dim(object@RNASeq2GeneNorm),collapse = "\t"))}
+  if(dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0){message("@RNASeqGene: A matrix withraw read counts or normalized data, dim: ",paste(dim(object@RNASeqGene),collapse = "\t"))}
+  if(dim(object@RNASeq2GeneNorm)[1] > 0 & dim(object@RNASeq2GeneNorm)[2] > 0){message("@RNASeq2GeneNorm: A matrix withraw read counts or normalized data, dim: ",paste(dim(object@RNASeq2GeneNorm),collapse = "\t"))}
   if(dim(object@miRNASeqGene)[1] > 0 & dim(object@miRNASeqGene)[2] > 0){message("@miRNASeqGene: A matrix, dim: ",paste(dim(object@miRNASeqGene),collapse = "\t"))}
   if(dim(object@CNASNP)[1] > 0 & dim(object@CNASNP)[2] > 0){message("@CNASNP: A data.frame, dim: ",paste(dim(object@CNASNP),collapse = "\t"))}
   if(dim(object@CNVSNP)[1] > 0 & dim(object@CNVSNP)[2] > 0){message("@CNVSNP: A data.frame, dim: ",paste(dim(object@CNVSNP),collapse = "\t"))}
