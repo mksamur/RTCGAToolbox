@@ -1,4 +1,4 @@
-citEntry(entry="Unpublished",
+citEntry(entry="article",
          title = "RTCGAToolbox: a new tool for exporting TCGA Firehose data",
          author = personList( as.person("Mehmet Kemal Samur")),
          year = 2014,
