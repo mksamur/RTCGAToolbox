@@ -137,7 +137,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     if(forceDownload || !file.exists(file.path(todir, paste0(runDate,"-",dataset,exportName))))
     {
       download.file(url=fileLink,destfile=file.path(todir, paste0(dataset,fileExt)),method="auto",quiet = FALSE, mode = "w")
-      fileList <- untar(paste(dataset,fileExt,sep=""),list=TRUE)
+      fileList <- untar(file.path(todir, paste0(dataset,fileExt)), list = TRUE)
       if(!subSearch)
       {
         fileList = fileList[grepl(searchName,fileList)]
@@ -154,10 +154,10 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           fileList = fileList[!grepl("MANIFEST.txt",fileList)]
         }
       }
-      untar(file.path(todir, paste0(dataset,fileExt)),files=fileList)
+      untar(file.path(todir, paste0(dataset,fileExt)),files=fileList,exdir=todir)
       file.rename(from=fileList,to=file.path(todir, paste0(runDate,"-",dataset,exportName)))
       file.remove(file.path(todir, paste0(dataset,fileExt)))
-      delFodler <- paste0(todir,"/",strsplit(fileList,"/")[[1]][1])
+      delFodler <- file.path(todir,strsplit(fileList[1],"/")[[1]][1])
       message(delFodler)
       unlink(delFodler, recursive = TRUE)
     }
@@ -172,7 +172,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     fh_url <- paste0(fh_url,substr(runDate,1,4),"_",substr(runDate,5,6),"_",substr(runDate,7,8),"/data/")
     fh_url <- paste0(fh_url,dataset,"/",runDate,"/")
     doc = htmlTreeParse(fh_url, useInternalNodes = T)
-## DOC not working ##    
+
     #Download clinical data
     if(Clinic)
     {
@@ -183,7 +183,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       {        
         exportFiles(paste0(fh_url,i),dataset,"-Clinical.tar.gz","*.clin.merged.picked.txt$",FALSE,"-Clinical.txt")
         
-        raw.clin <- read.delim(paste0(runDate,"-",dataset,"-Clinical.txt"),colClasses="character")
+        raw.clin <- read.delim(file.path(todir, paste0(runDate,"-",dataset,"-Clinical.txt")),colClasses="character")
         df.clin <- data.frame(do.call(rbind, raw.clin[, -1]))
         colnames(df.clin) <- raw.clin[, 1]
         resultClass@Clinical <- df.clin
@@ -258,7 +258,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                     TRUE,
                     "-CNASNPHg19.txt")
         #Get selected type only
-        tmpMat = fread(paste0(runDate,"-",dataset,"-CNASNPHg19.txt"),header=TRUE,colClasses=c("character","numeric","numeric",
+        tmpMat = fread(file.path(todir, paste0(runDate,"-",dataset,"-CNASNPHg19.txt")),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                              "numeric","numeric","numeric"),data.table = FALSE)
         resultClass@CNASNP <- tmpMat
       }
@@ -278,7 +278,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                     TRUE,
                     "-CNVSNPHg19.txt")
         #Get selected type only
-        tmpMat = fread(paste0(runDate,"-",dataset,"-CNVSNPHg19.txt"),header=TRUE,colClasses=c("character","numeric","numeric",
+        tmpMat = fread(file.path(todir,paste0(runDate,"-",dataset,"-CNVSNPHg19.txt")),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                              "numeric","numeric","numeric"),data.table = FALSE)
         resultClass@CNVSNP <- tmpMat
       }
@@ -298,10 +298,10 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                     TRUE,
                     "-CNAseq.txt")
         #Get selected type only
-        tmpMat = fread(paste0(runDate,"-",dataset,"-CNAseq.txt"),
+        tmpMat = fread(file.path(todir, paste0(runDate,"-",dataset,"-CNAseq.txt")),
                        header=TRUE,colClasses=c("character","numeric","numeric","numeric","numeric","numeric"), 
                        data.table = FALSE)
-        #tmpMat = read.delim(paste0(runDate,"-",dataset,"-CNAseq.txt"),header=TRUE,colClasses=c("character","numeric","numeric",
+        #tmpMat = read.delim(file.path(todir, paste0(runDate,"-",dataset,"-CNAseq.txt")),header=TRUE,colClasses=c("character","numeric","numeric",
         #                                                                                 "numeric","numeric"))
         resultClass@CNAseq <- tmpMat
       }
@@ -323,10 +323,10 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                     TRUE,
                     paste0(dataset,"-CNACGH-",listCount,".txt"))
         #Get selected type only
-        tmpMat = fread(paste0(runDate,"-",dataset,"-CNACGH-",listCount,".txt"),
+        tmpMat = fread(file.path(todir,paste0(runDate,"-",dataset,"-CNACGH-",listCount,".txt")),
                        header=TRUE,colClasses=c("character","numeric","numeric","numeric","numeric","numeric"), 
                        data.table = FALSE)
-        #tmpMat = read.delim(paste0(runDate,"-",dataset,"-CNACGH-",listCount,".txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
+        #tmpMat = read.delim(file.path(todir,paste0(runDate,"-",dataset,"-CNACGH-",listCount,".txt",sep="")),header=TRUE,colClasses=c("character","numeric","numeric",
         #                                                                                               "numeric","numeric"))
         tmpReturn <- new("FirehoseCGHArray",Filename=i,DataMatrix=tmpMat)
         dataLists[[listCount]] <- tmpReturn
@@ -355,11 +355,11 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                       paste0("-Methylation-",listCount,".txt"))
           
           #Get selected type only
-          tmpCols = read.delim(paste0(runDate,"-",dataset,"-Methylation-",listCount,".txt"),nrows=1,colClasses="character")
+          tmpCols = read.delim(file.path(todir, paste0(runDate,"-",dataset,"-Methylation-",listCount,".txt")),nrows=1,colClasses="character")
           colOrder <- 1:ncol(tmpCols)
           colOrder <- colOrder[tmpCols[1,] == "Beta_value"]
           
-          tmpMat <- fread(paste0(runDate,"-",dataset,"-Methylation-",listCount,".txt"),header=F,colClasses = "character", select=c(1,3,4,5,colOrder), data.table = FALSE)
+          tmpMat <- fread(file.path(todir, paste0(runDate,"-",dataset,"-Methylation-",listCount,".txt")),header=F,colClasses = "character", select=c(1,3,4,5,colOrder), data.table = FALSE)
           tmpMat <- tmpMat[,c(1,3,4,5,2,6:ncol(tmpMat))]
           closeAllConnections()
           colnames(tmpMat) <- c("CompositeElementREF","Gene_Symbol","Chromosome","Genomic_Coordinate",tmpMat[1,5:ncol(tmpMat)])
@@ -469,27 +469,27 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       listCount = 1
       for(ii in trim(plinks))
       {
-        if(forceDownload || !file.exists(paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt")))
+        if(forceDownload || !file.exists(file.path(todir, paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"))))
         {
           download_link = paste(fh_url,ii,sep="")
-          download.file(url=download_link,destfile=paste(dataset,"-Mutation.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
-          fileList <- untar(paste0(dataset,"-Mutation.tar.gz"),list=TRUE)
+          download.file(url=download_link,destfile=file.path(todir,paste(dataset,"-Mutation.tar.gz",sep="")),method="auto",quiet = FALSE, mode = "w")
+          fileList <- untar(file.path(todir,paste0(dataset,"-Mutation.tar.gz")),list=TRUE)
           grepSearch = "MANIFEST.txt"
           fileList = fileList[!grepl(grepSearch,fileList)]
           ###
-          untar(paste(dataset,"-Mutation.tar.gz",sep=""),files=fileList)
+          untar(file.path(todir, paste(dataset,"-Mutation.tar.gz",sep="")),files=fileList,exdir=todir)
           retMutations <- do.call("rbind",lapply(fileList,FUN=function(files){
             read.delim(files,header=TRUE,colClasses="character")
           }))
-          delFodler <- paste(getwd(),"/",strsplit(fileList[1],"/")[[1]][1],sep="")
+          delFodler <- file.path(todir,strsplit(fileList[1],"/")[[1]][1])
           unlink(delFodler, recursive = TRUE)
-          file.remove(paste(dataset,"-Mutation.tar.gz",sep=""))
-          write.table(retMutations,file=paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"),sep="\t",row.names=F,quote=F)
+          file.remove(file.path(todir,paste(dataset,"-Mutation.tar.gz",sep="")))
+          write.table(retMutations,file=file.path(todir, paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt")),sep="\t",row.names=F,quote=F)
         }
         else
         {
-          #retMutations <- read.delim(file=paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"),header = T,sep="\t")
-          retMutations <- fread(paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"),header=TRUE,colClasses="character", data.table = FALSE)
+          #retMutations <- read.delim(file=file.path(todir, paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt")),header = T,sep="\t")
+          retMutations <- fread(file.path(todir, paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt")),header=TRUE,colClasses="character", data.table = FALSE)
         }
         resultClass@Mutations <- retMutations
       }
@@ -507,29 +507,29 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     
     for(ii in trim(plinks))
     {
-      if(forceDownload || !file.exists(paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt")))
+      if(forceDownload || !file.exists(file.path(todir, paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"))))
       {
         download_link = paste(fh_url,ii,sep="")
-        download.file(url=download_link,destfile=paste0(dataset,"-Gistic2.tar.gz"),method="auto",quiet = FALSE, mode = "w")
-        fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
+        download.file(url=download_link,destfile=file.path(todir,paste0(dataset,"-Gistic2.tar.gz")),method="auto",quiet = FALSE, mode = "w")
+        fileList <- untar(file.path(todir,paste(dataset,"-Gistic2.tar.gz",sep="")),list=TRUE)
         grepSearch = "all_data_by_genes.txt"
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
+        untar(file.path(todir,paste0(dataset,"-Gistic2.tar.gz")),files=fileList,exdir=todir)
         tmpCNAll = fread(fileList,header=TRUE,colClasses="character", data.table = FALSE)
         file.rename(from=fileList,to=paste0(gistic2_Date,"-",dataset,"-all_data_by_genes.txt"))
         fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
         grepSearch = "all_thresholded.by_genes.txt"
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste(dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
+        untar(paste(dataset,"-Gistic2.tar.gz",sep=""),files=fileList,exdir=todir)
         tmpCNThreshhold = fread(fileList,header=T,colClasses = "character", data.table = FALSE)
         file.rename(from=fileList,to=paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"))
-        delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+        delFodler <- file.path(todir,strsplit(fileList[1],"/")[[1]][1])
         unlink(delFodler, recursive = TRUE)
         file.remove(paste0(dataset,"-Gistic2.tar.gz"))
       }
       else
       {
-        tmpCNThreshhold = fread(paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"),header=T,colClasses = "character", data.table = FALSE)
+        tmpCNThreshhold = fread(file.path(todir,paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt")),header=T,colClasses = "character", data.table = FALSE)
         tmpCNAll = fread(paste0(gistic2_Date,"-",dataset,"-all_data_by_genes.txt"),header=TRUE,colClasses="character", data.table = FALSE)
       }
       tmpReturn <- new("FirehoseGISTIC",Dataset=dataset,AllByGene=data.frame(tmpCNAll),
