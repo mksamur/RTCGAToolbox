@@ -1,8 +1,8 @@
 Package: RTCGAToolbox
 Type: Package
 Title: A new tool for exporting TCGA Firehose data
-Version: 1.2.1
-Date: 2014-12-15
+Version: 1.2.2
+Date: 2015-04-04
 Author: Mehmet Kemal Samur
 Maintainer: Mehmet Kemal Samur <samur@jimmy.harvard.edu>
 Description: Managing data from large scale projects such as The Cancer Genome
@@ -16,7 +16,7 @@ Description: Managing data from large scale projects such as The Cancer Genome
     researchers who are interested with TCGA data. In addition, it can be
     integrated with other analysis pipelines for following data analysis.
 License: GPL (>= 2)
-biocViews: Sequencing, DifferentialExpression
+biocViews: Sequencing, DifferentialExpression, GeneExpression
 VignetteBuilder: knitr
 Suggests:
     BiocStyle,

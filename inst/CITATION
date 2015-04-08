@@ -1,10 +1,12 @@
-citEntry(entry="Unpublished",
+citEntry(entry="article",
          title = "RTCGAToolbox: a new tool for exporting TCGA Firehose data",
-         author = personList( as.person("Mehmet Kemal Samur")),
-         year = 2014,
-         note = "PLoS One. 2014 Sep 2;9(9):e106397. doi: 10.1371/journal.pone.0106397. eCollection 2014",     
+         author = "Mehmet Kemal Samur",
+         journal = "PLoS One",
+         year = "2014",
+         volume = "9(9):e106397",
          textVersion = 
-         paste("Mehmet Kemal Samur:", 
-               "RTCGAToolbox: A new tool for exporting TCGA Firehose data") )
+         paste("Samur MK.", 
+               "RTCGAToolbox: A new tool for exporting TCGA Firehose data.",
+               "PLoS One. 2014 Sep 2;9(9):e106397. doi: 10.1371/journal.pone.0106397. eCollection 2014") )
 
 

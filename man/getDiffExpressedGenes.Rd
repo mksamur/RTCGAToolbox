@@ -34,9 +34,9 @@ Returns a list that stores results for each dataset
 \code{getDiffExpressedGenes} returns a list that stores the results for each dataset.
 }
 \examples{
-\dontrun{
 data(RTCGASample)
 dgegenes = getDiffExpressedGenes(a2)
+\dontrun{
 }
 }
 

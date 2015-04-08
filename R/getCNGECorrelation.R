@@ -8,9 +8,8 @@
 #' @param raw.pval raw p value cut off for results table (Default 0.05)
 #' @return Returns a list that stores results for each dataset
 #' @examples
-#'
-#' \dontrun{
 #' data(RTCGASample)
+#' \dontrun{
 #' corRes = getCNGECorrelation(a2)
 #' }
 getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval=0.05)

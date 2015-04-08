@@ -13,10 +13,9 @@
 #' @param meanFilter Mean read counts for each gene to filter not expressed genes (Default 10)
 #' @return Returns a list that stores results for each dataset
 #' @examples
-#'
-#' \dontrun{
 #' data(RTCGASample)
 #' dgegenes = getDiffExpressedGenes(a2)
+#' \dontrun{
 #' }
 
 getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.pval=0.05,raw.pval=0.05,logFC=2,
@@ -80,7 +79,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
           colnames (design) <-c ("Normal", "Tumor")
           v <- voom(voomMat,design,plot=DrawPlots)
           fit <- lmFit(v,design)
-          cont.matrix <- makeContrasts(TumorvsNormal=Tumor-Normal, levels=design)
+          cont.matrix <- makeContrasts("Tumor-Normal", levels=design)
           fit2 <- contrasts.fit(fit, cont.matrix)
           fit2 <- eBayes(fit2)
           aradeger <- topTable(fit2, adjust.method=adj.method, genelist=fit$genes, number=length(fit2))
@@ -156,7 +155,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
           colnames (design) <-c ("Normal", "Tumor")
           v <- voom(voomMat,design,plot=DrawPlots)
           fit <- lmFit(v,design)
-          cont.matrix <- makeContrasts(TumorvsNormal=Tumor-Normal, levels=design)
+          cont.matrix <- makeContrasts("Tumor-Normal", levels=design)
           fit2 <- contrasts.fit(fit, cont.matrix)
           fit2 <- eBayes(fit2)
           aradeger <- topTable(fit2, adjust.method=adj.method, genelist=fit$genes, number=length(fit2))
@@ -253,7 +252,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
           design <- model.matrix (~0 + factor(c(rep(1,length(normalSamples)),rep(2,length(tumorSamples)))))
           colnames (design) <-c ("Normal", "Tumor")
           fit <- lmFit(geneMat,design)
-          cont.matrix <- makeContrasts(TumorvsNormal=Tumor-Normal, levels=design)
+          cont.matrix <- makeContrasts("Tumor-Normal", levels=design)
           fit2 <- contrasts.fit(fit, cont.matrix)
           fit2 <- eBayes(fit2)
           aradeger <- topTable(fit2, adjust.method=adj.method, genelist=fit$genes, number=length(fit2))

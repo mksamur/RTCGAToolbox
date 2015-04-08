@@ -22,7 +22,8 @@
 #' @param RPPA Logical (default FALSE) parameter for RPPA data
 #' @param RNAseqNorm RNAseq data normalization method. (Default raw_counts)
 #' @param RNAseq2Norm RNAseq v2 data normalization method. (Default normalized_count)
-#' @param forceDownload A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time. 
+#' @param forceDownload A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.
+#' @param fileSizeLimit Files that are larger than set value (megabyte) won't be downloaded (Default: 500)  
 #' @return A \code{FirehoseData} data object that stores data for selected data types.
 #' @examples
 #'
@@ -37,7 +38,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                             CNA_SNP=FALSE,CNV_SNP=FALSE,
                             CNA_Seq=FALSE,CNA_CGH=FALSE,Methylation=FALSE,Mutation=FALSE,mRNA_Array=FALSE,
                             miRNA_Array=FALSE,RPPA=FALSE,RNAseqNorm="raw_counts",RNAseq2Norm="normalized_count", 
-                            todir = NULL, forceDownload=FALSE)
+                            todir = NULL, forceDownload=FALSE,fileSizeLimit=500)
 {
   #check input parameters
   if(!class(dataset)=="character" || is.null(dataset) || !length(dataset) == 1 || nchar(dataset) < 2)
@@ -163,6 +164,23 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     }
   }
   
+  checkFileSize <- function(dataURL)
+  {
+    asd = read.csv(url(paste0("http://www.canevolve.org/fmineRgetSize.php?url=",dataURL)))
+    if(as.numeric(asd[1,1])/(1024^2) > fileSizeLimit)
+    {
+      message(dataURL)
+      message(paste("File Size: ~"),format(as.numeric(asd[1,1])/(1024^2), digits=1, decimal.mark="."),"MB")
+      message("File above won't be donwloaded due to data size, RTCGAToolbox will skip this data!")
+      return(FALSE)
+    }
+    else
+    {
+      return(TRUE)
+    }
+    
+  }
+  
   resultClass <- new("FirehoseData", Dataset = dataset)
   
   if(!is.null(runDate))
@@ -199,10 +217,13 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       
       for(i in trim(plinks))
       { 
-        exportFiles(paste0(fh_url,i),dataset,"-RNAseqGene.tar.gz","[.]rnaseq__.*.__Level_3__gene_expression__data.data.txt$",TRUE,"-RNAseqGene.txt")
-        #Get selected type only
-        resultClass@RNASeqGene <- makeExprMat(dataset,"-RNAseqGene.txt",RNAseqNorm,"RNAseq")
-        gc()
+        if(checkFileSize(paste0(fh_url,i)))
+        {
+          exportFiles(paste0(fh_url,i),dataset,"-RNAseqGene.tar.gz","[.]rnaseq__.*.__Level_3__gene_expression__data.data.txt$",TRUE,"-RNAseqGene.txt")
+          #Get selected type only
+          resultClass@RNASeqGene <- makeExprMat(dataset,"-RNAseqGene.txt",RNAseqNorm,"RNAseq")
+          gc() 
+        }
       }
     }
     
@@ -214,14 +235,17 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       
       for(i in trim(plinks))
       {
-        exportFiles(paste0(fh_url,i),dataset,
-                    "-RNAseq2GeneNorm.tar.gz",
-                    "[.]rnaseqv2__.*.__Level_3__RSEM_genes_normalized__data.data.txt$",
-                    TRUE,
-                    "-RNAseq2GeneNorm.txt")
-        
-        resultClass@RNASeq2GeneNorm <- makeExprMat(dataset,"-RNAseq2GeneNorm.txt",RNAseq2Norm,"RNAseq2")
-        gc()
+        if(checkFileSize(paste0(fh_url,i)))
+        {
+          exportFiles(paste0(fh_url,i),dataset,
+                      "-RNAseq2GeneNorm.tar.gz",
+                      "[.]rnaseqv2__.*.__Level_3__RSEM_genes_normalized__data.data.txt$",
+                      TRUE,
+                      "-RNAseq2GeneNorm.txt")
+          
+          resultClass@RNASeq2GeneNorm <- makeExprMat(dataset,"-RNAseq2GeneNorm.txt",RNAseq2Norm,"RNAseq2")
+          gc() 
+        }
       }
     }
     
@@ -233,14 +257,17 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       
       for(i in trim(plinks))
       {
-        exportFiles(paste0(fh_url,i),dataset,
-                    "-miRNAseqGene.tar.gz",
-                    "[.]mirnaseq__.*.__Level_3__miR_gene_expression__data.data.txt$",
-                    TRUE,
-                    "-miRNAseqGene.txt")
-        
-        resultClass@miRNASeqGene <- makeExprMat(dataset,"-miRNAseqGene.txt","read_count","miRNAseq",100)
-        gc()
+        if(checkFileSize(paste0(fh_url,i)))
+        {
+          exportFiles(paste0(fh_url,i),dataset,
+                      "-miRNAseqGene.tar.gz",
+                      "[.]mirnaseq__.*.__Level_3__miR_gene_expression__data.data.txt$",
+                      TRUE,
+                      "-miRNAseqGene.txt")
+          
+          resultClass@miRNASeqGene <- makeExprMat(dataset,"-miRNAseqGene.txt","read_count","miRNAseq",100)
+          gc() 
+        }
       }
     }
     
@@ -252,15 +279,18 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       
       for(i in trim(plinks))
       {
-        exportFiles(paste0(fh_url,i),dataset,
-                    "-CNASNPHg19.tar.gz",
-                    "[.]snp__.*.__Level_3__segmented_scna_hg19__seg.seg.txt$",
-                    TRUE,
-                    "-CNASNPHg19.txt")
-        #Get selected type only
-        tmpMat = fread(file.path(todir, paste0(runDate,"-",dataset,"-CNASNPHg19.txt")),header=TRUE,colClasses=c("character","numeric","numeric",
-                                                                                             "numeric","numeric","numeric"),data.table = FALSE)
-        resultClass@CNASNP <- tmpMat
+        if(checkFileSize(paste0(fh_url,i)))
+        {
+          exportFiles(paste0(fh_url,i),dataset,
+                      "-CNASNPHg19.tar.gz",
+                      "[.]snp__.*.__Level_3__segmented_scna_hg19__seg.seg.txt$",
+                      TRUE,
+                      "-CNASNPHg19.txt")
+          #Get selected type only
+          tmpMat = fread(file.path(todir, paste0(runDate,"-",dataset,"-CNASNPHg19.txt")),header=TRUE,colClasses=c("character","numeric","numeric",
+                                                                                                "numeric","numeric","numeric"),data.table = FALSE)
+          resultClass@CNASNP <- tmpMat 
+        }
       }
     }
     
@@ -272,15 +302,18 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       
       for(i in trim(plinks))
       {
-        exportFiles(paste0(fh_url,i),dataset,
-                    "-CNVSNPHg19.tar.gz",
-                    "[.]snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.seg.txt$",
-                    TRUE,
-                    "-CNVSNPHg19.txt")
-        #Get selected type only
-        tmpMat = fread(file.path(todir,paste0(runDate,"-",dataset,"-CNVSNPHg19.txt")),header=TRUE,colClasses=c("character","numeric","numeric",
+        if(checkFileSize(paste0(fh_url,i)))
+        {
+          exportFiles(paste0(fh_url,i),dataset,
+                      "-CNVSNPHg19.tar.gz",
+                      "[.]snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.seg.txt$",
+                      TRUE,
+                      "-CNVSNPHg19.txt")
+          #Get selected type only
+tmpMat = fread(file.path(todir,paste0(runDate,"-",dataset,"-CNVSNPHg19.txt")),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                              "numeric","numeric","numeric"),data.table = FALSE)
-        resultClass@CNVSNP <- tmpMat
+          resultClass@CNVSNP <- tmpMat
+        }
       }
     }
     
@@ -292,18 +325,21 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       
       for(i in trim(plinks))
       {
-        exportFiles(paste0(fh_url,i),dataset,
-                    "-CNAseq.tar.gz",
-                    "[.]cna__.*.__Level_3__segmentation__seg.seg.txt$",
-                    TRUE,
-                    "-CNAseq.txt")
-        #Get selected type only
-        tmpMat = fread(file.path(todir, paste0(runDate,"-",dataset,"-CNAseq.txt")),
+        if(checkFileSize(paste0(fh_url,i)))
+        {
+          exportFiles(paste0(fh_url,i),dataset,
+                      "-CNAseq.tar.gz",
+                      "[.]cna__.*.__Level_3__segmentation__seg.seg.txt$",
+                      TRUE,
+                      "-CNAseq.txt")
+          #Get selected type only
+   tmpMat = fread(file.path(todir, paste0(runDate,"-",dataset,"-CNAseq.txt")),
                        header=TRUE,colClasses=c("character","numeric","numeric","numeric","numeric","numeric"), 
                        data.table = FALSE)
         #tmpMat = read.delim(file.path(todir, paste0(runDate,"-",dataset,"-CNAseq.txt")),header=TRUE,colClasses=c("character","numeric","numeric",
-        #                                                                                 "numeric","numeric"))
-        resultClass@CNAseq <- tmpMat
+          #                                                                                 "numeric","numeric"))
+          resultClass@CNAseq <- tmpMat 
+        }
       }
     }
     
@@ -317,20 +353,23 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       listCount = 1
       for(i in trim(plinks))
       {
-        exportFiles(paste0(fh_url,i),dataset,
-                    "-CNACGH.tar.gz",
-                    "[.]cna__.*.__Level_3__segmentation__seg.seg.txt$",
-                    TRUE,
-                    paste0(dataset,"-CNACGH-",listCount,".txt"))
-        #Get selected type only
+        if(checkFileSize(paste0(fh_url,i)))
+        {
+          exportFiles(paste0(fh_url,i),dataset,
+                      "-CNACGH.tar.gz",
+                      "[.]cna__.*.__Level_3__segmentation__seg.seg.txt$",
+                      TRUE,
+                      paste0(dataset,"-CNACGH-",listCount,".txt"))
+          #Get selected type only
         tmpMat = fread(file.path(todir,paste0(runDate,"-",dataset,"-CNACGH-",listCount,".txt")),
                        header=TRUE,colClasses=c("character","numeric","numeric","numeric","numeric","numeric"), 
                        data.table = FALSE)
         #tmpMat = read.delim(file.path(todir,paste0(runDate,"-",dataset,"-CNACGH-",listCount,".txt",sep="")),header=TRUE,colClasses=c("character","numeric","numeric",
         #                                                                                               "numeric","numeric"))
-        tmpReturn <- new("FirehoseCGHArray",Filename=i,DataMatrix=tmpMat)
-        dataLists[[listCount]] <- tmpReturn
-        listCount = listCount + 1
+          tmpReturn <- new("FirehoseCGHArray",Filename=i,DataMatrix=tmpMat)
+          dataLists[[listCount]] <- tmpReturn
+          listCount = listCount + 1 
+        }
       }
       resultClass@CNACGH <- dataLists
     }
@@ -345,9 +384,8 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       listCount = 1
       for(ii in trim(plinks))
       {
-        asd = read.csv(url(paste0("http://www.canevolve.org/fmineRgetSize.php?url=",paste0(fh_url,ii))))
-        if(as.numeric(asd[1,1])/(10^6) > 300){message(paste0(ii,": due to data size, RTCGAToolbox will skip this data!"))}
-        else{
+        if(checkFileSize(paste0(fh_url,ii)))
+        {
           exportFiles(paste0(fh_url,ii),dataset,
                       "-Methylation.tar.gz",
                       "[.]methylation__.*.__Level_3__within_bioassay_data_set_function__data.data.txt$",
@@ -391,17 +429,20 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       listCount = 1
       for(ii in trim(plinks))
       {
-        exportFiles(paste0(fh_url,ii),dataset,
-                    "-mRNAArray.tar.gz",
-                    "",
-                    TRUE,
-                    paste0("-mRNAArray-",listCount,".txt"),
-                    TRUE)
-        tmpReturn <- new("FirehosemRNAArray",Filename=ii,
-                         DataMatrix=makeExprMat(dataset,paste0("-mRNAArray-",listCount,".txt"),
-                                                "","mRNAArray",1000,TRUE))
-        dataLists[[listCount]] <- tmpReturn
-        listCount = listCount + 1
+        if(checkFileSize(paste0(fh_url,ii)))
+        {
+          exportFiles(paste0(fh_url,ii),dataset,
+                      "-mRNAArray.tar.gz",
+                      "",
+                      TRUE,
+                      paste0("-mRNAArray-",listCount,".txt"),
+                      TRUE)
+          tmpReturn <- new("FirehosemRNAArray",Filename=ii,
+                           DataMatrix=makeExprMat(dataset,paste0("-mRNAArray-",listCount,".txt"),
+                                                  "","mRNAArray",1000,TRUE))
+          dataLists[[listCount]] <- tmpReturn
+          listCount = listCount + 1 
+        }
       }
       resultClass@mRNAArray <- dataLists
     }
@@ -417,17 +458,20 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       listCount = 1
       for(ii in trim(plinks))
       {
-        exportFiles(paste0(fh_url,ii),dataset,
-                    "-miRNAArray.tar.gz",
-                    "",
-                    TRUE,
-                    paste0("-miRNAArray-",listCount,".txt"),
-                    TRUE)
-        tmpReturn <- new("FirehosemRNAArray",Filename=ii,
-                         DataMatrix=makeExprMat(dataset,paste0("-miRNAArray-",listCount,".txt"),
-                                                                                "","miRNAArray",100,TRUE))
-        dataLists[[listCount]] <- tmpReturn
-        listCount = listCount + 1
+        if(checkFileSize(paste0(fh_url,ii)))
+        {
+          exportFiles(paste0(fh_url,ii),dataset,
+                      "-miRNAArray.tar.gz",
+                      "",
+                      TRUE,
+                      paste0("-miRNAArray-",listCount,".txt"),
+                      TRUE)
+          tmpReturn <- new("FirehosemRNAArray",Filename=ii,
+                           DataMatrix=makeExprMat(dataset,paste0("-miRNAArray-",listCount,".txt"),
+                                                  "","miRNAArray",100,TRUE))
+          dataLists[[listCount]] <- tmpReturn
+          listCount = listCount + 1 
+        }
       }
       resultClass@miRNAArray <- dataLists
     }
@@ -443,17 +487,20 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       listCount = 1
       for(ii in trim(plinks))
       {
-        exportFiles(paste0(fh_url,ii),dataset,
-                    "-RPPAArray.tar.gz",
-                    "",
-                    TRUE,
-                    paste0("-RPPAArray-",listCount,".txt"),
-                    TRUE)
-        tmpReturn <- new("FirehosemRNAArray",Filename=ii,
-                         DataMatrix=makeExprMat(dataset,paste0("-RPPAArray-",listCount,".txt"),
-                                                                                "","RPPAArray",100,TRUE))
-        dataLists[[listCount]] <- tmpReturn
-        listCount = listCount + 1
+        if(checkFileSize(paste0(fh_url,ii)))
+        {
+          exportFiles(paste0(fh_url,ii),dataset,
+                      "-RPPAArray.tar.gz",
+                      "",
+                      TRUE,
+                      paste0("-RPPAArray-",listCount,".txt"),
+                      TRUE)
+          tmpReturn <- new("FirehosemRNAArray",Filename=ii,
+                           DataMatrix=makeExprMat(dataset,paste0("-RPPAArray-",listCount,".txt"),
+                                                  "","RPPAArray",100,TRUE))
+          dataLists[[listCount]] <- tmpReturn
+          listCount = listCount + 1 
+        }
       }
       resultClass@RPPAArray <- dataLists
     }
@@ -469,8 +516,10 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       listCount = 1
       for(ii in trim(plinks))
       {
-        if(forceDownload || !file.exists(file.path(todir, paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"))))
+        if(checkFileSize(paste0(fh_url,ii)))
         {
+          if(forceDownload || !file.exists(paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt")))
+          {
           download_link = paste(fh_url,ii,sep="")
           download.file(url=download_link,destfile=file.path(todir,paste(dataset,"-Mutation.tar.gz",sep="")),method="auto",quiet = FALSE, mode = "w")
           fileList <- untar(file.path(todir,paste0(dataset,"-Mutation.tar.gz")),list=TRUE)
@@ -492,6 +541,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           retMutations <- fread(file.path(todir, paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt")),header=TRUE,colClasses="character", data.table = FALSE)
         }
         resultClass@Mutations <- retMutations
+        }
       }
     }
   }
@@ -507,8 +557,10 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     
     for(ii in trim(plinks))
     {
-      if(forceDownload || !file.exists(file.path(todir, paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"))))
+      if(checkFileSize(paste0(fh_url,ii)))
       {
+        if(forceDownload || !file.exists(paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt")))
+        {
         download_link = paste(fh_url,ii,sep="")
         download.file(url=download_link,destfile=file.path(todir,paste0(dataset,"-Gistic2.tar.gz")),method="auto",quiet = FALSE, mode = "w")
         fileList <- untar(file.path(todir,paste(dataset,"-Gistic2.tar.gz",sep="")),list=TRUE)
@@ -529,12 +581,13 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       }
       else
       {
-        tmpCNThreshhold = fread(file.path(todir,paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt")),header=T,colClasses = "character", data.table = FALSE)
+        tmpCNThreshhold = fread(file.path(todir,paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt")),header=TRUE,colClasses = "character", data.table = FALSE)
         tmpCNAll = fread(paste0(gistic2_Date,"-",dataset,"-all_data_by_genes.txt"),header=TRUE,colClasses="character", data.table = FALSE)
       }
       tmpReturn <- new("FirehoseGISTIC",Dataset=dataset,AllByGene=data.frame(tmpCNAll),
                        ThresholedByGene=data.frame(tmpCNThreshhold))
       resultClass@GISTIC <- tmpReturn
+      }
     }
   }
   

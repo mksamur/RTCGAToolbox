@@ -22,10 +22,10 @@ Draws a circle plot
 \code{getReport} draws a circle plot into your workin director to show log fold changes for differentially expressed genes, copy number alterations and mutations.
 }
 \examples{
-\dontrun{
 data(RTCGASample)
 data(hg19.ucsc.gene.locations)
 t1=getDiffExpressedGenes(a2)
+\dontrun{
 getReport(dataObject=a2,DGEResult1=t1[[1]],geneLocations=hg19.ucsc.gene.locations)
 }
 }

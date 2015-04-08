@@ -16,9 +16,9 @@ Returns a data table
 Make a table for mutation rate of each gene in the cohort
 }
 \examples{
-\dontrun{
 data(RTCGASample)
 mutRate = getMutationRate(dataObject=a2)
+\dontrun{
 }
 }
 
