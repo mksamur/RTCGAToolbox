@@ -4,6 +4,8 @@ import(limma)
 import(survival)
 import(RCircos)
 import(data.table)
+import(RCurl)
+import(RJSONIO)
 exportPattern("^[^\\.]")
 exportPattern("^[[:alpha:]]+")
 exportClasses(

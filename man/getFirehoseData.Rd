@@ -10,7 +10,7 @@ getFirehoseData(dataset, runDate = NULL, gistic2_Date = NULL,
   Mutation = FALSE, mRNA_Array = FALSE, miRNA_Array = FALSE,
   RPPA = FALSE, RNAseqNorm = "raw_counts",
   RNAseq2Norm = "normalized_count", forceDownload = FALSE,
-  fileSizeLimit = 500)
+  fileSizeLimit = 500, getUUIDs = FALSE)
 }
 \arguments{
 \item{dataset}{A cohort name. All dataset names can be accessible via \code{\link{getFirehoseDatasets}}}
@@ -52,6 +52,8 @@ getFirehoseData(dataset, runDate = NULL, gistic2_Date = NULL,
 \item{forceDownload}{A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.}
 
 \item{fileSizeLimit}{Files that are larger than set value (megabyte) won't be downloaded (Default: 500)}
+
+\item{getUUIDs}{Logical key to get UUIDs from barcode (Default: FALSE)}
 }
 \value{
 A \code{FirehoseData} data object that stores data for selected data types.
