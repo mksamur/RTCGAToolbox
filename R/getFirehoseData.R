@@ -107,18 +107,18 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     return(tmpMat)
   }
   
-  getLinks <- function(keyWord1,keyWord2,dataset=NULL)
+  getLinks <- function(keyWord1,keyWord2,datasetLink=NULL)
   {
     keyWord = keyWord1#paste0(dataset,keyWord1)
     keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
-    plinks = xpathSApply(doc, keyWord, xmlValue)
-    if(is.null(dataset))
+    plinks = xpathSApply(doc, keyWord, xmlAttrs)
+    if(is.null(datasetLink))
     {
       plinks = plinks[grepl(keyWord2,plinks)]
     }
     else
     {
-      plinks = plinks[grepl(paste0("*.",dataset,keyWord2),plinks)]
+      plinks = plinks[grepl(paste0("*.",datasetLink,keyWord2),plinks)]
     }
     message(plinks)
     return(plinks)
@@ -181,6 +181,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     fh_url <- paste(fh_url,substr(runDate,1,4),"_",substr(runDate,5,6),"_",substr(runDate,7,8),"/data/",sep="")
     fh_url <- paste(fh_url,dataset,"/",runDate,"/",sep="")
     doc = htmlTreeParse(fh_url, useInternalNodes = T)
+
     
     #Download clinical data
     if(Clinic)
