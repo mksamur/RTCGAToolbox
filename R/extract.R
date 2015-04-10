@@ -49,38 +49,40 @@ extract <- function(object, type, phenoData = TRUE){
   } else {
     stop(paste("Type not yet supported or could not be matched."))
   }
+  
+  bcID <- function(barcodes, center=FALSE, sample=FALSE, collapse=FALSE){
+    barcodes <- gsub("\\.", "-", barcodes)
+    if(center){
+      if(!sample){
+        bcc <- sapply(strsplit(barcodes, "-"),"[", c(5:7))
+        bcc <- tolower(t(bcc))
+        return(bcc)
+      } else {
+        bcc <- sapply(strsplit(barcodes, "-"), "[", c(4:7))
+        bcc <- tolower(t(bcc))
+      }
+    } else {
+      bcc <- lapply(strsplit(barcodes, "-"), "[", c(1:3))
+      bcc <- tolower(sapply(bcc, paste, collapse="-"))
+      if(sample & collapse){
+        samp <- lapply(strsplit(barcodes, "-"), "[", c(1:4))
+        samp <- tolower(sapply(samp, paste, collapse="-"))
+        samp <- substr(samp, 1, nchar(samp)[1]-1)
+        return(samp)
+      }else if(sample & !collapse){
+        samp <- tolower(sapply(strsplit(barcodes, "-"), "[", 4))
+        samp <- substr(samp, 1,2)
+        return(samp)
+      }
+    }
+    return(bcc)
+  }
+  
   if(dim(output)[1] == 0 | dim(output)[2] == 0){
     message("There is no data for that data type!")
   } else {
     if(phenoData){
-      bcID <- function(barcodes, center=FALSE, sample=FALSE, collapse=FALSE){
-        barcodes <- gsub("\\.", "-", barcodes)
-        if(center){
-          if(!sample){
-            bcc <- sapply(strsplit(barcodes, "-"),"[", c(5:7))
-            bcc <- tolower(t(bcc))
-            return(bcc)
-          } else {
-            bcc <- sapply(strsplit(barcodes, "-"), "[", c(4:7))
-            bcc <- tolower(t(bcc))
-          }
-        } else {
-          bcc <- lapply(strsplit(barcodes, "-"), "[", c(1:3))
-          bcc <- tolower(sapply(bcc, paste, collapse="-"))
-          if(sample & collapse){
-            samp <- lapply(strsplit(barcodes, "-"), "[", c(1:4))
-            samp <- tolower(sapply(samp, paste, collapse="-"))
-            samp <- substr(samp, 1, nchar(samp)[1]-1)
-            return(samp)
-          }else if(sample & !collapse){
-            samp <- tolower(sapply(strsplit(barcodes, "-"), "[", 4))
-            samp <- substr(samp, 1,2)
-            return(samp)
-          }
-        }
-        return(bcc)
-      }
-      
+            
       dm <- apply(output[4:ncol(output)], 2, as.numeric, as.matrix)
       rownames(dm) <- rownames(output)
       # address duplicates tumor/normal
@@ -128,7 +130,12 @@ extract <- function(object, type, phenoData = TRUE){
       #       featureData(eset) <- AnnotatedDataFrame(jj)
       #       return(eset)
     } else {
-      return(output)
+      if(slotreq=="Methylation")
+      {
+        output <- output[, -c(1:3)]
+        colnames(output) <- bcID(colnames(output), sample = TRUE, collapse=TRUE)
+        return(output)  
+      }
     }
   }
 }

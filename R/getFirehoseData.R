@@ -125,18 +125,18 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     return(tmpMat)
   }
   
-  getLinks <- function(keyWord1,keyWord2,dataset=NULL)
+  getLinks <- function(keyWord1,keyWord2,datasetLink=NULL)
   {
     keyWord = keyWord1 #paste0(dataset,keyWord1)
     keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
-    plinks = xpathSApply(doc, keyWord, xmlValue)
-    if(is.null(dataset))
+    plinks = xpathSApply(doc, keyWord, xmlAttrs)
+    if(is.null(datasetLink))
     {
       plinks = plinks[grepl(keyWord2,plinks)]
     }
     else
     {
-      plinks = plinks[grepl(paste0("*.",dataset,keyWord2),plinks)]
+      plinks = plinks[grepl(paste0("*.",datasetLink,keyWord2),plinks)]
     }
     message(plinks)
     return(plinks)
@@ -164,9 +164,10 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           fileList = fileList[!grepl("MANIFEST.txt",fileList)]
         }
       }
-      untar(paste0(dataset,fileExt),files=fileList,exdir=todir)
+      untar(paste0(dataset,fileExt),files=fileList)
       file.rename(from=fileList,to=paste0(runDate,"-",dataset,exportName))
       file.remove(paste0(dataset,fileExt))
+      browser()
       delFodler <- strsplit(fileList[1],"/")[[1]][1]
       message(delFodler)
       unlink(delFodler, recursive = TRUE)
@@ -207,14 +208,17 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       plinks <- getLinks(".Clinical_Pick_Tier1.Level_4","*.tar[.]gz$")
       
       for(i in trim(plinks))
-      {        
-        exportFiles(paste0(fh_url,i),dataset,"-Clinical.tar.gz","*.clin.merged.picked.txt$",FALSE,"-Clinical.txt")
-        
-        raw.clin <- read.delim(paste0(runDate,"-",dataset,"-Clinical.txt"),colClasses="character")
-        df.clin <- data.frame(do.call(rbind, raw.clin[, -1]))
-        colnames(df.clin) <- raw.clin[, 1]
-        resultClass@Clinical <- df.clin
-        gc()
+      {
+        if(checkFileSize(paste0(fh_url,i)))
+        {
+          exportFiles(paste0(fh_url,i),dataset,"-Clinical.tar.gz","*.clin.merged.picked.txt$",FALSE,"-Clinical.txt")
+          
+          raw.clin <- read.delim(paste0(runDate,"-",dataset,"-Clinical.txt"),colClasses="character")
+          df.clin <- data.frame(do.call(rbind, raw.clin[, -1]))
+          colnames(df.clin) <- raw.clin[, 1]
+          resultClass@Clinical <- df.clin
+          gc() 
+        }
       }
     }
     
@@ -319,8 +323,8 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                       TRUE,
                       "-CNVSNPHg19.txt")
           #Get selected type only
-tmpMat = fread(paste0(runDate,"-",dataset,"-CNVSNPHg19.txt"),header=TRUE,colClasses=c("character","numeric","numeric",
-                                                                                             "numeric","numeric","numeric"),data.table = FALSE)
+          tmpMat = fread(paste0(runDate,"-",dataset,"-CNVSNPHg19.txt"),header=TRUE,colClasses=c("character","numeric","numeric",
+                                                                                                "numeric","numeric","numeric"),data.table = FALSE)
           resultClass@CNVSNP <- tmpMat
         }
       }
@@ -342,10 +346,10 @@ tmpMat = fread(paste0(runDate,"-",dataset,"-CNVSNPHg19.txt"),header=TRUE,colClas
                       TRUE,
                       "-CNAseq.txt")
           #Get selected type only
-   tmpMat = fread(paste0(runDate,"-",dataset,"-CNAseq.txt"),
-                       header=TRUE,colClasses=c("character","numeric","numeric","numeric","numeric","numeric"), 
-                       data.table = FALSE)
-        #tmpMat = read.delim(paste0(runDate,"-",dataset,"-CNAseq.txt"),header=TRUE,colClasses=c("character","numeric","numeric",
+          tmpMat = fread(paste0(runDate,"-",dataset,"-CNAseq.txt"),
+                         header=TRUE,colClasses=c("character","numeric","numeric","numeric","numeric","numeric"), 
+                         data.table = FALSE)
+          #tmpMat = read.delim(paste0(runDate,"-",dataset,"-CNAseq.txt"),header=TRUE,colClasses=c("character","numeric","numeric",
           #                                                                                 "numeric","numeric"))
           resultClass@CNAseq <- tmpMat 
         }
@@ -370,11 +374,11 @@ tmpMat = fread(paste0(runDate,"-",dataset,"-CNVSNPHg19.txt"),header=TRUE,colClas
                       TRUE,
                       paste0(dataset,"-CNACGH-",listCount,".txt"))
           #Get selected type only
-        tmpMat = fread(paste0(runDate,"-",dataset,"-CNACGH-",listCount,".txt"),
-                       header=TRUE,colClasses=c("character","numeric","numeric","numeric","numeric","numeric"), 
-                       data.table = FALSE)
-        #tmpMat = read.delim(paste0(runDate,"-",dataset,"-CNACGH-",listCount,".txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
-        #                                                                                               "numeric","numeric"))
+          tmpMat = fread(paste0(runDate,"-",dataset,"-CNACGH-",listCount,".txt"),
+                         header=TRUE,colClasses=c("character","numeric","numeric","numeric","numeric","numeric"), 
+                         data.table = FALSE)
+          #tmpMat = read.delim(paste0(runDate,"-",dataset,"-CNACGH-",listCount,".txt",sep=""),header=TRUE,colClasses=c("character","numeric","numeric",
+          #                                                                                               "numeric","numeric"))
           tmpReturn <- new("FirehoseCGHArray",Filename=i,DataMatrix=tmpMat)
           dataLists[[listCount]] <- tmpReturn
           listCount = listCount + 1 
@@ -535,7 +539,7 @@ tmpMat = fread(paste0(runDate,"-",dataset,"-CNVSNPHg19.txt"),header=TRUE,colClas
           grepSearch = "MANIFEST.txt"
           fileList = fileList[!grepl(grepSearch,fileList)]
           ###
-          untar(paste(dataset,"-Mutation.tar.gz",sep=""),files=fileList,exdir=todir)
+          untar(paste(dataset,"-Mutation.tar.gz",sep=""),files=fileList)
           retMutations <- do.call("rbind",lapply(fileList,FUN=function(files){
             read.delim(files,header=TRUE,colClasses="character")
           }))
