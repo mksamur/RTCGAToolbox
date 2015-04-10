@@ -22,8 +22,14 @@ Draws a KM plot
 \code{getSurvival} draws a KM plot and show survival analysis results between groups that are defined by gene expression data
 }
 \examples{
+## get data with  getFirehoseData() function and call survival analysis
+## Always check clinical data file for structural changes
+getFirehoseDatasets()
+getFirehoseAnalyzeDates()
 \dontrun{
-clinicData = brcaData@Clinical
+brcaData = getFirehoseData (dataset="BRCA", runDate="20140416", gistic2_Date="20140115",
+Clinic=TRUE, RNAseq_Gene=TRUE, mRNA_Array=TRUE, Mutation=TRUE)
+clinicData = data.frame(lapply(brcaData@Clinical, as.character), stringsAsFactors=FALSE,row.names = rownames(brcaData@Clinical))
 clinicData = clinicData[,3:5]
 clinicData[is.na(clinicData[,3]),3] = clinicData[is.na(clinicData[,3]),2]
 survData <- data.frame(Samples=rownames(clinicData),Time=as.numeric(clinicData[,3]),

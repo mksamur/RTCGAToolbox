@@ -97,7 +97,7 @@ extract <- function(object, type, phenoData = TRUE){
         dm <- cbind(dm[,!(bcID(colnames(dm)) %in% dups)], d)
       } 
       
-      centerbc <- bcID(colnames(output)[-c(1:3)], center=TRUE)
+      centerbc <- bcID(colnames(dm), center=TRUE, sample=TRUE)
       colnames(centerbc) <- c("sample", "portion", "plate", "center")
       rownames(centerbc) <- bcID(colnames(output))[-c(1:3)]
       
@@ -106,10 +106,11 @@ extract <- function(object, type, phenoData = TRUE){
       if(length(pd)==0){
         stop("No clinical data available!")
       }
-      
+      ## cannot bind on duplicated rownames
+      colnames(dm) <- bcID(colnames(dm))
       npd <- pd[na.omit(match(colnames(dm), rownames(pd))),]
       npd <- cbind(npd, centerbc[na.omit(match(rownames(npd), rownames(centerbc))),])
-      
+      # merge(npd, centerbc, "row.names")
       ndm <- dm[,na.omit(match(rownames(npd), colnames(dm)))]
       
       if(identical(all.equal(rownames(npd), colnames(ndm)), TRUE)){
