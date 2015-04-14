@@ -85,34 +85,44 @@ extract <- function(object, type, phenoData = TRUE){
             
       dm <- apply(output[4:ncol(output)], 2, as.numeric, as.matrix)
       rownames(dm) <- rownames(output)
-      # address duplicates tumor/normal
       
       dups <- colnames(dm)[duplicated(bcID(colnames(dm)))]
-      repeated <- dm[, bcID(colnames(dm)) %in% bcID(dups)]
       
-      if(length(dups) != 0 & identical(bcID(colnames(repeated), sample = TRUE)[1], bcID(colnames(repeated), sample = TRUE)[2])) {
+      # technical replicates and tumor/normals present
+      if(length(dups) != 0){
+        repeated <- dm[, bcID(colnames(dm)) %in% bcID(dups)]
+        samps <- as.numeric(bcID(colnames(repeated), sample=TRUE))
+        normals <- repeated[, samps >= 10 & samps <= 19]
+        controls <- repeated[, samps >= 20 & samps <= 29]
+        # follow up on controls
+        repeated <- repeated[, !bcID(colnames(repeated)) %in% bcID(colnames(normals))]
+        duplic <- colnames(repeated)[duplicated(bcID(colnames(repeated)))]
         d <- c()
-        for (cc in 1:length(dups)){
-          d <- cbind(d, apply(dm[,colnames(dm) %in% dups[cc]], 1, mean))
+        for (cc in seq(duplic)){
+          d <- cbind(d, apply(repeated[,bcID(colnames(repeated)) %in% bcID(duplic[cc])], 1, mean))
         }
-        colnames(d) <- dups
-        dm <- cbind(dm[,!(bcID(colnames(dm)) %in% dups)], d)
-      } 
+        colnames(d) <- duplic
+        dm <- cbind(dm[,!(bcID(colnames(dm)) %in% bcID(dups))], d)
+      }
       
+      # tumors <- dm[, samps <= 9]
       centerbc <- bcID(colnames(dm), center=TRUE, sample=TRUE)
       colnames(centerbc) <- c("sample", "portion", "plate", "center")
-      rownames(centerbc) <- bcID(colnames(output))[-c(1:3)]
+      rownames(centerbc) <- bcID(colnames(dm))
       
       pd <- getElement(object, "Clinical")
       rownames(pd) <- gsub("\\.", "-", rownames(pd))
       if(length(pd)==0){
         stop("No clinical data available!")
       }
-      ## cannot bind on duplicated rownames
+      
       colnames(dm) <- bcID(colnames(dm))
-      npd <- pd[na.omit(match(colnames(dm), rownames(pd))),]
-      npd <- cbind(npd, centerbc[na.omit(match(rownames(npd), rownames(centerbc))),])
-      # merge(npd, centerbc, "row.names")
+      
+      npd <- pd[na.omit(match(bcID(colnames(dm)), rownames(pd))),]
+      npd <- merge(npd, centerbc, "row.names")
+      rownames(npd) <- npd[, "Row.names"]
+      npd <-  npd[, -1]
+            
       ndm <- dm[,na.omit(match(rownames(npd), colnames(dm)))]
       
       if(identical(all.equal(rownames(npd), colnames(ndm)), TRUE)){
