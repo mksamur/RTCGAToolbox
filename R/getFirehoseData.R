@@ -25,6 +25,7 @@
 #' @param todir The directory path to download files to and from which to read files. It will be created if necessary. Defaults to current working directory. 
 #' @param forceDownload A logic (Default FALSE) key to force download files when run. By default, local files in the specified directory will be used if available.
 #' @param fileSizeLimit Files that are larger than set value (megabyte) won't be downloaded (Default: 500)  
+#' @param getUUIDs Logical key to get UUIDs from barcode (Default: FALSE)
 #' @return A \code{FirehoseData} data object that stores data for selected data types.
 #' @examples
 #'
@@ -39,7 +40,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                             CNA_SNP=FALSE,CNV_SNP=FALSE,
                             CNA_Seq=FALSE,CNA_CGH=FALSE,Methylation=FALSE,Mutation=FALSE,mRNA_Array=FALSE,
                             miRNA_Array=FALSE,RPPA=FALSE,RNAseqNorm="raw_counts",RNAseq2Norm="normalized_count", 
-                            todir = NULL, forceDownload=FALSE,fileSizeLimit=500)
+                            todir = NULL, forceDownload=FALSE,fileSizeLimit=500,getUUIDs=FALSE)
 {
   #check input parameters
   if(!class(dataset)=="character" || is.null(dataset) || !length(dataset) == 1 || nchar(dataset) < 2)
@@ -167,7 +168,6 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       untar(paste0(dataset,fileExt),files=fileList)
       file.rename(from=fileList,to=paste0(runDate,"-",dataset,exportName))
       file.remove(paste0(dataset,fileExt))
-      browser()
       delFodler <- strsplit(fileList[1],"/")[[1]][1]
       message(delFodler)
       unlink(delFodler, recursive = TRUE)
@@ -189,6 +189,132 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       return(TRUE)
     }
     
+  }
+  
+  barcodeUUID <- function(object)
+  {
+    message("Converting barcodes to UUID")
+    barcodes <- NULL
+    if(dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0)
+    {
+      barcodes <- c(barcodes,colnames(object@RNASeqGene))
+    }
+    if(dim(object@RNASeq2GeneNorm)[1] > 0 & dim(object@RNASeq2GeneNorm)[2] > 0)
+    {
+      barcodes <- c(barcodes,colnames(object@RNASeq2GeneNorm))
+    }
+    if(dim(object@miRNASeqGene)[1] > 0 & dim(object@miRNASeqGene)[2] > 0)
+    {
+      barcodes <- c(barcodes,colnames(object@miRNASeqGene))
+    }
+    if(dim(object@CNASNP)[1] > 0 & dim(object@CNASNP)[2] > 0)
+    {
+      barcodes <- c(barcodes,as.character(object@CNASNP[,1]))
+    }
+    if(dim(object@CNVSNP)[1] > 0 & dim(object@CNVSNP)[2] > 0)
+    {
+      barcodes <- c(barcodes,as.character(object@CNVSNP[,1]))
+    }
+    if(dim(object@CNAseq)[1] > 0 & dim(object@CNAseq)[2] > 0)
+    {
+      barcodes <- c(barcodes,as.character(object@CNAseq[,1]))
+    }
+    if(length(object@CNACGH) > 0 )
+    {
+      barcodes <- c(barcodes,as.character(object@CNACGH[,1]))
+    }
+    if(length(object@Methylation) > 0 )
+    {
+      for(i in 1:length(object@Methylation))
+      {
+        barcodes <- c(barcodes,colnames(object@Methylation[[i]]@DataMatrix))
+      }
+    }
+    if(length(object@mRNAArray) > 0 )
+    {
+      for(i in 1:length(object@mRNAArray))
+      {
+        barcodes <- c(barcodes,colnames(object@mRNAArray[[i]]@DataMatrix))
+      }
+    }
+    if(length(object@miRNAArray) > 0 )
+    {
+      for(i in 1:length(object@miRNAArray))
+      {
+        barcodes <- c(barcodes,colnames(object@miRNAArray[[i]]@DataMatrix))
+      }
+    } 
+    if(length(object@RPPAArray) > 0 )
+    {
+      for(i in 1:length(object@RPPAArray))
+      {
+        barcodes <- c(barcodes,colnames(object@RPPAArray[[i]]@DataMatrix))
+      }
+    }
+    if(length(object@GISTIC@Dataset) > 0)
+    {
+      barcodes <- c(barcodes,colnames(object@GISTIC@AllByGene)[-c(1:3)])
+    }
+    if(dim(object@Mutations)[1] > 0 & dim(object@Mutations)[2] > 0)
+    {
+      barcodes <- c(barcodes,unique(as.character(object@Mutations[,16])))
+      barcodes <- c(barcodes,unique(as.character(object@Mutations[,17])))
+    }
+    barcodes <- unique(barcodes)
+    barcodes <- toupper(barcodes)
+    barcodes <- gsub(pattern = "\\.",replacement = "-",x = barcodes)
+    
+    pb <- txtProgressBar(min = 0, max = length(barcodes), style = 3)
+    breakPoints <- seq(1,length(barcodes),20)
+    for(i in breakPoints)
+    {
+      setTxtProgressBar(pb, i)
+      urlToGo <- "https://tcga-data.nci.nih.gov/uuid/uuidws/mapping/json/barcode/batch"
+      endPoint <- (i+19)
+      if(endPoint > length(barcodes)){endPoint = length(barcodes)}
+      searchBarcode <- paste(barcodes[i:endPoint], collapse=",")
+      uuids = fromJSON(getURL(urlToGo, customrequest="POST", 
+                              httpheader=c("Content-Type: text/plain"), 
+                              postfields=searchBarcode))$uuidMapping
+      if(class(uuids)=="character")
+      {
+        if(exists("convertTable"))
+        {
+          convertTable <- rbind(convertTable,c(uuids[1],uuids[2]))
+        }
+        else
+        {
+          convertTable <- data.frame(Barcode=uuids[1],UUID=uuids[2])
+        }
+      }
+      else
+      {
+        if(exists("convertTable"))
+        {
+          convertTable <- rbind(convertTable,
+                                data.frame(matrix(unlist(uuids), nrow=length(uuids), byrow=TRUE),stringsAsFactors=FALSE))
+        }
+        else
+        {
+          convertTable <- data.frame(matrix(unlist(uuids), nrow=length(uuids), byrow=TRUE),stringsAsFactors=FALSE)
+        }    
+      }
+      
+      if ((endPoint %% 400) == 0)
+      {
+        message("RTCGAToolbox will wait 185 seconds due to TCGA web service limitations")
+        Sys.sleep(185)
+      }
+      
+    }
+    
+    shortNames <- apply(convertTable,1,function(x){
+      as.character(paste(strsplit(x[1],split = "-")[[1]][1:3],collapse = "-"))
+    })
+    convertTable <- cbind(convertTable,shortNames)
+    colnames(convertTable) <- c("Barcode","UUID","ShortName")
+    setTxtProgressBar(pb, length(barcodes))
+    return(convertTable)
   }
   
   resultClass <- new("FirehoseData", Dataset = dataset)
@@ -604,6 +730,10 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     }
   }
   
+  if(getUUIDs)
+  {
+    resultClass@BarcodeUUID <- barcodeUUID(resultClass) 
+  }
   return(resultClass)
 }
 

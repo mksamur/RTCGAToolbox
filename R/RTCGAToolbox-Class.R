@@ -40,11 +40,12 @@ setClass("FirehoseGISTIC", representation(Dataset = "character", AllByGene = "da
 #' @slot RPPAArray A list that stores \code{FirehosemRNAArray} object for RPPA data
 #' @slot Mutations A data frame for mutation infromation from sequencing data
 #' @slot GISTIC A \code{FirehoseGISTIC} object to store processed copy number data
+#' @slot BarcodeUUID A data frame that stores the Barcodes, UUIDs and Short sample identifiers
 setClass("FirehoseData", representation(Dataset = "character", Clinical = "data.frame", RNASeqGene = "matrix",
                                         RNASeq2GeneNorm="matrix",miRNASeqGene="matrix",CNASNP="data.frame",
                                         CNVSNP="data.frame",CNAseq="data.frame",CNACGH="list",Methylation="list",
                                         mRNAArray="list",miRNAArray="list",RPPAArray="list",Mutations="data.frame",
-                                        GISTIC="FirehoseGISTIC"))
+                                        GISTIC="FirehoseGISTIC",BarcodeUUID="data.frame"))
 setMethod("show", "FirehoseData",function(object){
   message(paste0(object@Dataset," FirehoseData object"))
   message("Available slots:")

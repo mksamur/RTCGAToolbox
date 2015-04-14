@@ -39,5 +39,7 @@ An S4 class to store main data object from clinent function.
 \item{\code{Mutations}}{A data frame for mutation infromation from sequencing data}
 
 \item{\code{GISTIC}}{A \code{FirehoseGISTIC} object to store processed copy number data}
+
+\item{\code{BarcodeUUID}}{A data frame that stores the Barcodes, UUIDs and Short sample identifiers}
 }}
 
