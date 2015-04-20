@@ -1,3 +1,239 @@
+.makeExprMat <- function(dataset,fileExt,normMethod,dataType,mergeSize=1000,arrayData=FALSE,runDate)
+{
+  #Get selected type only
+  tmpCols = read.delim(paste0(runDate,"-",dataset,fileExt),nrows=1,colClasses="character")
+  if(!arrayData)
+  {
+    colOrder <- 1:ncol(tmpCols)
+    colOrder <- colOrder[tmpCols[1,] == normMethod]
+  }
+  else
+  {
+    colOrder <- 2:ncol(tmpCols) 
+  }
+  closeAllConnections()
+  message(paste(dataType,"data will be imported! This may take a while!",sep=" "))
+  message(paste0("Start: ",Sys.time()))
+  tmpMat <- fread(paste0(runDate,"-",dataset,fileExt),header=FALSE,colClasses = "character", select=c(1,colOrder), data.table = FALSE)
+  message(paste0("Done: " ,Sys.time()))
+  closeAllConnections()
+  if(!arrayData)
+  {
+    colnames(tmpMat) <- tmpMat[1,]
+  }
+  else
+  {
+    colnames(tmpMat) <- c("Symbol",tmpMat[1,2:ncol(tmpMat)])
+  }
+  tmpMat <- tmpMat[-c(1:2),]
+  removeQM <- grepl("\\?\\|",tmpMat[,1])
+  tmpMat <- tmpMat[!removeQM,]
+  names1 <- tmpMat[,1]
+  names2 <- sapply(names1,function(x){unlist(strsplit(x,"\\|"))[1]})
+  names1 <- duplicated(names2)
+  tmpMat <- tmpMat[!names1,]
+  rownames(tmpMat) <- names2[!names1]
+  tmpMat <- tmpMat[,-1]
+  cNames <- colnames(tmpMat)
+  rNames <- rownames(tmpMat)
+  tmpMat <- apply(tmpMat,2,as.numeric)
+  colnames(tmpMat) <- cNames
+  rownames(tmpMat) <- rNames
+  return(tmpMat)
+}
+
+.getLinks <- function(keyWord1,keyWord2,datasetLink=NULL,doc)
+{
+  keyWord = keyWord1#paste0(dataset,keyWord1)
+  keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
+  plinks = xpathSApply(doc, keyWord, xmlAttrs)
+  if(is.null(datasetLink))
+  {
+    plinks = plinks[grepl(keyWord2,plinks)]
+  }
+  else
+  {
+    plinks = plinks[grepl(paste0("*.",datasetLink,keyWord2),plinks)]
+  }
+  message(plinks)
+  return(plinks)
+}
+
+.barcodeUUID <- function(object)
+{
+  message("Converting barcodes to UUID")
+  barcodes <- NULL
+  if(dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0)
+  {
+    barcodes <- c(barcodes,colnames(object@RNASeqGene))
+  }
+  if(dim(object@RNASeq2GeneNorm)[1] > 0 & dim(object@RNASeq2GeneNorm)[2] > 0)
+  {
+    barcodes <- c(barcodes,colnames(object@RNASeq2GeneNorm))
+  }
+  if(dim(object@miRNASeqGene)[1] > 0 & dim(object@miRNASeqGene)[2] > 0)
+  {
+    barcodes <- c(barcodes,colnames(object@miRNASeqGene))
+  }
+  if(dim(object@CNASNP)[1] > 0 & dim(object@CNASNP)[2] > 0)
+  {
+    barcodes <- c(barcodes,as.character(object@CNASNP[,1]))
+  }
+  if(dim(object@CNVSNP)[1] > 0 & dim(object@CNVSNP)[2] > 0)
+  {
+    barcodes <- c(barcodes,as.character(object@CNVSNP[,1]))
+  }
+  if(dim(object@CNAseq)[1] > 0 & dim(object@CNAseq)[2] > 0)
+  {
+    barcodes <- c(barcodes,as.character(object@CNAseq[,1]))
+  }
+  if(length(object@CNACGH) > 0 )
+  {
+    barcodes <- c(barcodes,as.character(object@CNACGH[,1]))
+  }
+  if(length(object@Methylation) > 0 )
+  {
+    for(i in 1:length(object@Methylation))
+    {
+      barcodes <- c(barcodes,colnames(object@Methylation[[i]]@DataMatrix))
+    }
+  }
+  if(length(object@mRNAArray) > 0 )
+  {
+    for(i in 1:length(object@mRNAArray))
+    {
+      barcodes <- c(barcodes,colnames(object@mRNAArray[[i]]@DataMatrix))
+    }
+  }
+  if(length(object@miRNAArray) > 0 )
+  {
+    for(i in 1:length(object@miRNAArray))
+    {
+      barcodes <- c(barcodes,colnames(object@miRNAArray[[i]]@DataMatrix))
+    }
+  } 
+  if(length(object@RPPAArray) > 0 )
+  {
+    for(i in 1:length(object@RPPAArray))
+    {
+      barcodes <- c(barcodes,colnames(object@RPPAArray[[i]]@DataMatrix))
+    }
+  }
+  if(length(object@GISTIC@Dataset) > 0)
+  {
+    barcodes <- c(barcodes,colnames(object@GISTIC@AllByGene)[-c(1:3)])
+  }
+  if(dim(object@Mutations)[1] > 0 & dim(object@Mutations)[2] > 0)
+  {
+    barcodes <- c(barcodes,unique(as.character(object@Mutations[,16])))
+    barcodes <- c(barcodes,unique(as.character(object@Mutations[,17])))
+  }
+  barcodes <- unique(barcodes)
+  barcodes <- toupper(barcodes)
+  barcodes <- gsub(pattern = "\\.",replacement = "-",x = barcodes)
+  
+  pb <- txtProgressBar(min = 0, max = length(barcodes), style = 3)
+  breakPoints <- seq(1,length(barcodes),20)
+  for(i in breakPoints)
+  {
+    setTxtProgressBar(pb, i)
+    urlToGo <- "https://tcga-data.nci.nih.gov/uuid/uuidws/mapping/json/barcode/batch"
+    endPoint <- (i+19)
+    if(endPoint > length(barcodes)){endPoint = length(barcodes)}
+    searchBarcode <- paste(barcodes[i:endPoint], collapse=",")
+    uuids = fromJSON(getURL(urlToGo, customrequest="POST", 
+                            httpheader=c("Content-Type: text/plain"), 
+                            postfields=searchBarcode))$uuidMapping
+    if(class(uuids)=="character")
+    {
+      if(exists("convertTable"))
+      {
+        convertTable <- rbind(convertTable,c(uuids[1],uuids[2]))
+      }
+      else
+      {
+        convertTable <- data.frame(Barcode=uuids[1],UUID=uuids[2])
+      }
+    }
+    else
+    {
+      if(exists("convertTable"))
+      {
+        convertTable <- rbind(convertTable,
+                              data.frame(matrix(unlist(uuids), nrow=length(uuids), byrow=TRUE),stringsAsFactors=FALSE))
+      }
+      else
+      {
+        convertTable <- data.frame(matrix(unlist(uuids), nrow=length(uuids), byrow=TRUE),stringsAsFactors=FALSE)
+      }    
+    }
+    
+    if ((endPoint %% 400) == 0)
+    {
+      message("RTCGAToolbox will wait 185 seconds due to TCGA web service limitations")
+      Sys.sleep(185)
+    }
+    
+  }
+  
+  shortNames <- apply(convertTable,1,function(x){
+    as.character(paste(strsplit(x[1],split = "-")[[1]][1:3],collapse = "-"))
+  })
+  convertTable <- cbind(convertTable,shortNames)
+  colnames(convertTable) <- c("Barcode","UUID","ShortName")
+  setTxtProgressBar(pb, length(barcodes))
+  return(convertTable)
+}
+
+.checkFileSize <- function(dataURL,fileSizeLimit)
+{
+  asd = read.csv(url(paste0("http://www.canevolve.org/fmineRgetSize.php?url=",dataURL)))
+  if(as.numeric(asd[1,1])/(1024^2) > fileSizeLimit)
+  {
+    message(dataURL)
+    message(paste("File Size: ~"),format(as.numeric(asd[1,1])/(1024^2), digits=1, decimal.mark="."),"MB")
+    message("File above won't be donwloaded due to data size, RTCGAToolbox will skip this data!")
+    return(FALSE)
+  }
+  else
+  {
+    return(TRUE)
+  }
+  
+}
+
+.exportFiles <- function(fileLink,dataset,fileExt,searchName,subSearch=FALSE,
+                         exportName,manifest=FALSE,forceDownload=FALSE,runDate)
+{
+  if(forceDownload || !file.exists(paste0(runDate,"-",dataset,exportName)))
+  {
+    download.file(url=fileLink,destfile=paste(dataset,fileExt,sep=""),method="auto",quiet = FALSE, mode = "w")
+    fileList <- untar(paste(dataset,fileExt,sep=""),list=TRUE)
+    if(!subSearch)
+    {
+      fileList = fileList[grepl(searchName,fileList)]
+    }
+    else
+    {
+      if(!manifest)
+      {
+        grepSearch = paste0("*.",dataset,searchName)
+        fileList = fileList[grepl(grepSearch,fileList)]
+      }
+      else
+      {
+        fileList = fileList[!grepl("MANIFEST.txt",fileList)]
+      }
+    }
+    untar(paste(dataset,fileExt,sep=""),files=fileList)
+    file.rename(from=fileList,to=paste0(runDate,"-",dataset,exportName))
+    file.remove(paste(dataset,fileExt,sep=""))
+    delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+    message(delFodler)
+    unlink(delFodler, recursive = TRUE)
+  }
+}
+
 #' Get data from Firehose portal.
 #'
 #' \code{getFirehoseData} returns \code{FirehoseData} object that stores TCGA data.
@@ -27,9 +263,11 @@
 #' @param getUUIDs Logical key to get UUIDs from barcode (Default: FALSE)
 #' @return A \code{FirehoseData} data object that stores data for selected data types.
 #' @examples
-#'
+#' #Sample Dataset
+#' data(RTCGASample)
+#' RTCGASample
 #' \dontrun{
-#' a2 <- getFirehoseData(dataset="BRCA",
+#' BRCAdata <- getFirehoseData(dataset="BRCA",
 #' runDate="20140416",gistic2_Date="20140115",
 #' RNAseq_Gene=TRUE,Clinic=TRUE,mRNA_Array=TRUE,Mutation=TRUE)
 #' }
@@ -64,242 +302,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   if(is.null(gistic2_Date) & is.null(runDate)){stop("Please specify run date or/and gistic date!")}
   
   trim <- function (x) gsub("^\\s+|\\s+$", "", x)
-  
-  makeExprMat <- function(dataset,fileExt,normMethod,dataType,mergeSize=1000,arrayData=FALSE)
-  {
-    #Get selected type only
-    tmpCols = read.delim(paste0(runDate,"-",dataset,fileExt),nrows=1,colClasses="character")
-    if(!arrayData)
-    {
-      colOrder <- 1:ncol(tmpCols)
-      colOrder <- colOrder[tmpCols[1,] == normMethod]
-    }
-    else
-    {
-      colOrder <- 2:ncol(tmpCols) 
-    }
-    closeAllConnections()
-    message(paste(dataType,"data will be imported! This may take a while!",sep=" "))
-    message(paste0("Start: ",Sys.time()))
-    tmpMat <- fread(paste0(runDate,"-",dataset,fileExt),header=F,colClasses = "character", select=c(1,colOrder), data.table = FALSE)
-    message(paste0("Done: " ,Sys.time()))
-    closeAllConnections()
-    if(!arrayData)
-    {
-      colnames(tmpMat) <- tmpMat[1,]
-    }
-    else
-    {
-      colnames(tmpMat) <- c("Symbol",tmpMat[1,2:ncol(tmpMat)])
-    }
-    tmpMat <- tmpMat[-c(1:2),]
-    removeQM <- grepl("\\?\\|",tmpMat[,1])
-    tmpMat <- tmpMat[!removeQM,]
-    names1 <- tmpMat[,1]
-    names2 <- sapply(names1,function(x){unlist(strsplit(x,"\\|"))[1]})
-    names1 <- duplicated(names2)
-    tmpMat <- tmpMat[!names1,]
-    rownames(tmpMat) <- names2[!names1]
-    tmpMat <- tmpMat[,-1]
-    cNames <- colnames(tmpMat)
-    rNames <- rownames(tmpMat)
-    tmpMat <- apply(tmpMat,2,as.numeric)
-    colnames(tmpMat) <- cNames
-    rownames(tmpMat) <- rNames
-    return(tmpMat)
-  }
-  
-  getLinks <- function(keyWord1,keyWord2,datasetLink=NULL)
-  {
-    keyWord = keyWord1#paste0(dataset,keyWord1)
-    keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
-    plinks = xpathSApply(doc, keyWord, xmlAttrs)
-    if(is.null(datasetLink))
-    {
-      plinks = plinks[grepl(keyWord2,plinks)]
-    }
-    else
-    {
-      plinks = plinks[grepl(paste0("*.",datasetLink,keyWord2),plinks)]
-    }
-    message(plinks)
-    return(plinks)
-  }
-  
-  exportFiles <- function(fileLink,dataset,fileExt,searchName,subSearch=FALSE,exportName,manifest=FALSE)
-  {
-    if(forceDownload || !file.exists(paste0(runDate,"-",dataset,exportName)))
-    {
-      download.file(url=fileLink,destfile=paste(dataset,fileExt,sep=""),method="auto",quiet = FALSE, mode = "w")
-      fileList <- untar(paste(dataset,fileExt,sep=""),list=TRUE)
-      if(!subSearch)
-      {
-        fileList = fileList[grepl(searchName,fileList)]
-      }
-      else
-      {
-        if(!manifest)
-        {
-          grepSearch = paste0("*.",dataset,searchName)
-          fileList = fileList[grepl(grepSearch,fileList)]
-        }
-        else
-        {
-          fileList = fileList[!grepl("MANIFEST.txt",fileList)]
-        }
-      }
-      untar(paste(dataset,fileExt,sep=""),files=fileList)
-      file.rename(from=fileList,to=paste0(runDate,"-",dataset,exportName))
-      file.remove(paste(dataset,fileExt,sep=""))
-      delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
-      message(delFodler)
-      unlink(delFodler, recursive = TRUE)
-    }
-  }
-  
-  checkFileSize <- function(dataURL)
-  {
-    asd = read.csv(url(paste0("http://www.canevolve.org/fmineRgetSize.php?url=",dataURL)))
-    if(as.numeric(asd[1,1])/(1024^2) > fileSizeLimit)
-    {
-      message(dataURL)
-      message(paste("File Size: ~"),format(as.numeric(asd[1,1])/(1024^2), digits=1, decimal.mark="."),"MB")
-      message("File above won't be donwloaded due to data size, RTCGAToolbox will skip this data!")
-      return(FALSE)
-    }
-    else
-    {
-      return(TRUE)
-    }
     
-  }
-  
-  barcodeUUID <- function(object)
-  {
-    message("Converting barcodes to UUID")
-    barcodes <- NULL
-    if(dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0)
-    {
-      barcodes <- c(barcodes,colnames(object@RNASeqGene))
-    }
-    if(dim(object@RNASeq2GeneNorm)[1] > 0 & dim(object@RNASeq2GeneNorm)[2] > 0)
-    {
-      barcodes <- c(barcodes,colnames(object@RNASeq2GeneNorm))
-    }
-    if(dim(object@miRNASeqGene)[1] > 0 & dim(object@miRNASeqGene)[2] > 0)
-    {
-      barcodes <- c(barcodes,colnames(object@miRNASeqGene))
-    }
-    if(dim(object@CNASNP)[1] > 0 & dim(object@CNASNP)[2] > 0)
-    {
-      barcodes <- c(barcodes,as.character(object@CNASNP[,1]))
-    }
-    if(dim(object@CNVSNP)[1] > 0 & dim(object@CNVSNP)[2] > 0)
-    {
-      barcodes <- c(barcodes,as.character(object@CNVSNP[,1]))
-    }
-    if(dim(object@CNAseq)[1] > 0 & dim(object@CNAseq)[2] > 0)
-    {
-      barcodes <- c(barcodes,as.character(object@CNAseq[,1]))
-    }
-    if(length(object@CNACGH) > 0 )
-    {
-      barcodes <- c(barcodes,as.character(object@CNACGH[,1]))
-    }
-    if(length(object@Methylation) > 0 )
-    {
-      for(i in 1:length(object@Methylation))
-      {
-        barcodes <- c(barcodes,colnames(object@Methylation[[i]]@DataMatrix))
-      }
-    }
-    if(length(object@mRNAArray) > 0 )
-    {
-      for(i in 1:length(object@mRNAArray))
-      {
-        barcodes <- c(barcodes,colnames(object@mRNAArray[[i]]@DataMatrix))
-      }
-    }
-    if(length(object@miRNAArray) > 0 )
-    {
-      for(i in 1:length(object@miRNAArray))
-      {
-        barcodes <- c(barcodes,colnames(object@miRNAArray[[i]]@DataMatrix))
-      }
-    } 
-    if(length(object@RPPAArray) > 0 )
-    {
-      for(i in 1:length(object@RPPAArray))
-      {
-        barcodes <- c(barcodes,colnames(object@RPPAArray[[i]]@DataMatrix))
-      }
-    }
-    if(length(object@GISTIC@Dataset) > 0)
-    {
-      barcodes <- c(barcodes,colnames(object@GISTIC@AllByGene)[-c(1:3)])
-    }
-    if(dim(object@Mutations)[1] > 0 & dim(object@Mutations)[2] > 0)
-    {
-      barcodes <- c(barcodes,unique(as.character(object@Mutations[,16])))
-      barcodes <- c(barcodes,unique(as.character(object@Mutations[,17])))
-    }
-    barcodes <- unique(barcodes)
-    barcodes <- toupper(barcodes)
-    barcodes <- gsub(pattern = "\\.",replacement = "-",x = barcodes)
-    
-    pb <- txtProgressBar(min = 0, max = length(barcodes), style = 3)
-    breakPoints <- seq(1,length(barcodes),20)
-    for(i in breakPoints)
-    {
-      setTxtProgressBar(pb, i)
-      urlToGo <- "https://tcga-data.nci.nih.gov/uuid/uuidws/mapping/json/barcode/batch"
-      endPoint <- (i+19)
-      if(endPoint > length(barcodes)){endPoint = length(barcodes)}
-      searchBarcode <- paste(barcodes[i:endPoint], collapse=",")
-      uuids = fromJSON(getURL(urlToGo, customrequest="POST", 
-                              httpheader=c("Content-Type: text/plain"), 
-                              postfields=searchBarcode))$uuidMapping
-      if(class(uuids)=="character")
-      {
-        if(exists("convertTable"))
-        {
-          convertTable <- rbind(convertTable,c(uuids[1],uuids[2]))
-        }
-        else
-        {
-          convertTable <- data.frame(Barcode=uuids[1],UUID=uuids[2])
-        }
-      }
-      else
-      {
-        if(exists("convertTable"))
-        {
-          convertTable <- rbind(convertTable,
-                                data.frame(matrix(unlist(uuids), nrow=length(uuids), byrow=TRUE),stringsAsFactors=FALSE))
-        }
-        else
-        {
-          convertTable <- data.frame(matrix(unlist(uuids), nrow=length(uuids), byrow=TRUE),stringsAsFactors=FALSE)
-        }    
-      }
-      
-      if ((endPoint %% 400) == 0)
-      {
-        message("RTCGAToolbox will wait 185 seconds due to TCGA web service limitations")
-        Sys.sleep(185)
-      }
-      
-    }
-    
-    shortNames <- apply(convertTable,1,function(x){
-      as.character(paste(strsplit(x[1],split = "-")[[1]][1:3],collapse = "-"))
-    })
-    convertTable <- cbind(convertTable,shortNames)
-    colnames(convertTable) <- c("Barcode","UUID","ShortName")
-    setTxtProgressBar(pb, length(barcodes))
-    return(convertTable)
-  }
-  
   resultClass <- new("FirehoseData", Dataset = dataset)
   
   if(!is.null(runDate))
@@ -308,23 +311,24 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     fh_url <- "http://gdac.broadinstitute.org/runs/stddata__"
     fh_url <- paste(fh_url,substr(runDate,1,4),"_",substr(runDate,5,6),"_",substr(runDate,7,8),"/data/",sep="")
     fh_url <- paste(fh_url,dataset,"/",runDate,"/",sep="")
-    doc = htmlTreeParse(fh_url, useInternalNodes = T)
+    doc = htmlTreeParse(fh_url, useInternalNodes = TRUE)
 
     
     #Download clinical data
     if(Clinic)
     {
       #Search for links
-      plinks <- getLinks(".Clinical_Pick_Tier1.Level_4","*.tar[.]gz$")
+      plinks <- .getLinks(".Clinical_Pick_Tier1.Level_4","*.tar[.]gz$",NULL,doc)
       
       for(i in trim(plinks))
       {
-        if(checkFileSize(paste0(fh_url,i)))
+        if(.checkFileSize(paste0(fh_url,i),fileSizeLimit))
         {
-          exportFiles(paste0(fh_url,i),dataset,"-Clinical.tar.gz","*.clin.merged.picked.txt$",FALSE,"-Clinical.txt")
+          .exportFiles(paste0(fh_url,i),dataset,"-Clinical.tar.gz","*.clin.merged.picked.txt$",FALSE,
+                       "-Clinical.txt",FALSE,forceDownload,runDate)
           
           raw.clin <- read.delim(paste0(runDate,"-",dataset,"-Clinical.txt"),colClasses="character")
-          df.clin <- data.frame(do.call(rbind, raw.clin[, -1]))
+          df.clin <- data.frame(do.call(rbind, raw.clin[, -1]),stringsAsFactors = FALSE)
           colnames(df.clin) <- raw.clin[, 1]
           resultClass@Clinical <- df.clin
           gc() 
@@ -336,15 +340,17 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     if(RNAseq_Gene)
     {
       #Search for links
-      plinks <- getLinks("Level_3__gene_expression__data.Level_3","*.Merge_rnaseq__.*._rnaseq__.*.tar[.]gz$")
+      plinks <- .getLinks("Level_3__gene_expression__data.Level_3","*.Merge_rnaseq__.*._rnaseq__.*.tar[.]gz$",NULL,doc)
       
       for(i in trim(plinks))
       { 
-        if(checkFileSize(paste0(fh_url,i)))
+        if(.checkFileSize(paste0(fh_url,i),fileSizeLimit))
         {
-          exportFiles(paste0(fh_url,i),dataset,"-RNAseqGene.tar.gz","[.]rnaseq__.*.__Level_3__gene_expression__data.data.txt$",TRUE,"-RNAseqGene.txt")
+          .exportFiles(paste0(fh_url,i),dataset,"-RNAseqGene.tar.gz",
+                       "[.]rnaseq__.*.__Level_3__gene_expression__data.data.txt$",
+                       TRUE,"-RNAseqGene.txt",FALSE,forceDownload,runDate)
           #Get selected type only
-          resultClass@RNASeqGene <- makeExprMat(dataset,"-RNAseqGene.txt",RNAseqNorm,"RNAseq")
+          resultClass@RNASeqGene <- .makeExprMat(dataset,"-RNAseqGene.txt",RNAseqNorm,"RNAseq",mergeSize=1000,arrayData=FALSE,runDate)
           gc() 
         }
       }
@@ -354,19 +360,19 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     if(RNAseq2_Gene_Norm)
     {
       #Search for links
-      plinks <- getLinks("Level_3__RSEM_genes_normalized__data.Level_3","*.Merge_rnaseqv2__.*._rnaseqv2__.*.tar[.]gz$")
+      plinks <- .getLinks("Level_3__RSEM_genes_normalized__data.Level_3","*.Merge_rnaseqv2__.*._rnaseqv2__.*.tar[.]gz$",NULL,doc)
       
       for(i in trim(plinks))
       {
-        if(checkFileSize(paste0(fh_url,i)))
+        if(.checkFileSize(paste0(fh_url,i),fileSizeLimit))
         {
-          exportFiles(paste0(fh_url,i),dataset,
+          .exportFiles(paste0(fh_url,i),dataset,
                       "-RNAseq2GeneNorm.tar.gz",
                       "[.]rnaseqv2__.*.__Level_3__RSEM_genes_normalized__data.data.txt$",
                       TRUE,
-                      "-RNAseq2GeneNorm.txt")
+                      "-RNAseq2GeneNorm.txt",FALSE,forceDownload,runDate)
           
-          resultClass@RNASeq2GeneNorm <- makeExprMat(dataset,"-RNAseq2GeneNorm.txt",RNAseq2Norm,"RNAseq2")
+          resultClass@RNASeq2GeneNorm <- .makeExprMat(dataset,"-RNAseq2GeneNorm.txt",RNAseq2Norm,"RNAseq2",mergeSize=1000,arrayData=FALSE,runDate)
           gc() 
         }
       }
@@ -376,19 +382,19 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     if(miRNASeq_Gene)
     {
       #Search for links
-      plinks <- getLinks("Level_3__miR_gene_expression__data.Level_3","[.]Merge_mirnaseq__.*.hiseq_mirnaseq__.*.tar[.]gz$",dataset)
+      plinks <- .getLinks("Level_3__miR_gene_expression__data.Level_3","[.]Merge_mirnaseq__.*.hiseq_mirnaseq__.*.tar[.]gz$",dataset,doc)
       
       for(i in trim(plinks))
       {
-        if(checkFileSize(paste0(fh_url,i)))
+        if(.checkFileSize(paste0(fh_url,i),fileSizeLimit))
         {
-          exportFiles(paste0(fh_url,i),dataset,
+          .exportFiles(paste0(fh_url,i),dataset,
                       "-miRNAseqGene.tar.gz",
                       "[.]mirnaseq__.*.__Level_3__miR_gene_expression__data.data.txt$",
                       TRUE,
-                      "-miRNAseqGene.txt")
+                      "-miRNAseqGene.txt",FALSE,forceDownload,runDate)
           
-          resultClass@miRNASeqGene <- makeExprMat(dataset,"-miRNAseqGene.txt","read_count","miRNAseq",100)
+          resultClass@miRNASeqGene <- .makeExprMat(dataset,"-miRNAseqGene.txt","read_count","miRNAseq",mergeSize=100,arrayData=FALSE,runDate)
           gc() 
         }
       }
@@ -398,17 +404,17 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     if(CNA_SNP)
     {
       #Search for links
-      plinks <- getLinks("Level_3__segmented_scna_hg19__seg.Level_3","[.]Merge_snp__.*.__Level_3__segmented_scna_hg19__seg.Level_3.*.tar[.]gz$",dataset)
+      plinks <- .getLinks("Level_3__segmented_scna_hg19__seg.Level_3","[.]Merge_snp__.*.__Level_3__segmented_scna_hg19__seg.Level_3.*.tar[.]gz$",dataset,doc)
       
       for(i in trim(plinks))
       {
-        if(checkFileSize(paste0(fh_url,i)))
+        if(.checkFileSize(paste0(fh_url,i),fileSizeLimit))
         {
-          exportFiles(paste0(fh_url,i),dataset,
+          .exportFiles(paste0(fh_url,i),dataset,
                       "-CNASNPHg19.tar.gz",
                       "[.]snp__.*.__Level_3__segmented_scna_hg19__seg.seg.txt$",
                       TRUE,
-                      "-CNASNPHg19.txt")
+                      "-CNASNPHg19.txt",FALSE,forceDownload,runDate)
           #Get selected type only
           tmpMat = fread(paste0(runDate,"-",dataset,"-CNASNPHg19.txt"),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                                 "numeric","numeric","numeric"),data.table = FALSE)
@@ -421,17 +427,17 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     if(CNV_SNP)
     {
       #Search for links
-      plinks <- getLinks("Level_3__segmented_scna_minus_germline_cnv_hg19__seg.Level_3","[.]Merge_snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.Level_3.*.tar[.]gz$",dataset)
+      plinks <- .getLinks("Level_3__segmented_scna_minus_germline_cnv_hg19__seg.Level_3","[.]Merge_snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.Level_3.*.tar[.]gz$",dataset,doc)
       
       for(i in trim(plinks))
       {
-        if(checkFileSize(paste0(fh_url,i)))
+        if(.checkFileSize(paste0(fh_url,i),fileSizeLimit))
         {
-          exportFiles(paste0(fh_url,i),dataset,
+          .exportFiles(paste0(fh_url,i),dataset,
                       "-CNVSNPHg19.tar.gz",
                       "[.]snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.seg.txt$",
                       TRUE,
-                      "-CNVSNPHg19.txt")
+                      "-CNVSNPHg19.txt",FALSE,forceDownload,runDate)
           #Get selected type only
           tmpMat = fread(paste0(runDate,"-",dataset,"-CNVSNPHg19.txt"),header=TRUE,colClasses=c("character","numeric","numeric",
                                                                                                 "numeric","numeric","numeric"),data.table = FALSE)
@@ -444,17 +450,17 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     if(CNA_Seq)
     {
       #Search for links
-      plinks <- getLinks("__Level_3__segmentation__seg.Level_3","[.]Merge_cna__.*.dnaseq.*.__Level_3__segmentation__seg.Level_3.*.tar[.]gz$",dataset)
+      plinks <- .getLinks("__Level_3__segmentation__seg.Level_3","[.]Merge_cna__.*.dnaseq.*.__Level_3__segmentation__seg.Level_3.*.tar[.]gz$",dataset,doc)
       
       for(i in trim(plinks))
       {
-        if(checkFileSize(paste0(fh_url,i)))
+        if(.checkFileSize(paste0(fh_url,i),fileSizeLimit))
         {
-          exportFiles(paste0(fh_url,i),dataset,
+          .exportFiles(paste0(fh_url,i),dataset,
                       "-CNAseq.tar.gz",
                       "[.]cna__.*.__Level_3__segmentation__seg.seg.txt$",
                       TRUE,
-                      "-CNAseq.txt")
+                      "-CNAseq.txt",FALSE,forceDownload,runDate)
           #Get selected type only
           tmpMat = fread(paste0(runDate,"-",dataset,"-CNAseq.txt"),
                          header=TRUE,colClasses=c("character","numeric","numeric","numeric","numeric","numeric"), 
@@ -470,19 +476,19 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     if(CNA_CGH)
     {
       #Search for links
-      plinks <- getLinks("__Level_3__segmentation__seg.Level_3","[.]Merge_cna__.*.cgh.*.__Level_3__segmentation__seg.Level_3.*.tar[.]gz$",dataset)
+      plinks <- .getLinks("__Level_3__segmentation__seg.Level_3","[.]Merge_cna__.*.cgh.*.__Level_3__segmentation__seg.Level_3.*.tar[.]gz$",dataset,doc)
       
       dataLists <- list()
       listCount = 1
       for(i in trim(plinks))
       {
-        if(checkFileSize(paste0(fh_url,i)))
+        if(.checkFileSize(paste0(fh_url,i),fileSizeLimit))
         {
-          exportFiles(paste0(fh_url,i),dataset,
+          .exportFiles(paste0(fh_url,i),dataset,
                       "-CNACGH.tar.gz",
                       "[.]cna__.*.__Level_3__segmentation__seg.seg.txt$",
                       TRUE,
-                      paste0(dataset,"-CNACGH-",listCount,".txt"))
+                      paste0(dataset,"-CNACGH-",listCount,".txt"),FALSE,forceDownload,runDate)
           #Get selected type only
           tmpMat = fread(paste0(runDate,"-",dataset,"-CNACGH-",listCount,".txt"),
                          header=TRUE,colClasses=c("character","numeric","numeric","numeric","numeric","numeric"), 
@@ -501,26 +507,26 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     if(Methylation)
     {
       #Search for links
-      plinks <- getLinks("__Level_3__within_bioassay_data_set_function__data.Level_3","[.]Merge_methylation__.*.methylation.*.__Level_3__within_bioassay_data_set_function__data.Level_3.*.tar[.]gz$",dataset)
+      plinks <- .getLinks("__Level_3__within_bioassay_data_set_function__data.Level_3","[.]Merge_methylation__.*.methylation.*.__Level_3__within_bioassay_data_set_function__data.Level_3.*.tar[.]gz$",dataset,doc)
       
       dataLists <- list()
       listCount = 1
       for(ii in trim(plinks))
       {
-        if(checkFileSize(paste0(fh_url,ii)))
+        if(.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
         {
-          exportFiles(paste0(fh_url,ii),dataset,
+          .exportFiles(paste0(fh_url,ii),dataset,
                       "-Methylation.tar.gz",
                       "[.]methylation__.*.__Level_3__within_bioassay_data_set_function__data.data.txt$",
                       TRUE,
-                      paste0("-Methylation-",listCount,".txt"))
+                      paste0("-Methylation-",listCount,".txt"),FALSE,forceDownload,runDate)
           
           #Get selected type only
           tmpCols = read.delim(paste0(runDate,"-",dataset,"-Methylation-",listCount,".txt"),nrows=1,colClasses="character")
           colOrder <- 1:ncol(tmpCols)
           colOrder <- colOrder[tmpCols[1,] == "Beta_value"]
           
-          tmpMat <- fread(paste0(runDate,"-",dataset,"-Methylation-",listCount,".txt"),header=F,colClasses = "character", select=c(1,3,4,5,colOrder), data.table = FALSE)
+          tmpMat <- fread(paste0(runDate,"-",dataset,"-Methylation-",listCount,".txt"),header=FALSE,colClasses = "character", select=c(1,3,4,5,colOrder), data.table = FALSE)
           tmpMat <- tmpMat[,c(1,3,4,5,2,6:ncol(tmpMat))]
           closeAllConnections()
           colnames(tmpMat) <- c("CompositeElementREF","Gene_Symbol","Chromosome","Genomic_Coordinate",tmpMat[1,5:ncol(tmpMat)])
@@ -542,9 +548,9 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     if(mRNA_Array)
     {
       #Search for links
-      plinks1 <- getLinks("Merge_transcriptome__agilentg4502a_07","[.]Merge_transcriptome__agilentg4502a_.*.__Level_3__unc_lowess_normalization_gene_level__data.Level_3.*.tar[.]gz$",dataset)
-      plinks2 <- getLinks("Merge_transcriptome__ht_hg_u133a","[.]Merge_transcriptome__ht_hg_u133a__.*.__Level_3__gene_rma__data.Level_3.*.tar[.]gz$",dataset)
-      plinks3 <- getLinks("Merge_exon__huex_1_0_st_v2","[.]Merge_exon__huex_1_0_st_v2__.*.__Level_3__quantile_normalization_gene__data.Level_3.*.tar[.]gz$",dataset)
+      plinks1 <- .getLinks("Merge_transcriptome__agilentg4502a_07","[.]Merge_transcriptome__agilentg4502a_.*.__Level_3__unc_lowess_normalization_gene_level__data.Level_3.*.tar[.]gz$",dataset,doc)
+      plinks2 <- .getLinks("Merge_transcriptome__ht_hg_u133a","[.]Merge_transcriptome__ht_hg_u133a__.*.__Level_3__gene_rma__data.Level_3.*.tar[.]gz$",dataset,doc)
+      plinks3 <- .getLinks("Merge_exon__huex_1_0_st_v2","[.]Merge_exon__huex_1_0_st_v2__.*.__Level_3__quantile_normalization_gene__data.Level_3.*.tar[.]gz$",dataset,doc)
       
       plinks = c(plinks1,plinks2,plinks3)
       plinks = unique(plinks[plinks != ""])
@@ -552,17 +558,17 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       listCount = 1
       for(ii in trim(plinks))
       {
-        if(checkFileSize(paste0(fh_url,ii)))
+        if(.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
         {
-          exportFiles(paste0(fh_url,ii),dataset,
+          .exportFiles(paste0(fh_url,ii),dataset,
                       "-mRNAArray.tar.gz",
                       "",
                       TRUE,
                       paste0("-mRNAArray-",listCount,".txt"),
-                      TRUE)
+                      TRUE,forceDownload,runDate)
           tmpReturn <- new("FirehosemRNAArray",Filename=ii,
-                           DataMatrix=makeExprMat(dataset,paste0("-mRNAArray-",listCount,".txt"),
-                                                  "","mRNAArray",1000,TRUE))
+                           DataMatrix=.makeExprMat(dataset,paste0("-mRNAArray-",listCount,".txt"),
+                                                  "","mRNAArray",1000,TRUE,runDate))
           dataLists[[listCount]] <- tmpReturn
           listCount = listCount + 1 
         }
@@ -574,24 +580,24 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     if(miRNA_Array)
     {
       #Search for links
-      plinks <- getLinks("h_mirna_8x15k","[.]Merge_mirna__h_mirna_8x15k.*.data.Level_3.*.tar[.]gz$",dataset)
+      plinks <- .getLinks("h_mirna_8x15k","[.]Merge_mirna__h_mirna_8x15k.*.data.Level_3.*.tar[.]gz$",dataset,doc)
       plinks = unique(plinks[plinks != ""])
       
       dataLists <- list()
       listCount = 1
       for(ii in trim(plinks))
       {
-        if(checkFileSize(paste0(fh_url,ii)))
+        if(.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
         {
-          exportFiles(paste0(fh_url,ii),dataset,
+          .exportFiles(paste0(fh_url,ii),dataset,
                       "-miRNAArray.tar.gz",
                       "",
                       TRUE,
                       paste0("-miRNAArray-",listCount,".txt"),
-                      TRUE)
+                      TRUE,forceDownload,runDate)
           tmpReturn <- new("FirehosemRNAArray",Filename=ii,
-                           DataMatrix=makeExprMat(dataset,paste0("-miRNAArray-",listCount,".txt"),
-                                                  "","miRNAArray",100,TRUE))
+                           DataMatrix=.makeExprMat(dataset,paste0("-miRNAArray-",listCount,".txt"),
+                                                  "","miRNAArray",100,TRUE,runDate))
           dataLists[[listCount]] <- tmpReturn
           listCount = listCount + 1 
         }
@@ -603,24 +609,24 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     if(RPPA)
     {
       #Search for links
-      plinks <- getLinks("rppa_core","[.]Merge_protein_exp.*.protein_normalization__data.Level_3.*.tar[.]gz$",dataset)
+      plinks <- .getLinks("rppa_core","[.]Merge_protein_exp.*.protein_normalization__data.Level_3.*.tar[.]gz$",dataset,doc)
       plinks = unique(plinks[plinks != ""])
       
       dataLists <- list()
       listCount = 1
       for(ii in trim(plinks))
       {
-        if(checkFileSize(paste0(fh_url,ii)))
+        if(.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
         {
-          exportFiles(paste0(fh_url,ii),dataset,
+          .exportFiles(paste0(fh_url,ii),dataset,
                       "-RPPAArray.tar.gz",
                       "",
                       TRUE,
                       paste0("-RPPAArray-",listCount,".txt"),
-                      TRUE)
+                      TRUE,forceDownload,runDate)
           tmpReturn <- new("FirehosemRNAArray",Filename=ii,
-                           DataMatrix=makeExprMat(dataset,paste0("-RPPAArray-",listCount,".txt"),
-                                                  "","RPPAArray",100,TRUE))
+                           DataMatrix=.makeExprMat(dataset,paste0("-RPPAArray-",listCount,".txt"),
+                                                  "","RPPAArray",100,TRUE,runDate))
           dataLists[[listCount]] <- tmpReturn
           listCount = listCount + 1 
         }
@@ -632,14 +638,14 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     if(Mutation)
     {
       #Search for links 
-      plinks <- getLinks("Mutation_Packager_Calls","[.]Mutation_Packager_Calls[.]Level_3[.].*.tar[.]gz$",dataset)
+      plinks <- .getLinks("Mutation_Packager_Calls","[.]Mutation_Packager_Calls[.]Level_3[.].*.tar[.]gz$",dataset,doc)
       plinks = unique(plinks[plinks != ""])
       
       dataLists <- list()
       listCount = 1
       for(ii in trim(plinks))
       {
-        if(checkFileSize(paste0(fh_url,ii)))
+        if(.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
         {
           if(forceDownload || !file.exists(paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt")))
           {
@@ -674,13 +680,13 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     fh_url <- "http://gdac.broadinstitute.org/runs/analyses__"
     fh_url <- paste(fh_url,substr(gistic2_Date,1,4),"_",substr(gistic2_Date,5,6),"_",substr(gistic2_Date,7,8),"/data/",sep="")
     fh_url <- paste(fh_url,dataset,"/",gistic2_Date,"/",sep="")
-    doc = htmlTreeParse(fh_url, useInternalNodes = T)
+    doc = htmlTreeParse(fh_url, useInternalNodes = TRUE)
     #Search for links
-    plinks <- getLinks("CopyNumber_Gistic2.Level_4","-TP[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$",dataset)
+    plinks <- .getLinks("CopyNumber_Gistic2.Level_4","-TP[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$",dataset,doc)
     
     for(ii in trim(plinks))
     {
-      if(checkFileSize(paste0(fh_url,ii)))
+      if(.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
       {
         if(forceDownload || !file.exists(paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt")))
         {
@@ -696,7 +702,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           grepSearch = "all_thresholded.by_genes.txt"
           fileList = fileList[grepl(grepSearch,fileList)]
           untar(paste(dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
-          tmpCNThreshhold = fread(fileList,header=T,colClasses = "character", data.table = FALSE)
+          tmpCNThreshhold = fread(fileList,header=TRUE,colClasses = "character", data.table = FALSE)
           file.rename(from=fileList,to=paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"))
           delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
           unlink(delFodler, recursive = TRUE)
@@ -716,7 +722,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   
   if(getUUIDs)
   {
-    resultClass@BarcodeUUID <- barcodeUUID(resultClass) 
+    resultClass@BarcodeUUID <- .barcodeUUID(resultClass) 
   }
   return(resultClass)
 }

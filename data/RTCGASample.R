@@ -1,0 +1,2 @@
+message("RTCGASample dataset is artificially created for function test. It isn't biologically meaninful and it has no relation with any cancer type. For real datasets, please use client function to get data from data portal. See 'Vignette' for more detail.")
+load("RTCGASample.RData")

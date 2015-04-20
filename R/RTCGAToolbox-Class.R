@@ -1,20 +1,56 @@
+.getListData <- function(object,platform){
+  if(is.null(platform)){stop("Please set platform")}
+  switch(class(platform),
+         "numeric"={
+           if(platform > length(object)){
+             message("Accessible platforms:")
+             for(i in 1:length(object)){
+               message(paste0("#",i," :",object[[i]]@Filename))
+             }
+             stop("Invalid list member")
+           }
+           invisible(object[[platform]]@DataMatrix)
+         },
+        {
+          message("Accessible platforms:")
+          for(i in 1:length(object)){
+            message(paste0("#",i," :",object[[i]]@Filename))
+          }
+          stop("Set a valid platfrom")
+        }
+  )
+}
+
 #' An S4 class to store data from CGA platforms
 #'
 #' @slot Filename Platform name
 #' @slot DataMatrix A data frame that stores the CGH data.
 setClass("FirehoseCGHArray", representation(Filename = "character", DataMatrix = "data.frame"))
+setMethod("show", "FirehoseCGHArray",function(object){
+  message(paste0("Platform:", object@Filename))
+  if(dim(object@DataMatrix)[1] > 0 ){message("FirehoseCGHArray object, dim: ",paste(dim(object@DataMatrix),collapse = "\t"))}
+})
 
 #' An S4 class to store data from methylation platforms
 #'
 #' @slot Filename Platform name
 #' @slot DataMatrix A data frame that stores the methylation data.
 setClass("FirehoseMethylationArray", representation(Filename = "character", DataMatrix = "data.frame"))
+setMethod("show", "FirehoseMethylationArray",function(object){
+  message(paste0("Platform:", object@Filename))
+  if(dim(object@DataMatrix)[1] > 0 ){message("FirehoseMethylationArray object, dim: ",paste(dim(object@DataMatrix),collapse = "\t"))}
+})
+
 
 #' An S4 class to store data from array (mRNA, miRNA etc.) platforms
 #'
 #' @slot Filename Platform name
 #' @slot DataMatrix A data matrix that stores the expression data.
 setClass("FirehosemRNAArray", representation(Filename = "character", DataMatrix = "matrix"))
+setMethod("show", "FirehosemRNAArray",function(object){
+  message(object@Filename)
+  if(dim(object@DataMatrix)[1] > 0 ){message("FirehoseCGHArray object, dim: ",paste(dim(object@DataMatrix),collapse = "\t"))}
+})
 
 #' An S4 class to store processed copy number data. (Data processed by using GISTIC2 algorithm)
 #'
@@ -22,6 +58,10 @@ setClass("FirehosemRNAArray", representation(Filename = "character", DataMatrix 
 #' @slot AllByGene A data frame that stores continuous copy number
 #' @slot ThresholedByGene A data frame for discrete copy number data
 setClass("FirehoseGISTIC", representation(Dataset = "character", AllByGene = "data.frame",ThresholedByGene="data.frame"))
+setMethod("show", "FirehoseGISTIC",function(object){
+  message(paste0("Dataset:", object@Dataset))
+  if(dim(object@AllByGene)[1] > 0 ){message("FirehoseGISTIC object, dim: ",paste(dim(object@AllByGene),collapse = "\t"))}
+})
 
 #' An S4 class to store main data object from clinent function.
 #'
@@ -66,14 +106,149 @@ setMethod("show", "FirehoseData",function(object){
 }
 )
 
+#' Export data from FirehoseData object
+#' @param object A \code{\linkS4class{FirehoseData}} object
+#' @param type A data type to be exported (Data types can be seen by typing show(objectname))
+#' @param platform A list id for data types that may come from multiple platform (such as mRNAArray)
+#' @param CN A copy number data type (Default: 'All') (Possible values 'All' or 'Thresholed')
+#' @return Returns matrix or data frame depends on data type
+#' @examples
+#' data(RTCGASample)
+#' sampleClinical = getData(RTCGASample,"Clinical")
+#' sampleClinical = getData(RTCGASample,"RNASeqGene")
+setGeneric("getData",
+           function(object,type="",platform=NULL,CN="All") standardGeneric("getData")
+)
+
+#' Export data from FirehoseData object
+#' @param object A \code{\linkS4class{FirehoseData}} object
+#' @param type A data type to be exported (Data types can be seen by typing show(objectname))
+#' @param platform A list id for data types that may come from multiple platform (such as mRNAArray)
+#' @param CN A copy number data type (Default: 'All') (Possible values 'All' or 'Thresholed')
+#' @rdname getData-methods
+#' @aliases getData,FirehoseData,FirehoseData-method
+#' @return Returns matrix or data frame depends on data type
+#' @examples
+#' data(RTCGASample)
+#' sampleClinical = getData(RTCGASample,"Clinical")
+#' sampleClinical = getData(RTCGASample,"RNASeqGene")
+setMethod("getData", "FirehoseData",function(object,type="",platform=NULL,CN="All"){
+  show(object)
+  switch(type,
+         "Clinical"={
+           invisible(object@Clinical)
+         },
+         "RNASeqGene"={
+           invisible(object@RNASeqGene)
+         },
+         "RNASeq2GeneNorm"={
+           invisible(object@RNASeq2GeneNorm)
+         },
+         "miRNASeqGene"={
+           invisible(object@miRNASeqGene)
+         },
+         "CNASNP"={
+           invisible(object@CNASNP)
+         },
+         "CNVSNP"={
+           invisible(object@CNVSNP)
+         },
+         "CNAseq"={
+           invisible(object@CNAseq)
+         },
+         "CNACGH"={
+           .getListData(object@CNACGH,platform)
+         },
+         "mRNAArray"={
+           .getListData(object@mRNAArray,platform) 
+         },
+         "Methylation"={
+           .getListData(object@Methylation,platform)
+         },
+         "miRNAArray"={
+           .getListData(object@miRNAArray,platform)
+         },
+         "RPPAArray"={
+           .getListData(object@RPPAArray,platform)
+         },
+         "GISTIC"={
+           if(!CN %in% c("Thresholed","All")){stop("CN must be 'All' or 'Thresholed'")}
+           switch(CN,
+                  "All"={
+                    invisible(object@GISTIC@AllByGene)
+                  },
+                  "Thresholed"={
+                    invisible(object@GISTIC@ThresholedByGene)
+                  }
+            )
+         },
+         "Mutations"={
+           invisible(object@Mutations)
+         },
+         stop("Please specify valid data type")
+  )
+})
+
 #' An S4 class to store differential gene expression results
 #'
 #' @slot Dataset Dataset name
 #' @slot Toptable Results data frame
 setClass("DGEResult", representation(Dataset = "character", Toptable = "data.frame"))
+setMethod("show", "DGEResult",function(object){
+  message(paste0("Dataset:", object@Dataset))
+  if(dim(object@Toptable)[1] > 0 ){message("DGEResult object, dim: ",paste(dim(object@Toptable),collapse = "\t"))}
+})
+
+#' Export toptable or correlation data frame
+#' @param object A \code{\linkS4class{DGEResult}} or \code{\linkS4class{CorResult}} object
+#' @return Returns toptable or correlation data frame
+#' @examples
+#' data(RTCGASample)
+#' dgeRes = getDiffExpressedGenes(RTCGASample)
+#' dgeRes
+#' showResults(dgeRes[[1]])
+setGeneric("showResults",
+           function(object) standardGeneric("showResults")
+)
+
+#' Export toptable or correlation data frame
+#' @param object A \code{\linkS4class{DGEResult}} or \code{\linkS4class{CorResult}} object
+#' @rdname showResults-DGEResult
+#' @aliases showResults,DGEResult,DGEResult-method
+#' @return Returns toptable for DGE results
+#' @examples
+#' data(RTCGASample)
+#' dgeRes = getDiffExpressedGenes(RTCGASample)
+#' dgeRes
+#' showResults(dgeRes[[1]])
+setMethod("showResults", "DGEResult",function(object){
+  message(paste0("Dataset: ",object@Dataset))
+  print(head(object@Toptable))
+  invisible(object@Toptable)
+})
 
 #' An S4 class to store correlations between gene expression level and copy number data
 #'
 #' @slot Dataset A cohort name
 #' @slot Correlations Results data frame
 setClass("CorResult", representation(Dataset = "character", Correlations = "data.frame"))
+setMethod("show", "CorResult",function(object){
+  message(paste0("Dataset:", object@Dataset))
+  if(dim(object@Correlations)[1] > 0 ){message("CorResult object, dim: ",paste(dim(object@Correlations),collapse = "\t"))}
+})
+
+#' Export toptable or correlation data frame
+#' @param object A \code{\linkS4class{DGEResult}} or \code{\linkS4class{CorResult}} object
+#' @rdname showResults-CorResult
+#' @aliases showResults,CorResult,CorResult-method
+#' @return Returns correlation results data frame
+#' @examples
+#' data(RTCGASample)
+#' corRes = getCNGECorrelation(RTCGASample,adj.pval = 1,raw.pval = 1)
+#' corRes
+#' showResults(corRes[[1]])
+setMethod("showResults", "CorResult",function(object){
+  message(paste0("Dataset: ",object@Dataset))
+  print(head(object@Correlations))
+  invisible(object@Correlations)
+})

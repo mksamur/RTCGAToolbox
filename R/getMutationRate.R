@@ -4,7 +4,9 @@
 #' @return Returns a data table
 #' @examples
 #' data(RTCGASample)
-#' mutRate = getMutationRate(dataObject=a2)
+#' mutRate = getMutationRate(dataObject=RTCGASample)
+#' mutRate <- mutRate[order(mutRate[,2],decreasing = TRUE),]
+#' head(mutRate)
 #' \dontrun{
 #' }
 getMutationRate <- function(dataObject)

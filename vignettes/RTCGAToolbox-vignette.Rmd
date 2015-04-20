@@ -6,7 +6,69 @@ output:
   rmarkdown::html_vignette:
     toc: true
     number_sections: true
-bibliography: RTCGAToolbox-Vignette-Bib.bib
+
+
+references:
+- id: ref1
+  title: Comprehensive genomic characterization defines human glioblastoma genes and core pathways
+  author:
+  - family: Cancer Genome Atlas Research Network
+    given:
+  journal: Nature
+  volume: 455
+  number: 7216
+  pages: 1061-1068
+  issued:
+    year: 2008
+
+- id: ref2
+  title: GISTIC2.0 facilitates sensitive and confident localization of the targets of focal somatic copy-number alteration in human cancers
+  author:
+  - family: Mermel, C. H. and Schumacher, S. E. and Hill, B. and Meyerson, M. L. and Beroukhim, R. and Getz, G
+    given:
+  journal: Genome Biol
+  volume: 12
+  number: 4
+  pages: R41
+  issued:
+    year: 2011
+
+- id: ref3
+  title: Linear models and empirical bayes methods for assessing differential expression in microarray experiments
+  author:
+  - family: Smyth, G. K
+    given:
+  journal: Stat Appl Genet Mol Biol
+  volume: 3
+  number: 
+  pages: Article3
+  issued:
+    year: 2004
+
+- id: ref4
+  title: voom\:\ Precision weights unlock linear model analysis tools for RNA-seq read counts
+  author:
+  - family: Law, C. W. and Chen, Y. and Shi, W. and Smyth, G. K
+    given:
+  journal: Stat Appl Genet Mol Biol
+  volume: 15
+  number: 2
+  pages: R29
+  issued:
+    year: 2014
+
+- id: ref5
+  title: RCircos\:\ an R package for Circos 2D track plots
+  author:
+  - family: Zhang, H. and Meltzer, P. and Davis, S
+    given:
+  journal: BMC Bioinformatics
+  volume: 14
+  number: 
+  pages: 244
+  issued:
+    year: 2013
+
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
@@ -38,75 +100,34 @@ Currently, following functions are provided to access datasets and processed dat
     + getSurvival: Performs an univariate survival comparison for individual genes between high and low expressed sample groups.
     + getReport: Creates a circular pdf figure from differential gene expression, copy number and mutation information.
     
-After successful installation of RTCGAToolbox, one needs to load the library to get started using it:
-```{r eval=FALSE}
-library(RTCGAToolbox)
-```
 
 # Installation
 
-To install RTCGAToolbox, you may use either `install_github` function from [devtools](http://cran.r-project.org/web/packages/devtools/index.html) package or you may download, build and install by yourself.
+To install RTCGAToolbox, you can use Bioconductor. Source code is also available on GitHub.
 
-## With devtools
-```{r eval=FALSE}
-# You should install devtools package before loading it.
-library("devtools")
-# Next function will download, build and install RTCGAToolbox.
-install_github("mksamur/RTCGAToolbox")
-# Finally call the RTCGAToolbox
+```{r eval=TRUE}
 library("RTCGAToolbox") # Package should be successfully installed!
-```
-
-## Manuel Installation
-First you need to download archive (zip or tar.gz) from [here](http://mksamur.github.io/RTCGAToolbox). After downloading, extract archive file into a folder. Please note that you should have all dependent packages. If you have missing dependent package, you will get an error that tells you which packages you should install. X.Y.Z is the current version of RTCGAToolbox.
-
-```
-cd /path/to/folder/
-R CMD build RTCGAToolbox/
-R CMD install RTCGAToolbox_X.Y.Z.tar.gz
 ```
 
 # Data Client
 Before getting the data from Firehose pipelines, users have to check valid dataset aliases, stddata run dates and analyze run dates. To provide valid information RTCGAToolbox comes with three control functions. Users can list datasets with "getFirehoseDatasets" function. In addition, users have to provide stddata run date or/and analyze run date for client function. Valid dates are accessible via "getFirehoseRunningDates" and "getFirehoseAnalyzeDates" functions. Below code chunk shows how to list datasets and dates.
 
-```{r eval=FALSE}
+```{r eval=TRUE}
 library(RTCGAToolbox)
 
 # Valid aliases
 getFirehoseDatasets()
 ```
-```
- [1] "ACC"      "BLCA"     "BRCA"     "CESC"     "COAD"     "COADREAD"
- [7] "DLBC"     "ESCA"     "GBM"      "HNSC"     "KICH"     "KIRC"    
-[13] "KIRP"     "LAML"     "LGG"      "LIHC"     "LUAD"     "LUSC"    
-[19] "MESO"     "OV"       "PAAD"     "PCPG"     "PRAD"     "READ"    
-[25] "SARC"     "SKCM"     "STAD"     "TGCT"     "THCA"     "THYM"    
-[31] "UCEC"     "UCS"      "UVM"     
-```
-```{r eval=FALSE}
+```{r eval=TRUE}
 # Valid stddata runs
 stddata = getFirehoseRunningDates()
 stddata
 ```
-```
- [1] "20141206" "20141017" "20140902" "20140715" "20140614" "20140518"
- [7] "20140416" "20140316" "20140215" "20140115" "20131210" "20131114"
-[13] "20131010" "20130923" "20130809" "20130715" "20130623" "20130606"
-[19] "20130523" "20130508" "20130421" "20130406" "20130326" "20130309"
-[25] "20130222" "20130203" "20130116" "20121221" "20121206" "20121114"
-[31] "20121102" "20121024" "20121020" "20121018" "20121004" "20120913"
-[37] "20120825" "20120804" "20120725" "20120707" "20120623" "20120606"
-[43] "20120525" "20120515" "20120425" "20120412" "20120321" "20120306"
-[49] "20120217" "20120124" "20120110" "20111230" "20111206" "20111128"
-[55] "20111115" "20111026"
-```
-```{r eval=FALSE}
+```{r eval=TRUE}
 # Valid analysis running dates (will return 3 recent date)
 gisticDate = getFirehoseAnalyzeDates(last=3)
 gisticDate
 ```
-```
-[1] "20141017" "20140715" "20140416"
 ```
 When the dates and datasets are determined users can call data client function ("getFirehoseData") to access data. Current version can download multiple data types except ISOFORM and exon level data due to their huge data size. Below code chunk will download BRCA dataset with clinical, gene expression (both from RNASeq and mRNA array platfroms), mutation and GISTIC2 [@ref2] processed copy number estimates data.
 
@@ -132,11 +153,9 @@ diffGeneExprs = getDiffExpressedGenes(dataObject=brcaData,DrawPlots=TRUE,
                                    adj.method="BH",adj.pval=0.05,raw.pval=0.05,
                                    logFC=2,hmTopUpN=100,hmTopDownN=100)
 # Show head for expression outputs
-for(i in length(diffGeneExprs))
-{
-   writeLines(diffGeneExprs[[i]]@Dataset)
-   head(diffGeneExprs[[i]]@Toptable)
-}
+diffGeneExprs
+showResults(diffGeneExprs[[1]])
+toptableOut = showResults(diffGeneExprs[[1]])
 ```
 If "DrawPlots" set as TRUE, running code above will provide following image outputs.
 <img src="Figure2.png" height="400px" width="800px" />
@@ -152,7 +171,10 @@ Voom + limma: To voom (variance modeling at the observational level) is to estim
 ```{r eval=FALSE}
 #Correlation between gene expression values and copy number
 corrGECN = getCNGECorrelation(dataObject=brcaData,adj.method="BH",
-                              adj.pval=0.05,raw.pval=0.05) 
+                              adj.pval=0.05,raw.pval=0.05)
+corrGECN
+showResults(corrGECN[[1]])
+corRes = showResults(corrGECN[[2]])
 ```
 
 If the dataset has RNASeq data, data will be normalized for correlation analysis. Correlation function uses Benjamini & Hochberg adjustment for p values. For more details about adjment users can check base adjustment methods by calling "?p.adjust". In addition, to filter results adjusted and raw p values are used. Users can change "adj.pval" and "raw.pval" parameters to refine results.
@@ -176,7 +198,8 @@ This function also needs a survival data, which can be obtained using clinical d
 ```{r eval=FALSE}
 # Creating survival data frame and running analysis for  
 # PIK3CA which is one of the most frequently mutated gene
-clinicData = data.frame(lapply(brcaData@Clinical, as.character), stringsAsFactors=FALSE,row.names = rownames(myData@Clinical))
+clinicData <- getData(brcaData,"Clinical")
+head(clinicData)
 clinicData = clinicData[,3:5]
 clinicData[is.na(clinicData[,3]),3] = clinicData[is.na(clinicData[,3]),2]
 survData <- data.frame(Samples=rownames(clinicData),
@@ -197,20 +220,36 @@ This function needs a genes location data frame, which can be obtained from "hg1
 ```{r eval=FALSE}
 # Creating dataset analysis summary figure with getReport. 
 # Figure will be saved as PDF file.
-data(hg19.ucsc.gene.locations)
+library("Homo.sapiens")
+locations = genes(Homo.sapiens,columns="SYMBOL")
+locations = as.data.frame(locations)
+locations <- locations[,c(6,1,5,2:3)]
+locations <- locations[!is.na(locations[,1]),]
+rownames(locations) <- locations[,1]
 getReport(dataObject=brcaData,DGEResult1=diffGeneExprs[[1]],
-DGEResult2=diffGeneExprs[[2]],geneLocations=hg19.ucsc.gene.locations)
+DGEResult2=diffGeneExprs[[2]],geneLocations=locations)
 ```
 Running code above will provide following circle plot.
 <img src="Figure4.png" height="600px" width="600px" />
 
+# Data Export
+You can export downloaded data from FirehoseData object by using 'getData()' function.
+```{r eval=FALSE}
+brcaData
+brcaClinical = getData(brcaData,"Clinical")
+brcaRNAseqCounts = getData(brcaData,"RNASeqGene")
+#following function will export data from first platform in the list
+brcamRNAArray = getData(brcaData,"mRNAArray",1)
+brcaCN = getData(brcaData,"GISTIC")
+
+```
+
+
 # Data Objects
-RTCGAToolbox provides two data objects.
-* "RTCGASample" data object provides sample data for testing functions
-* "hg19.ucsc.gene.locations" data object provides required gene coordinates from hg19 for report figure.
+RTCGAToolbox provides toy data object for testing functions.
+* "RTCGASample" data is a FirehoseData object that stores RNAseq, copy number, muatation, clinical data for artificially created dataset.
 ```{r eval=FALSE}
 data(RTCGASample)
-data(hg19.ucsc.gene.locations)
 ```
 ******
 ```{r eval=TRUE}

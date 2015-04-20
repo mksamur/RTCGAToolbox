@@ -14,7 +14,11 @@
 #' @return Returns a list that stores results for each dataset
 #' @examples
 #' data(RTCGASample)
-#' dgegenes = getDiffExpressedGenes(a2)
+#' dgegenes = getDiffExpressedGenes(RTCGASample)
+#' dgegenes
+#' showResults(dgegenes[[1]])
+#' dgegenes = showResults(dgegenes[[1]])
+#' head(dgegenes)
 #' \dontrun{
 #' }
 
@@ -41,7 +45,8 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
     function(x, tol = .Machine$double.eps^0.5) abs(x - round(x)) < tol
   for(i in validMatrix)
   {
-    if(i == "RNASeq")
+    switch(i,
+    "RNASeq"=
     {
       chkTmp <- as.numeric(dataObject@RNASeqGene[1,])
       if(all(is.wholenumber(chkTmp)) == FALSE){warning("RNASeq data does not look like raw counts! We will skip this data!")}
@@ -116,8 +121,8 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
           }
         }
       }
-    }
-    if(i == "RNASeq2")
+    },
+    "RNASeq2"=
     {
       chkTmp <- as.numeric(dataObject@RNASeq2GeneNorm[1,])
       if(all(is.wholenumber(chkTmp)) == FALSE){warning("RNASeq2 data does not look like raw counts! We will skip this data!")}
@@ -192,18 +197,14 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
           }
         }
       }
-    }
-    if(i == "mRNAArray")
+    },
+    "mRNAArray"=
     {
       for(j in 1:length(dataObject@mRNAArray))
       {
         tmpObj <- dataObject@mRNAArray[[j]]
-        #genes <- tmpObj@DataMatrix[,1]
-        #genes <- setdiff(genes,genes[duplicated(genes)])
-        #geneMat <- tmpObj@DataMatrix[tmpObj@DataMatrix[,1] %in% genes,]
-        #rownames(geneMat) <- geneMat[,1]
-        geneMat <- tmpObj@DataMatrix#geneMat[,2:ncol(geneMat)]
-        sampleIDs <- colnames(geneMat)#[]
+        geneMat <- tmpObj@DataMatrix
+        sampleIDs <- colnames(geneMat)
         samplesDat <- data.frame(matrix(nrow=length(sampleIDs),ncol=7))
         rownames(samplesDat) <- sampleIDs
         for(j in 1:length(sampleIDs))
@@ -224,8 +225,6 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
         sampleIDs1 <- as.numeric(sampleIDs1)
         normalSamples <- rownames(samplesDat)[sampleIDs1 < 20 & sampleIDs1 > 9]
         tumorSamples <- rownames(samplesDat)[sampleIDs1 < 10]
-        #print(normalSamples[1:10])
-        #print(tumorSamples[1:10])
         analysisGo <- TRUE
         if(is.null(normalSamples) | length(normalSamples) < 1)
         {
@@ -246,9 +245,6 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
           geneMat <- geneMat[,c(normalSamples,tumorSamples)]
           rN <- rownames(geneMat)
           cN <- colnames(geneMat)
-          #suppressWarnings(geneMat <- apply(geneMat,2,as.numeric))
-          #rownames(geneMat) <- rN
-          #colnames(geneMat) <- cN
           design <- model.matrix (~0 + factor(c(rep(1,length(normalSamples)),rep(2,length(tumorSamples)))))
           colnames (design) <-c ("Normal", "Tumor")
           fit <- lmFit(geneMat,design)
@@ -300,7 +296,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
           }
         }
       }
-    }
+    })
   }
   return(listResults)
 }

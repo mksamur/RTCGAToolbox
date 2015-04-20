@@ -10,18 +10,13 @@
 #' @examples
 #' ## get data with  getFirehoseData() function and call survival analysis
 #' ## Always check clinical data file for structural changes
-#' getFirehoseDatasets()
-#' getFirehoseAnalyzeDates()
-#' \dontrun{
-#' brcaData = getFirehoseData (dataset="BRCA", runDate="20140416", gistic2_Date="20140115",
-#' Clinic=TRUE, RNAseq_Gene=TRUE, mRNA_Array=TRUE, Mutation=TRUE)
-#' clinicData = data.frame(lapply(brcaData@@Clinical, as.character), stringsAsFactors=FALSE,row.names = rownames(brcaData@@Clinical))
+#' data(RTCGASample)
+#' clinicData <- getData(RTCGASample,"Clinical")
 #' clinicData = clinicData[,3:5]
 #' clinicData[is.na(clinicData[,3]),3] = clinicData[is.na(clinicData[,3]),2]
 #' survData <- data.frame(Samples=rownames(clinicData),Time=as.numeric(clinicData[,3]),
 #' Censor=as.numeric(clinicData[,1]))
-#' getSurvival(dataObject=brcaData,geneSymbols=c("PIK3CA"),sampleTimeCensor=survData)
-#' }
+#' getSurvival(dataObject=RTCGASample,geneSymbols=c("FCGBP"),sampleTimeCensor=survData)
 getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor)
 {
   if(is.null(dataObject) | class(dataObject) != "FirehoseData")
@@ -50,7 +45,8 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
     function(x, tol = .Machine$double.eps^0.5) abs(x - round(x)) < tol
   for(i in validMatrix)
   {
-    if(i == "RNASeq")
+    switch(i,
+    "RNASeq"=
     {
       chkTmp <- as.numeric(dataObject@RNASeqGene[1,])
       controlVal = FALSE
@@ -59,21 +55,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
         #warning("Current version of survival tool only works with normalized RNASeq data!")
         controlVal=TRUE
       }
-      #else
-      #{
       tmpMat1 <- dataObject@RNASeqGene
-      #rnaseqGenes <- rownames(tmpMat1)
-      #rnaseqGenes2 <- character()
-      #for(rg in rnaseqGenes)
-      #{
-      # rnaseqGenes2 <- append(rnaseqGenes2,as.character(strsplit(rg,"\\|")[[1]][1]))
-      #}
-      #rnaFrame <- data.frame(rnaseqGenes,rnaseqGenes2)
-      #rnaFrame <- rnaFrame[!duplicated(rnaFrame[,2]),]
-      #rnaseqGenes2 <- rnaFrame[,2]
-      #names(rnaseqGenes2) <- rnaFrame[,1]
-      #tmpMat1 <- tmpMat1[names(rnaseqGenes2),]
-      #rownames(tmpMat1) <- rnaseqGenes2
       sampleIDs1 <- colnames(tmpMat1)
       sampleIDs1 <- gsub(pattern="\\.",replacement="-",sampleIDs1)
       samplesDat <- data.frame(matrix(nrow=length(sampleIDs1),ncol=7))
@@ -137,8 +119,8 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
         }
       }
       #}
-    }
-    if(i == "RNASeq2")
+    },
+    "RNASeq2"=
     {
       chkTmp <- as.numeric(dataObject@RNASeq2GeneNorm[1,])
       controlVal = FALSE
@@ -147,21 +129,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
         #warning("Current version of survival tool only works with normalized RNASeq data!")
         controlVal=TRUE
       }
-      #else
-      #{
       tmpMat1 <- dataObject@RNASeq2GeneNorm
-      #rnaseqGenes <- rownames(tmpMat1)
-      #rnaseqGenes2 <- character()
-      #for(rg in rnaseqGenes)
-      #{
-      # rnaseqGenes2 <- append(rnaseqGenes2,as.character(strsplit(rg,"\\|")[[1]][1]))
-      #}
-      #rnaFrame <- data.frame(rnaseqGenes,rnaseqGenes2)
-      #rnaFrame <- rnaFrame[!duplicated(rnaFrame[,2]),]
-      #rnaseqGenes2 <- rnaFrame[,2]
-      #names(rnaseqGenes2) <- rnaFrame[,1]
-      #tmpMat1 <- tmpMat1[names(rnaseqGenes2),]
-      #rownames(tmpMat1) <- rnaseqGenes2
       sampleIDs1 <- colnames(tmpMat1)
       sampleIDs1 <- gsub(pattern="\\.",replacement="-",sampleIDs1)
       samplesDat <- data.frame(matrix(nrow=length(sampleIDs1),ncol=7))
@@ -225,14 +193,12 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
         }
       }
       #}
-    }
-    if(i == "mRNAArray")
+    },
+    "mRNAArray"=
     {
       for(jj in 1:length(dataObject@mRNAArray))
       {
         tmpMat1 <- dataObject@mRNAArray[[jj]]@DataMatrix
-        #rownames(tmpMat1) <- tmpMat1[,1]
-        #tmpMat1 <- tmpMat1[,2:ncol(tmpMat1)]
         sampleIDs1 <- colnames(tmpMat1)
         sampleIDs1 <- gsub(pattern="\\.",replacement="-",sampleIDs1)
         samplesDat <- data.frame(matrix(nrow=length(sampleIDs1),ncol=7))
@@ -301,6 +267,6 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
           }
         }
       }
-    }
+    })
   }
 }
