@@ -26,6 +26,8 @@ setClass("FirehoseGISTIC", representation(Dataset = "character", AllByGene = "da
 #' An S4 class to store main data object from clinent function.
 #'
 #' @slot Dataset A cohort name
+#' @slot runDate Standard data run date from \code{\link{getFirehoseRunningDates}}
+#' @slot gistic2Date Analyze running date from \code{\link{getFirehoseAnalyzeDates}}
 #' @slot Clinical Clinical data frame
 #' @slot RNASeqGene Gene level expression data matrix from RNAseq
 #' @slot RNASeq2GeneNorm Gene level expression data matrix from RNAseq (RSEM)
@@ -41,13 +43,15 @@ setClass("FirehoseGISTIC", representation(Dataset = "character", AllByGene = "da
 #' @slot Mutations A data frame for mutation infromation from sequencing data
 #' @slot GISTIC A \code{FirehoseGISTIC} object to store processed copy number data
 #' @slot BarcodeUUID A data frame that stores the Barcodes, UUIDs and Short sample identifiers
-setClass("FirehoseData", representation(Dataset = "character", Clinical = "data.frame", RNASeqGene = "matrix",
+setClass("FirehoseData", representation(Dataset = "character", runDate = "character", gistic2Date = "character", Clinical = "data.frame", RNASeqGene = "matrix",
                                         RNASeq2GeneNorm="matrix",miRNASeqGene="matrix",CNASNP="data.frame",
                                         CNVSNP="data.frame",CNAseq="data.frame",CNACGH="list",Methylation="list",
                                         mRNAArray="list",miRNAArray="list",RPPAArray="list",Mutations="data.frame",
                                         GISTIC="FirehoseGISTIC",BarcodeUUID="data.frame"))
 setMethod("show", "FirehoseData",function(object){
   message(paste0(object@Dataset," FirehoseData object"))
+  message(paste0("Standard data run date: ", object@runDate))
+  message(paste0("Analyze running date: ", object@gistic2Date))
   message("Available slots:")
   if(dim(object@Clinical)[1] > 0 & dim(object@Clinical)[2] > 0){message("@Clinical: A data frame, dim: ",paste(dim(object@Clinical),collapse = "\t"))}
   if(dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0){message("@RNASeqGene: A matrix withraw read counts or normalized data, dim: ",paste(dim(object@RNASeqGene),collapse = "\t"))}

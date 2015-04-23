@@ -51,11 +51,11 @@ extract <- function(object, type, phenoData = TRUE){
     stop(paste("Type not yet supported or could not be matched."))
   }
   
-  bcID <- function(barcodes, center=FALSE, sample=FALSE, collapse=FALSE){
+  bcID <- function(barcodes, sample=FALSE, portion = FALSE, center=FALSE, collapse=FALSE){
     barcodes <- gsub("\\.", "-", barcodes)
     if(center){
       if(!sample){
-        bcc <- sapply(strsplit(barcodes, "-"),"[", c(5:7))
+        bcc <- sapply(strsplit(barcodes, "-"),"[", c(6:7))
         bcc <- tolower(t(bcc))
         return(bcc)
       } else {
@@ -65,14 +65,18 @@ extract <- function(object, type, phenoData = TRUE){
     } else {
       bcc <- lapply(strsplit(barcodes, "-"), "[", c(1:3))
       bcc <- tolower(sapply(bcc, paste, collapse="-"))
+      if(!sample & portion){
+        port <- tolower(sapply(strsplit(barcodes, "-"), "[", 5))
+        return(port)
+      }
       if(sample & collapse){
         samp <- lapply(strsplit(barcodes, "-"), "[", c(1:4))
         samp <- tolower(sapply(samp, paste, collapse="-"))
-        samp <- substr(samp, 1, nchar(samp)[1]-1)
+        samp <- substr(samp, 1, (nchar(samp)-1))
         return(samp)
       }else if(sample & !collapse){
         samp <- tolower(sapply(strsplit(barcodes, "-"), "[", 4))
-        samp <- substr(samp, 1,2)
+        samp <- as.numeric(substr(samp, 1, nchar(samp)-1))
         return(samp)
       }
     }
@@ -80,10 +84,10 @@ extract <- function(object, type, phenoData = TRUE){
   }
   
   if(dim(output)[1] == 0 | dim(output)[2] == 0){
-    message("There is no data for that data type!")
+    stop("There is no data for that data type!")
   } else {
-    if(phenoData){
-            
+      if(slotreq=="Methylation"){
+      annote <- output[,c("Gene_Symbol", "Chromosome", "Genomic_Coordinate")]      
       dm <- apply(output[4:ncol(output)], 2, as.numeric, as.matrix)
       rownames(dm) <- rownames(output)
       
@@ -91,62 +95,90 @@ extract <- function(object, type, phenoData = TRUE){
       
       # technical replicates and tumor/normals present
       if(length(dups) != 0){
+        # from TCGA Code Tables Report  
+        
+        sample_type <- samptab[,2][match(bcID(colnames(dm), sample=TRUE), samptab[,1])]
+        rightbc <- data.frame(sample_type, 
+                              sample_code = substr(bcID(colnames(dm), sample=TRUE), 1,2), vial = substr(bcID(colnames(dm), sample=TRUE, center=TRUE)[,1], 3,3),
+                              portion = substr(bcID(colnames(dm), portion=TRUE), 1,2), analyte = substr(bcID(colnames(dm), portion=TRUE), 3,3), 
+                              plate = bcID(colnames(dm), center=T)[,1], center = bcID(colnames(dm), center=T)[,2],  stringsAsFactors=FALSE)
+        rightbc[, "sample_code"] <- as.numeric(rightbc[,"sample_code"])
+        rownames(rightbc) <- bcID(colnames(dm), sample=TRUE, collapse=TRUE)
+              
         repeated <- dm[, bcID(colnames(dm)) %in% bcID(dups)]
-        samps <- as.numeric(bcID(colnames(repeated), sample=TRUE))
+        samps <- bcID(colnames(repeated), sample=TRUE)
         normals <- repeated[, samps >= 10 & samps <= 19]
-        controls <- repeated[, samps >= 20 & samps <= 29]
-        # follow up on controls
-        repeated <- repeated[, !bcID(colnames(repeated)) %in% bcID(colnames(normals))]
-        duplic <- colnames(repeated)[duplicated(bcID(colnames(repeated)))]
+        
+        if(range(samps)[2] > 19){
+          controls <- repeated[, samps >= 20 & samps <= 29]
+          replicates <- repeated[, !bcID(colnames(repeated)) %in% bcID(colnames(normals)) & 
+                                   !bcID(colnames(repeated)) %in% bcID(colnames(controls))]
+        } else {      
+        replicates <- repeated[, !bcID(colnames(repeated)) %in% bcID(colnames(normals))]
+        }
+        
+        duplic <- colnames(replicates)[duplicated(bcID(colnames(replicates)))]
         d <- c()
         for (cc in seq(duplic)){
-          d <- cbind(d, apply(repeated[,bcID(colnames(repeated)) %in% bcID(duplic[cc])], 1, mean))
+          d <- cbind(d, apply(replicates[,bcID(colnames(replicates)) %in% bcID(duplic[cc])], 1, mean))
         }
-        colnames(d) <- duplic
+        colnames(d) <- bcID(duplic)
         dm <- cbind(dm[,!(bcID(colnames(dm)) %in% bcID(dups))], d)
+        colnames(dm) <- bcID(colnames(dm))
       }
       
-      # tumors <- dm[, samps <= 9]
-      centerbc <- bcID(colnames(dm), center=TRUE, sample=TRUE)
-      colnames(centerbc) <- c("sample", "portion", "plate", "center")
-      rownames(centerbc) <- bcID(colnames(dm))
-      
-      pd <- getElement(object, "Clinical")
-      rownames(pd) <- gsub("\\.", "-", rownames(pd))
-      if(length(pd)==0){
-        stop("No clinical data available!")
-      }
-      
-      colnames(dm) <- bcID(colnames(dm))
+      if(phenoData){
+        
+        pd <- getElement(object, "Clinical")
+        rownames(pd) <- gsub("\\.", "-", rownames(pd))
+        if(length(pd)==0){
+          stop("No clinical data available!")
+        }
       
       npd <- pd[na.omit(match(bcID(colnames(dm)), rownames(pd))),]
-      npd <- merge(npd, centerbc, "row.names")
-      rownames(npd) <- npd[, "Row.names"]
+      npd <- cbind(npd, rightbc[match(rownames(npd), bcID(rownames(rightbc))),])
       npd <-  npd[, -1]
       
-      ndm <- dm[,na.omit(match(rownames(npd), colnames(dm)))]
+      # getLinks(".Merge_Clinical.Level_1", "*.tar[.]gz$")
+      cl_url <- "http://gdac.broadinstitute.org/runs/stddata__"
+      cl_url <- paste0(cl_url,substr(getElement(object, "runDate"),1,4),"_",substr(getElement(object, "runDate"),5,6),"_",substr(getElement(object, "runDate"),7,8),"/data/")
+      cl_url <- paste0(cl_url,getElement(object, "Dataset"),"/",getElement(object, "runDate"),"/")
+      cl_url <- paste0(cl_url, "gdac.broadinstitute.org_", getElement(object, "Dataset"), ".Merge_Clinical.Level_1.", getElement(object, "runDate"), "00.0.0.tar.gz")
+      download.file(url=cl_url, destfile=paste0(getElement(object, "Dataset"), "-ExClinical.tar.gz"), method="auto", quiet=TRUE, mode="w")
+      fileList <- untar(paste0(getElement(object, "Dataset"), "-ExClinical.tar.gz"), list=TRUE)
+      fileList <- grep(".clin.merged.txt", fileList, fixed = TRUE, value=TRUE)
+      untar(paste0(getElement(object, "Dataset"),"-ExClinical.tar.gz"),files=fileList)
+      file.rename(from=fileList,to=paste0(getElement(object, "runDate"),"-",getElement(object, "Dataset"),"-ExClinical.txt"))
+      file.remove(paste0(getElement(object, "Dataset"),"-ExClinical.tar.gz"))
+      unlink(strsplit(fileList[1],"/")[[1]][1], recursive = TRUE)
+      extracl <- fread(paste0(getElement(object, "runDate"),"-",getElement(object, "Dataset"),"-ExClinical.txt"), data.table=FALSE)
+      colnames(extracl)[-1] <- extracl[grep("patient_barcode", extracl[, 1]),][-1]
+      rownames(extracl) <- extracl[, 1]      
+      extracl <- extracl[,-1]
+      extracl <- t(extracl)
+      extracl <- extracl[,!grepl("patient_barcode", colnames(extracl))]
       
-      if(identical(all.equal(rownames(npd), colnames(ndm)), TRUE)){
-        eset <- ExpressionSet(ndm, AnnotatedDataFrame(npd))
+      phenoD <- merge(npd, extracl, "row.names")
+      rownames(phenoD) <- phenoD[,"Row.names"]
+      phenoD <- phenoD[, -1]
+      
+      ndm <- dm[,na.omit(match(rownames(phenoD), colnames(dm)))]
+      
+      
+      if(identical(all.equal(rownames(phenoD), colnames(ndm)), TRUE)){
+        eset <- ExpressionSet(ndm, AnnotatedDataFrame(phenoD))
+        featureData(eset) <- AnnotatedDataFrame(annote)
+        return(eset)
       }else{
         stop("Couldn't match up rownames of phenodata to colnames of numeric data")
+        return(dm)
+      }
+  
+      return(eset)
+      } else {
+        return(dm)
       }
       
-      return(eset)
-      #       ovextraclin <- fread("extraclinfilehere")
-      #       ovextraclin[grep("patient_barcode", ovextraclin[, 1]),][-1]
-      #       colnames(ovextraclin)[-1] <- ovextraclin[grep("patient_barcode", ovextraclin[, 1]),][-1]
-      #       rownames(ovextraclin) <- ovextraclin[, 1]      
-      #       jj <- ovextraclin[,match(rownames(npd), colnames(ovextraclin))]
-      #       featureData(eset) <- AnnotatedDataFrame(jj)
-      #       return(eset)
-    } else {
-      if(slotreq=="Methylation")
-      {
-        output <- output[, -c(1:3)]
-        colnames(output) <- bcID(colnames(output), sample = TRUE, collapse=TRUE)
-        return(output)  
-      }
     }
   }
 }

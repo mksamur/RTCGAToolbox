@@ -12,6 +12,10 @@ An S4 class to store main data object from clinent function.
 \describe{
 \item{\code{Dataset}}{A cohort name}
 
+\item{\code{runDate}}{Standard data run date from \code{\link{getFirehoseRunningDates}}}
+
+\item{\code{gistic2Date}}{Analyze running date from \code{\link{getFirehoseAnalyzeDates}}}
+
 \item{\code{Clinical}}{Clinical data frame}
 
 \item{\code{RNASeqGene}}{Gene level expression data matrix from RNAseq}

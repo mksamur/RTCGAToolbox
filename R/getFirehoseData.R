@@ -54,6 +54,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     runDateList <- getFirehoseRunningDates()
     if(!any(runDateList==runDate)){stop('Please use valid run date! "getFirehoseRunningDates" function gives you the vector of valid dates!')}
   }
+  
   if(!is.null(gistic2_Date))
   {
     if(!class(gistic2_Date)=="character" || !length(gistic2_Date) == 1 || !nchar(gistic2_Date) == 8)
@@ -318,6 +319,16 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   }
   
   resultClass <- new("FirehoseData", Dataset = dataset)
+  if(!is.null(runDate)){
+    resultClass@runDate <- runDate
+  } else { 
+    resultClass@runDate <- "N/A"
+  }
+  if(!is.null(gistic2_Date)){
+    resultClass@gistic2Date <- gistic2_Date
+  } else {
+    resultClass@gistic2Date <- "N/A"
+  }
   
   if(!is.null(runDate))
   {
