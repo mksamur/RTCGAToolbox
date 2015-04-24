@@ -29,23 +29,23 @@ extract <- function(object, type, phenoData = TRUE){
     elemlength <- length(getElement(object, slotreq))
     if(is(getElement(object, slotreq), "list")){
       if(elemlength > 1){
-        output <- lapply(getElement(object, slotreq), function(tmp){getElement(tmp, "DataMatrix")})
-        keeplist <- which.max(sapply(output, ncol))
-        output <- output[[keeplist]]
+        dm <- lapply(getElement(object, slotreq), function(tmp){getElement(tmp, "DataMatrix")})
+        keeplist <- which.max(sapply(dm, ncol))
+        dm <- dm[[keeplist]]
         warning(paste("Taking the array platform with the greatest number of samples:", keeplist))
       } else if(elemlength == 1){
-        output <- getElement(object, slotreq)[[1]]@DataMatrix
+        dm <- getElement(object, slotreq)[[1]]@DataMatrix
       } else if(elemlength == 0){
-        output <- matrix(NA, nrow=0, ncol=0)
+        dm <- matrix(NA, nrow=0, ncol=0)
       }
     } else {
-      output <- getElement(object, slotreq)
+      dm <- getElement(object, slotreq)
     }
   } else if(type %in% c("GISTIC_A", "GISTIC_T")) {
     if(type=="GISTIC_A"){
-      output <- getElement(object@GISTIC, "AllByGene")
+      dm <- getElement(object@GISTIC, "AllByGene")
     } else {
-      output <- getElement(object@GISTIC, "ThresholedByGene")
+      dm <- getElement(object@GISTIC, "ThresholedByGene")
     }
   } else {
     stop(paste("Type not yet supported or could not be matched."))
@@ -83,14 +83,14 @@ extract <- function(object, type, phenoData = TRUE){
     return(bcc)
   }
   
-  if(dim(output)[1] == 0 | dim(output)[2] == 0){
+  if(dim(dm)[1] == 0 | dim(dm)[2] == 0){
     stop("There is no data for that data type!")
   } else {
       if(slotreq=="Methylation"){
-      annote <- output[,c("Gene_Symbol", "Chromosome", "Genomic_Coordinate")]      
-      dm <- apply(output[4:ncol(output)], 2, as.numeric, as.matrix)
-      rownames(dm) <- rownames(output)
-      
+      annote <- dm[,c("Gene_Symbol", "Chromosome", "Genomic_Coordinate")]      
+      dm <- apply(dm[4:ncol(dm)], 2, as.numeric, as.matrix)
+      rownames(dm) <- rownames(dm)
+      }
       dups <- colnames(dm)[duplicated(bcID(colnames(dm)))]
       
       # technical replicates and tumor/normals present
@@ -167,7 +167,9 @@ extract <- function(object, type, phenoData = TRUE){
       
       if(identical(all.equal(rownames(phenoD), colnames(ndm)), TRUE)){
         eset <- ExpressionSet(ndm, AnnotatedDataFrame(phenoD))
-        featureData(eset) <- AnnotatedDataFrame(annote)
+        if(exists("annote")){
+          featureData(eset) <- AnnotatedDataFrame(annote)
+        }
         return(eset)
       }else{
         stop("Couldn't match up rownames of phenodata to colnames of numeric data")
@@ -175,11 +177,12 @@ extract <- function(object, type, phenoData = TRUE){
       }
   
       return(eset)
+      
       } else {
         return(dm)
       }
       
     }
   }
-}
+
   
