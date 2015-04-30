@@ -1,0 +1,354 @@
+---
+title: "RTCGAToolbox"
+author: "Mehmet Kemal Samur"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+
+
+references:
+- id: ref1
+  title: Comprehensive genomic characterization defines human glioblastoma genes and core pathways
+  author:
+  - family: Cancer Genome Atlas Research Network
+    given:
+  journal: Nature
+  volume: 455
+  number: 7216
+  pages: 1061-1068
+  issued:
+    year: 2008
+
+- id: ref2
+  title: GISTIC2.0 facilitates sensitive and confident localization of the targets of focal somatic copy-number alteration in human cancers
+  author:
+  - family: Mermel, C. H. and Schumacher, S. E. and Hill, B. and Meyerson, M. L. and Beroukhim, R. and Getz, G
+    given:
+  journal: Genome Biol
+  volume: 12
+  number: 4
+  pages: R41
+  issued:
+    year: 2011
+
+- id: ref3
+  title: Linear models and empirical bayes methods for assessing differential expression in microarray experiments
+  author:
+  - family: Smyth, G. K
+    given:
+  journal: Stat Appl Genet Mol Biol
+  volume: 3
+  number: 
+  pages: Article3
+  issued:
+    year: 2004
+
+- id: ref4
+  title: voom\:\ Precision weights unlock linear model analysis tools for RNA-seq read counts
+  author:
+  - family: Law, C. W. and Chen, Y. and Shi, W. and Smyth, G. K
+    given:
+  journal: Stat Appl Genet Mol Biol
+  volume: 15
+  number: 2
+  pages: R29
+  issued:
+    year: 2014
+
+- id: ref5
+  title: RCircos\:\ an R package for Circos 2D track plots
+  author:
+  - family: Zhang, H. and Meltzer, P. and Davis, S
+    given:
+  journal: BMC Bioinformatics
+  volume: 14
+  number: 
+  pages: 244
+  issued:
+    year: 2013
+
+- id: ref6
+  title: RTCGAToolbox\:\ A New Tool for Exporting TCGA Firehose Data
+  author:
+  - family: Samur MK.
+    given:
+  journal: Plos ONE
+  volume: 9
+  number: 9
+  pages: e106397
+  issued:
+    year: 2014
+
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+---
+
+
+
+# Introduction
+
+Managing data from large scale projects such as The Cancer Genome Atlas (TCGA)[@ref1] for further analysis is an important and time consuming step for research projects. Several efforts, such as Firehose project, make TCGA pre-processed data publicly available via web services and data portals but it requires managing, downloading and preparing the data for following steps. We developed an open source and extensible R based data client for Firehose Level 3 and Level 4 data and demonstrated its use with sample case studies. RTCGAToolbox could improve data management for researchers who are interested with TCGA data. In addition, it can be integrated with other analysis pipelines for further data analysis.  
+
+RTCGAToolbox is open-source and licensed under the GNU General Public License Version 2.0. All documentation and source code for RTCGAToolbox is freely available.  
+
+Currently, following functions are provided to access datasets and process datasets.
+
+* Control functions:
+    + getFirehoseRunningDates: This function can be called to access valid stddata run dates. To access data, users have to provide valid dates.
+    + getFirehoseAnalyzeDates: This function can be called to access valid analyze run dates. To access data, users have to provide valid dates. This function only affects the GISTIC2 [@ref2] processed copy estimate matrices.
+    + getFirehoseDatasets: This function can be called to access valid dataset aliases.
+* Data client function:
+    + getFirehoseData: This is the core function of the package. Users can access Firehose processed data via this function. Once it is called, several steps are realized by the library to access data. Finally this function returns an S4 object that keeps all the downloaded data.
+* Analysis Functions:
+    + getDiffExpressedGenes: This function takes "FirehoseData" object as an input and uses differential gene expression analysis to compare cancer and normal samples. Function takes "limma"[3-4] package advantages for performing analysis. In addition, sample and normal population is obtained from TCGA sample barcodes.
+    + getCNGECorrelation: This function calculates the correlation between gene expression values and copy number data. Users have to download GISTIC2 [@ref2] copy number estimates, as well as the expression data from at least one platform. 
+    + getMutationRate: From all samples that have mutation information, this function calculates the genes' mutation frequency.
+    + getSurvival: Performs an univariate survival comparison for individual genes between high and low expressed sample groups.
+    + getReport: Creates a circular pdf figure from differential gene expression, copy number and mutation information.
+    
+
+# Installation
+
+To install RTCGAToolbox, you can use Bioconductor. Source code is also available on GitHub. First time users use the following code snippet to install the package
+
+```{r eval=FALSE}
+source("http://bioconductor.org/biocLite.R")
+biocLite("RTCGAToolbox")
+```
+
+# Data Client
+Before getting the data from Firehose pipelines, users have to check valid dataset aliases, stddata run dates and analyze run dates. To provide valid information RTCGAToolbox comes with three control functions. Users can list datasets with "getFirehoseDatasets" function. In addition, users have to provide stddata run date or/and analyze run date for client function. Valid dates are accessible via "getFirehoseRunningDates" and "getFirehoseAnalyzeDates" functions. Below code chunk shows how to list datasets and dates.
+
+```{r}
+library(RTCGAToolbox)
+
+# Valid aliases
+getFirehoseDatasets()
+```
+```{r}
+# Valid stddata runs
+stddata = getFirehoseRunningDates()
+stddata
+```
+```{r}
+# Valid analysis running dates (will return 3 recent date)
+gisticDate = getFirehoseAnalyzeDates(last=3)
+gisticDate
+```
+When the dates and datasets are determined users can call data client function ("getFirehoseData") to access data. Current version can download multiple data types except ISOFORM and exon level data due to their huge data size. Below code chunk will download READ dataset with clinical and mutation data.
+
+```{r eval=TRUE,message=FALSE}
+# READ mutation data and clinical data 
+brcaData = getFirehoseData (dataset="READ", runDate="20150402",forceDownload = TRUE,
+               Clinic=TRUE, Mutation=TRUE)
+```
+Users has to set several parameters to get data they need. Below "getFirehoseData" options has been explained:
+
+* dataset: Users should set cohort code for the dataset they would like to download. List can be accessiable via getFirehoseDatasets() like as explained above.
+* runDate: Firehose project provides different data point for cohorts. Users can list dates by using function above. "getFirehoseRunningDates()" 
+* gistic2_Date: Just like cohorts Firehose project runs their analysis pipelines to process copy number data with GISTIC2 [@ref2]. Users who want to get GISTIC2 processed copy number data should set this date. List can be accessible via "getFirehoseAnalyzeDates()"
+
+Following logic keys are provided for different data types. By default client only download  clinical data.
+
+* RNAseq_Gene
+* Clinic
+* miRNASeq_Gene
+* RNAseq2_Gene_Norm
+* CNA_SNP
+* CNV_SNP
+* CNA_Seq
+* CNA_CGH
+* Methylation
+* Mutation
+* mRNA_Array
+* miRNA_Array
+* RPPA
+
+Users can also set following parameters to set client behavior.
+
+* forceDownload: By default RTCGAToolbox checks your working directory before download data. If you have data in the working directory from previous run it loads data by using these exports. If you would like to suppress  this and re download data you can force RTCGAToolbox.
+* fileSizeLimit: If you would like to set a limit for downloaded file size you can use this parameter. Huge data files require longer download time and memory to load. By default his parameter set as 500MB.
+* getUUIDs: Firehose provides TCGA barcodes for every sample. In some cases users may want to use UUIDs for samples. If this parameter set, then after processing data RTCGAToolbox gets UUIDs for each barcode.
+
+
+# Post analysis functions
+RTCGAToolbox has analyze functions to provide basic information about datasets. Analyze function includes differential gene expression analyze, correlation analysis between CN and GE data, univariate survival analysis, mutation frequency table and report figure.
+
+## Toy dataset
+Since downloading new dataset takes some time and requires enough space on hard drive, I will use nonsense data set for following steps.
+
+You can use following code snippet to load toy dataset.
+```{r}
+data(RTCGASample)
+RTCGASample
+```
+
+## Differential gene expression
+RTCGAToolbox hires voom[@ref4] and limma[@ref3] package functions to preform differential gene expression analysis between "Normal" and "Cancer" tissue samples. Every sample which is processed by TCGA project[@ref1] has a structured barcode number which includes the source of the tissue. RTCGAToolbox uses the barcode information to divide samples into "Normal" or "Tumor" groups and perform DGE analysis. Since "voom"[@ref4] requires raw count for RNASeq data, normalized RNASeq data cannot be used for the analysis.
+This function uses all gene expression datasets and returns a list which each member is "DGEResult" object. Each result object keeps top table from the genes that have 2 log fold change expression difference and significant adjusted p value.
+This function filters the results as a deafult behaviour using raw p value, adjusted p value and log fold change. Users can change "adj.pval", "raw.pval" and "logFC" parameters to refine their results. Also function uses Benjamini & Hochberg adjustment for p values. For more details about adjment users can check base adjustment methods by calling "?p.adjust". In addition to filter as a default behaviour function only draws heatmap for top 100 up and down regulated genes. Users can also adjust these values by using "hmTopUpN" and "hmTopDownN" parameters.
+
+```{r}
+# Differential gene expression analysis for gene level RNA data.
+diffGeneExprs = getDiffExpressedGenes(dataObject=RTCGASample,DrawPlots=TRUE,
+                                   adj.method="BH",adj.pval=0.05,raw.pval=0.05,
+                                   logFC=2,hmTopUpN=10,hmTopDownN=10)
+# Show head for expression outputs
+diffGeneExprs
+showResults(diffGeneExprs[[1]])
+toptableOut = showResults(diffGeneExprs[[1]])
+```
+If "DrawPlots" set as FALSE, running code above won't provide any output figure.
+
+Voom + limma: To voom (variance modeling at the observational level) is to estimate the mean-variance relationship robustly and non-parametrically from the data. Voom works with log-counts that are normalized for sequence depth, in particular with log-counts per million (log-cpm). The mean-variance is fitted to the gene-wise standard deviations of the log-cpm, as a function of the average log-count. This method incorporates the mean-variance trend into a precision weight for each individual normalized observation. The normalized log-counts and associated precision weights can then be entered into the limma analysis pipeline, or indeed into any statistical pipeline for microarray data that is precision weight aware[@ref3; @ref4]. Users can check the following publications for more information about methods: 
+
+[limma : Smyth, G. K. (2004). Linear models and empirical Bayes methods for assessing differential expression in microarray experiments. Statistical Applications in Genetics and Molecular Biology, Vol. 3, No. 1, Article 3.](http://www.ncbi.nlm.nih.gov/pubmed/16646809)
+
+[Voom: Law, CW, Chen, Y, Shi, W, Smyth, GK (2014). Voom: precision weights unlock linear model analysis tools for RNA-seq read counts. Genome Biology15, R29.](http://www.ncbi.nlm.nih.gov/pubmed/24485249)
+
+## Correlation between gene expression and copy number data
+"getCNGECorrelation" function provides correlation coefficient and adjusted p value between copy number and gene expression data for each dataset. This function takes main dataobject as an input (uses gene copy number estimates from GISTIC2 [@ref2] algorithm and gen expression values from every platform (RNAseq and arrays) to prepare return lists. List object stores "CorResult" object that contains results for each comparison.)
+```{r}
+#Correlation between gene expression values and copy number
+corrGECN = getCNGECorrelation(dataObject=RTCGASample,adj.method="BH",
+                              adj.pval=0.9,raw.pval=0.05)
+corrGECN
+showResults(corrGECN[[1]])
+corRes = showResults(corrGECN[[1]])
+```
+
+If the dataset has RNASeq data, data will be normalized for correlation analysis. Correlation function uses Benjamini & Hochberg adjustment for p values. For more details about adjment users can check base adjustment methods by calling "?p.adjust". In addition, to filter results adjusted and raw p values are used. Users can change "adj.pval" and "raw.pval" parameters to refine results.
+
+The RTCGAToolbox uses one of Pearson's product moment correlation coefficient to test for associations between paired samples. Measures of association, all in the range [-1, 1] with 0 indicating no association, shows how copy number alterations affect gene expression changes. The test statistic follows a t-distribution, with length (x)-2 degrees of freedom if the samples follow independent normal distributions. Users can get detailed information by calling `?cor.test` function
+
+## Mutation frequencies
+"getMutationRate" function gets the data frame that stores mutation frequency for the genes. This function gets the mutation information for each sample that has data and calculates frequency for each gene.
+
+```{r}
+# Mutation frequencies
+mutFrq = getMutationRate(dataObject=RTCGASample)
+head(mutFrq[order(mutFrq[,2],decreasing=TRUE),])
+```
+
+## Univariate survival analysis
+Survival analysis is considered as one of the methods that can provide clinically valuable information. To provide this information, the function creates 2 or 3 groups based on expression data.(If the dataset has RNASeq data, data will be normalized for survival analysis.). If function is triggered with 2 groups, RTCGAToolbox creates groups using the median expression level of individual genes. If group number is set to be 3, then the groups will be defined as: the samples in 1st. quartile (expression < 1st Q), the samples those have higher expression (expression > 3rd Q) and the samples lying in between these 2 groups.
+
+This function also needs a survival data, which can be obtained using clinical data frame. Clinical data frames can be obtained from main data downloads. First column of the survival data frame should be sample barcodes, second column should be time and the last column should be event data. Below code chunk shows how survival data frame can be obtained from clinical data and how survival analysis can be done.
+
+```{r fig.width=6,fig.height=6,fig.align='center'}
+# Creating survival data frame and running analysis for  
+# FCGBP which is one of the most frequently mutated gene in the toy data
+# Running following code will provide following KM plot.
+clinicData <- getData(RTCGASample,"Clinical")
+head(clinicData)
+clinicData = clinicData[,3:5]
+clinicData[is.na(clinicData[,3]),3] = clinicData[is.na(clinicData[,3]),2]
+survData <- data.frame(Samples=rownames(clinicData),
+                        Time=as.numeric(clinicData[,3]),
+                        Censor=as.numeric(clinicData[,1]))
+getSurvival(dataObject=RTCGASample,geneSymbols=c("FCGBP"),sampleTimeCensor=survData)
+```
+
+# Data Export
+You can export downloaded data from FirehoseData object by using 'getData()' function.
+```{r}
+# Note: This function is provided for real dataset test since the toy dataset is small.
+RTCGASample
+```
+```{r message=FALSE}
+RTCGASampleClinical = getData(RTCGASample,"Clinical")
+RTCGASampleRNAseqCounts = getData(RTCGASample,"RNASeqGene")
+RTCGASampleCN = getData(RTCGASample,"GISTIC")
+```
+# Reproducing BRCA results from original manuscript
+Following code block is provided to reproduce case study in the RTCGAToolbox paper[@ref6].
+
+```{r eval=FALSE}
+# BRCA data with mRNA (Both array and RNASeq), GISTIC processed copy number data
+# mutation data and clinical data 
+# (Depends on bandwidth this process may take long time)
+brcaData = getFirehoseData (dataset="BRCA", runDate="20140416", gistic2_Date="20140115",
+               Clinic=TRUE, RNAseq_Gene=TRUE, mRNA_Array=TRUE, Mutation=TRUE)
+
+# Differential gene expression analysis for gene level RNA data.
+# Heatmaps are given below.
+diffGeneExprs = getDiffExpressedGenes(dataObject=brcaData,DrawPlots=TRUE,
+                                   adj.method="BH",adj.pval=0.05,raw.pval=0.05,
+                                   logFC=2,hmTopUpN=100,hmTopDownN=100)
+# Show head for expression outputs
+diffGeneExprs
+showResults(diffGeneExprs[[1]])
+toptableOut = showResults(diffGeneExprs[[1]])
+
+# Correlation between expresiion profiles and copy number data
+corrGECN = getCNGECorrelation(dataObject=brcaData,adj.method="BH",
+                              adj.pval=0.05,raw.pval=0.05)
+
+corrGECN
+showResults(corrGECN[[1]])
+corRes = showResults(corrGECN[[1]])
+
+# Gene mutation frequincies in BRCA dataset
+mutFrq = getMutationRate(dataObject=brcaData)
+head(mutFrq[order(mutFrq[,2],decreasing=TRUE),])
+
+# PIK3CA which is one of the most frequently mutated gene in BRCA dataset
+# KM plot is given below.
+clinicData <- getData(brcaData,"Clinical")
+head(clinicData)
+clinicData = clinicData[,3:5]
+clinicData[is.na(clinicData[,3]),3] = clinicData[is.na(clinicData[,3]),2]
+survData <- data.frame(Samples=rownames(clinicData),
+                        Time=as.numeric(clinicData[,3]),
+                        Censor=as.numeric(clinicData[,1]))
+getSurvival(dataObject=brcaData,geneSymbols=c("PIK3CA"),sampleTimeCensor=survData)
+```
+
+Differentially expressed genes.</br>
+<img src="Figure2.png" height="300px" width="600px" />
+<br/>
+KM plot for PIK3CA on BRCA dataset.<br/>
+<img src="Figure3.png" height="400px" width="400px" />
+
+## Report figure
+This function provides an overall circle figure for the dataset by using the RCircos[@ref5]. This function uses differential gene expression analysis results (max results for 2 different platforms), copy number data estimates from GISTIC2 [@ref2] and mutation data.
+
+Outer circle shows the gene symbols that have mutation in at least 5% of the samples. Inner tracks show the significantly altered gene expressions as fold change and copy number changes where blue represents the deletions and red represents the amplifications.
+
+This function needs a genes location data frame, which can be obtained from "hg19.ucsc.gene.locations" data object. Please see the next section.
+
+```{r eval=FALSE}
+# Creating dataset analysis summary figure with getReport. 
+# Figure will be saved as PDF file.
+library("Homo.sapiens")
+locations = genes(Homo.sapiens,columns="SYMBOL")
+locations = as.data.frame(locations)
+locations <- locations[,c(6,1,5,2:3)]
+locations <- locations[!is.na(locations[,1]),]
+rownames(locations) <- locations[,1]
+getReport(dataObject=brcaData,DGEResult1=diffGeneExprs[[1]],
+DGEResult2=diffGeneExprs[[2]],geneLocations=locations)
+```
+Running code above will provide following circle plot.
+<img src="Figure4.png" height="600px" width="600px" />
+
+# Data Objects
+RTCGAToolbox provides toy data object for testing functions.
+* "RTCGASample" data is a FirehoseData object that stores RNAseq, copy number, muatation, clinical data for artificially created dataset.
+```{r}
+data(RTCGASample)
+```
+******
+```{r}
+sessionInfo()
+```
+
+# References
+
+
