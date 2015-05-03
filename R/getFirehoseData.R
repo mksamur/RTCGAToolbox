@@ -11,12 +11,12 @@
   {
     colOrder <- 2:ncol(tmpCols) 
   }
-  closeAllConnections()
+  #closeAllConnections()
   message(paste(dataType,"data will be imported! This may take a while!",sep=" "))
   message(paste0("Start: ",Sys.time()))
   tmpMat <- fread(paste0(runDate,"-",dataset,fileExt),header=FALSE,colClasses = "character", select=c(1,colOrder), data.table = FALSE)
   message(paste0("Done: " ,Sys.time()))
-  closeAllConnections()
+  #closeAllConnections()
   if(!arrayData)
   {
     colnames(tmpMat) <- tmpMat[1,]
@@ -192,7 +192,7 @@
   {
     message(dataURL)
     message(paste("File Size: ~"),format(as.numeric(asd[1,1])/(1024^2), digits=1, decimal.mark="."),"MB")
-    message("File above won't be donwloaded due to data size, RTCGAToolbox will skip this data!")
+    message("File above won't be downloaded due to data size, RTCGAToolbox will skip this data!")
     return(FALSE)
   }
   else
@@ -528,7 +528,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           
           tmpMat <- fread(paste0(runDate,"-",dataset,"-Methylation-",listCount,".txt"),header=FALSE,colClasses = "character", select=c(1,3,4,5,colOrder), data.table = FALSE)
           tmpMat <- tmpMat[,c(1,3,4,5,2,6:ncol(tmpMat))]
-          closeAllConnections()
+          #closeAllConnections()
           colnames(tmpMat) <- c("CompositeElementREF","Gene_Symbol","Chromosome","Genomic_Coordinate",tmpMat[1,5:ncol(tmpMat)])
           tmpMat <- tmpMat[-c(1:2),]
           removeQM <- grepl("\\?\\|",tmpMat[,1])
@@ -666,7 +666,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           }
           else
           {
-            #retMutations <- read.delim(file=paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"),header = T,sep="\t")
+            #retMutations <- read.delim(file=paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"),header = TRUE,sep="\t")
             retMutations <- fread(paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"),header=TRUE,colClasses="character", data.table = FALSE)
           }
           resultClass@Mutations <- retMutations 
