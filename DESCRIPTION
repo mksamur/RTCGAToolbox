@@ -5,23 +5,25 @@ Version: 1.99.2
 Date: 2015-04-26
 Author: Mehmet Kemal Samur
 Maintainer: Mehmet Kemal Samur <samur@jimmy.harvard.edu>
-Description: Managing data from large scale projects such as The Cancer
-        Genome Atlas (TCGA) for further analysis is an important and
-        time consuming step for research projects. Several efforts,
-        such as Firehose project, make TCGA pre-processed data publicly
-        available via web services and data portals but it requires
-        managing, downloading and preparing the data for following
-        steps. We developed an open source and extensible R based data
-        client for Firehose pre-processed data and demonstrated its use
-        with sample case studies. Results showed that RTCGAToolbox
-        could improve data management for researchers who are
-        interested with TCGA data. In addition, it can be integrated
-        with other analysis pipelines for following data analysis.
+Description: Managing data from large scale projects such as The Cancer Genome
+    Atlas (TCGA) for further analysis is an important and time consuming step
+    for research projects. Several efforts, such as Firehose project, make TCGA
+    pre-processed data publicly available via web services and data portals but
+    it requires managing, downloading and preparing the data for following
+    steps. We developed an open source and extensible R based data client for
+    Firehose pre-processed data and demonstrated its use with sample case
+    studies. Results showed that RTCGAToolbox could improve data management for
+    researchers who are interested with TCGA data. In addition, it can be
+    integrated with other analysis pipelines for following data analysis.
 License: GPL (>= 2)
 biocViews: Sequencing, DifferentialExpression, GeneExpression
 VignetteBuilder: knitr
-Suggests: BiocStyle, knitr, rmarkdown, Homo.sapiens
-Imports: methods,XML,limma (>= 3.18),survival,RCircos,data.table (>=
-        1.9.4),RCurl,RJSONIO
-Depends: R (>= 3.2.0)
-NeedsCompilation: no
+Suggests:
+    BiocStyle,
+    knitr,
+    rmarkdown,
+    Homo.sapiens
+Imports:
+    methods,XML,limma (>= 3.18),survival,RCircos,data.table (>= 1.9.4),RCurl,RJSONIO
+Depends:
+    R (>= 3.2.0)
