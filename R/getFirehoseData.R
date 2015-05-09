@@ -207,7 +207,7 @@
 {
   if(forceDownload || !file.exists(paste0(runDate,"-",dataset,exportName)))
   {
-    download.file(url=fileLink,destfile=paste(dataset,fileExt,sep=""),method="auto",quiet = FALSE, mode = "w")
+    download.file(url=fileLink,destfile=paste(dataset,fileExt,sep=""),method="auto",quiet = FALSE, mode = "wb")
     fileList <- untar(paste(dataset,fileExt,sep=""),list=TRUE)
     if(!subSearch)
     {
@@ -650,7 +650,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           if(forceDownload || !file.exists(paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt")))
           {
             download_link = paste(fh_url,ii,sep="")
-            download.file(url=download_link,destfile=paste(dataset,"-Mutation.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "w")
+            download.file(url=download_link,destfile=paste(dataset,"-Mutation.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "wb")
             fileList <- untar(paste0(dataset,"-Mutation.tar.gz"),list=TRUE)
             grepSearch = "MANIFEST.txt"
             fileList = fileList[!grepl(grepSearch,fileList)]
@@ -691,7 +691,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         if(forceDownload || !file.exists(paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt")))
         {
           download_link = paste(fh_url,ii,sep="")
-          download.file(url=download_link,destfile=paste0(dataset,"-Gistic2.tar.gz"),method="auto",quiet = FALSE, mode = "w")
+          download.file(url=download_link,destfile=paste0(dataset,"-Gistic2.tar.gz"),method="auto",quiet = FALSE, mode = "wb")
           fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
           grepSearch = "all_data_by_genes.txt"
           fileList = fileList[grepl(grepSearch,fileList)]
