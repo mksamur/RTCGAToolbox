@@ -237,6 +237,8 @@
     
     message(dirname(fileList))
     unlink(dirname(fileList), recursive = TRUE)
+  } else {
+    message(sprintf('Using locally cached version of %s',destfile))
   }
   return(destfile)
 }
