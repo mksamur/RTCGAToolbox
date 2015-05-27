@@ -1,7 +1,7 @@
-.makeExprMat <- function(dataset,fileExt,normMethod,dataType,mergeSize=1000,arrayData=FALSE,runDate)
+.makeExprMat <- function(file,normMethod,dataType,mergeSize=1000,arrayData=FALSE)
 {
   #Get selected type only
-  tmpCols = read.delim(paste0(runDate,"-",dataset,fileExt),nrows=1,colClasses="character")
+  tmpCols = read.delim(file,nrows=1,colClasses="character")
   if(!arrayData)
   {
     colOrder <- 1:ncol(tmpCols)
@@ -14,7 +14,7 @@
   #closeAllConnections()
   message(paste(dataType,"data will be imported! This may take a while!",sep=" "))
   message(paste0("Start: ",Sys.time()))
-  tmpMat <- fread(paste0(runDate,"-",dataset,fileExt),header=FALSE,colClasses = "character", select=c(1,colOrder), data.table = FALSE)
+  tmpMat <- fread(file,header=FALSE,colClasses = "character", select=c(1,colOrder), data.table = FALSE)
   message(paste0("Done: " ,Sys.time()))
   #closeAllConnections()
   if(!arrayData)
