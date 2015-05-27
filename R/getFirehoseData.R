@@ -238,6 +238,7 @@
     message(dirname(fileList))
     unlink(dirname(fileList), recursive = TRUE)
   }
+  return(destfile)
 }
 
 #' Get data from Firehose portal.
