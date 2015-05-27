@@ -203,12 +203,17 @@
 }
 
 .exportFiles <- function(fileLink,dataset,fileExt,searchName,subSearch=FALSE,
-                         exportName,manifest=FALSE,forceDownload=FALSE,runDate)
+                         exportName,manifest=FALSE,destdir=".",forceDownload=FALSE,runDate)
 {
-  if(forceDownload || !file.exists(paste0(runDate,"-",dataset,exportName)))
+  
+  if (destdir != ".") dir.create(destdir, recursive = TRUE, showWarnings = FALSE)
+  tcgafile <- paste0(dataset,fileExt,sep="")
+  destfile <- file.path(destdir, paste0(runDate,"-",dataset,exportName))
+  
+  if(forceDownload || !file.exists(destfile))
   {
-    download.file(url=fileLink,destfile=paste(dataset,fileExt,sep=""),method="auto",quiet = FALSE, mode = "wb")
-    fileList <- untar(paste(dataset,fileExt,sep=""),list=TRUE)
+    download.file(url=fileLink,destfile=tcgafile,method="auto",quiet = FALSE, mode = "wb")
+    fileList <- untar(tcgafile,list=TRUE)
     if(!subSearch)
     {
       fileList = fileList[grepl(searchName,fileList)]
@@ -225,12 +230,13 @@
         fileList = fileList[!grepl("MANIFEST.txt",fileList)]
       }
     }
-    untar(paste(dataset,fileExt,sep=""),files=fileList)
-    file.rename(from=fileList,to=paste0(runDate,"-",dataset,exportName))
-    file.remove(paste(dataset,fileExt,sep=""))
-    delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
-    message(delFodler)
-    unlink(delFodler, recursive = TRUE)
+
+    untar(tcgafile,files=fileList)
+    file.rename(from=fileList,to=destfile)
+    file.remove(tcgafile)
+    
+    message(dirname(fileList))
+    unlink(dirname(fileList), recursive = TRUE)
   }
 }
 
