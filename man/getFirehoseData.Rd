@@ -10,7 +10,7 @@ getFirehoseData(dataset, runDate = NULL, gistic2_Date = NULL,
   CNA_Seq = FALSE, CNA_CGH = FALSE, Methylation = FALSE,
   Mutation = FALSE, mRNA_Array = FALSE, miRNA_Array = FALSE,
   RPPA = FALSE, RNAseqNorm = "raw_counts",
-  RNAseq2Norm = "normalized_count", forceDownload = FALSE,
+  RNAseq2Norm = "normalized_count", forceDownload = FALSE, destdir = ".",
   fileSizeLimit = 500, getUUIDs = FALSE)
 }
 \arguments{
@@ -51,6 +51,8 @@ getFirehoseData(dataset, runDate = NULL, gistic2_Date = NULL,
 \item{RNAseq2Norm}{RNAseq v2 data normalization method. (Default normalized_count)}
 
 \item{forceDownload}{A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.}
+
+\item{destdir}{Directory in which to store the resulting downloaded file. Defaults to current working directory.}
 
 \item{fileSizeLimit}{Files that are larger than set value (megabyte) won't be downloaded (Default: 500)}
 

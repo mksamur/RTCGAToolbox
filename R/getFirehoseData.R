@@ -653,7 +653,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
       {
         if(.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
         {
-          if(forceDownload || !file.exists(paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt")))
+          if(forceDownload || !file.exists(paste0(destdir,"/",runDate,"-",dataset,"-Mutations-AllSamples.txt")))
           {
             download_link = paste(fh_url,ii,sep="")
             download.file(url=download_link,destfile=paste(dataset,"-Mutation.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "wb")
@@ -668,12 +668,12 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
             delFodler <- paste(getwd(),"/",strsplit(fileList[1],"/")[[1]][1],sep="")
             unlink(delFodler, recursive = TRUE)
             file.remove(paste(dataset,"-Mutation.tar.gz",sep=""))
-            write.table(retMutations,file=paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"),sep="\t",row.names=FALSE,quote=FALSE)
+            write.table(retMutations,file=paste0(destdir,"/",runDate,"-",dataset,"-Mutations-AllSamples.txt"),sep="\t",row.names=FALSE,quote=FALSE)
           }
           else
           {
             #retMutations <- read.delim(file=paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"),header = TRUE,sep="\t")
-            retMutations <- fread(paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"),header=TRUE,colClasses="character", data.table = FALSE)
+            retMutations <- fread(paste0(destdir,"/",runDate,"-",dataset,"-Mutations-AllSamples.txt"),header=TRUE,colClasses="character", data.table = FALSE)
           }
           resultClass@Mutations <- retMutations 
         }
@@ -694,7 +694,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     {
       if(.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
       {
-        if(forceDownload || !file.exists(paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt")))
+        if(forceDownload || !file.exists(paste0(destdir,"/",gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt")))
         {
           download_link = paste(fh_url,ii,sep="")
           download.file(url=download_link,destfile=paste0(dataset,"-Gistic2.tar.gz"),method="auto",quiet = FALSE, mode = "wb")
@@ -703,21 +703,21 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           fileList = fileList[grepl(grepSearch,fileList)]
           untar(paste(dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
           tmpCNAll = fread(fileList,header=TRUE,colClasses="character", data.table = FALSE)
-          file.rename(from=fileList,to=paste0(gistic2_Date,"-",dataset,"-all_data_by_genes.txt"))
+          file.rename(from=fileList,to=paste0(destdir,"/",gistic2_Date,"-",dataset,"-all_data_by_genes.txt"))
           fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
           grepSearch = "all_thresholded.by_genes.txt"
           fileList = fileList[grepl(grepSearch,fileList)]
           untar(paste(dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
           tmpCNThreshhold = fread(fileList,header=TRUE,colClasses = "character", data.table = FALSE)
-          file.rename(from=fileList,to=paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"))
+          file.rename(from=fileList,to=paste0(destdir,"/",gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"))
           delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
           unlink(delFodler, recursive = TRUE)
           file.remove(paste0(dataset,"-Gistic2.tar.gz"))
         }
         else
         {
-          tmpCNThreshhold = fread(paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"),header=TRUE,colClasses = "character", data.table = FALSE)
-          tmpCNAll = fread(paste0(gistic2_Date,"-",dataset,"-all_data_by_genes.txt"),header=TRUE,colClasses="character", data.table = FALSE)
+          tmpCNThreshhold = fread(paste0(destdir,"/",gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"),header=TRUE,colClasses = "character", data.table = FALSE)
+          tmpCNAll = fread(paste0(destdir,"/",gistic2_Date,"-",dataset,"-all_data_by_genes.txt"),header=TRUE,colClasses="character", data.table = FALSE)
         }
         tmpReturn <- new("FirehoseGISTIC",Dataset=dataset,AllByGene=data.frame(tmpCNAll),
                          ThresholedByGene=data.frame(tmpCNThreshhold))
