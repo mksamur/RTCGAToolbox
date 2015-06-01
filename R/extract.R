@@ -84,6 +84,22 @@ extract <- function(object, type, clinical = TRUE){
     return(bcc)
   }
   
+  rightbc <- function(mat){
+    dmat <- dm
+    if(slotreq %in% rangeslots && is(dm, "list")){
+      FUN = names
+    } else {
+      FUN = colnames
+    }
+    sample_type <- samptab[,2][match(bcID(FUN(dmat), sample=TRUE), samptab[,1])]
+    tb <- data.frame(sample_type, sample_code = substr(bcID(FUN(dmat), sample=TRUE), 1,2), vial = substr(bcID(FUN(dmat), sample=TRUE, center=TRUE)[,1], 3,3),
+                     portion = substr(bcID(FUN(dmat), portion=TRUE), 1,2), analyte = substr(bcID(FUN(dmat), portion=TRUE), 3,3), 
+                     plate = bcID(FUN(dmat), center=T)[,1], center = bcID(FUN(dmat), center=T)[,2],  stringsAsFactors=FALSE)
+    tb[, "sample_code"] <- as.numeric(tb[, "sample_code"])
+    rownames(tb) <- bcID(FUN(dmat), sample=TRUE, collapse=TRUE)
+    return(tb)
+  }
+  
   if(dim(dm)[1] == 0 | dim(dm)[2] == 0){
     stop("There is no data for that data type!")
   } else {
@@ -93,7 +109,13 @@ extract <- function(object, type, clinical = TRUE){
       dm <- apply(dm[grep("TCGA", names(dm))[1]:ncol(dm)], 2, as.numeric, as.matrix)
       rownames(dm) <- rNames
       if(any(grepl("\\.", colnames(dm)))){ colnames(dm) <- gsub("\\.", "-", colnames(dm)) }
-      dups <- colnames(dm)[duplicated(bcID(colnames(dm)))]
+      matches <- match(bcID(colnames(dm)), bcID(rownames(pd)))
+      dups <- bcID(colnames(dm), sample=T, collapse = T)[duplicated(bcID(colnames(dm), sample = T, collapse = T))]
+          clindup <- matrix(NA, nrow=ncol(dm))
+      rownames(clindup) <- bcID(colnames(dm), sample=T, collapse=T)
+      clindup <- cbind(clindup, pd[match(bcID(rownames(clindup)), bcID(rownames(pd))),])
+      clindup <- clindup[apply(clindup, 1, function(x) !all(is.na(x))),]
+      clindup <- clindup[, -c(1:2)]
     }
     rangeslots <- c("CNVSNP", "CNASNP", "CNAseq", "CNACGH")
     if(slotreq %in% rangeslots){
@@ -111,30 +133,14 @@ extract <- function(object, type, clinical = TRUE){
       dups <- names(tumors)[duplicated(bcID(names(tumors)))] 
     }
     
-    rightbc <- function(mat){
-      dmat <- dm
-      if(slotreq %in% rangeslots && is(dm, "list")){
-        FUN = names
-      } else {
-        FUN = colnames
-      }
-      sample_type <- samptab[,2][match(bcID(FUN(dmat), sample=TRUE), samptab[,1])]
-      tb <- data.frame(sample_type, sample_code = substr(bcID(FUN(dmat), sample=TRUE), 1,2), vial = substr(bcID(FUN(dmat), sample=TRUE, center=TRUE)[,1], 3,3),
-                       portion = substr(bcID(FUN(dmat), portion=TRUE), 1,2), analyte = substr(bcID(FUN(dmat), portion=TRUE), 3,3), 
-                       plate = bcID(FUN(dmat), center=T)[,1], center = bcID(FUN(dmat), center=T)[,2],  stringsAsFactors=FALSE)
-      tb[, "sample_code"] <- as.numeric(tb[, "sample_code"])
-      rownames(tb) <- bcID(FUN(dmat), sample=TRUE, collapse=TRUE)
-      return(tb)
-    }
     righttab <- rightbc(dm)
     # check if technical replicates and tumor/normals present
-    if(length(dups) != 0){
-      # from TCGA Code Tables Report    
+    if(length(dups) != 0){    
       if(!slotreq %in% rangeslots){
         repeated <- dm[, bcID(colnames(dm)) %in% bcID(dups)]
         tumors <- dm[, grepl("Tumor", righttab$sample_type)]
+        browser()
         normals <- dm[, grepl("Normal", righttab$sample_type)]
-        rFun <- colnames
         if(range(bcID(colnames(dm), sample=TRUE))[2] > 19){
           controls <- dm[, righttab$sample_code >= 20 & righttab$sample_code <= 29]
           replicates <- repeated[, !bcID(colnames(repeated)) %in% bcID(colnames(normals)) & 
@@ -145,8 +151,11 @@ extract <- function(object, type, clinical = TRUE){
         duplic <- colnames(replicates)[duplicated(bcID(colnames(replicates)))]
         d <- c()
         for (cc in seq(duplic)){
-          d <- cbind(d, apply(replicates[,bcID(rFun(replicates)) %in% bcID(duplic[cc])], 1, mean))
+          d <- cbind(d, apply(replicates[,bcID(colnames(replicates)) %in% bcID(duplic[cc])], 1, mean))
         }
+        colnames(d) <- bcID(duplic)
+        dm <- cbind(dm[, !(bcID(colnames(dm)) %in% bcID(dups))], d)
+        colnames(dm) <- bcID(colnames(dm))
       } else {
         replicates <- names(tumors)[gsub(".$", "", bcID(names(tumors), sample=T, collapse=T)) %in% gsub(".$", "", bcID(dups, sample=T, collapse=T))]
         # which(bcID(names(tumors), sample=T) %in% c(0:9))
@@ -156,10 +165,6 @@ extract <- function(object, type, clinical = TRUE){
 #           d <- cbind(d, apply(replicates[bcID(rFun(replicates)) %in% bcID(duplic[cc])], 1, mean))
 #         }
       }
-                
-      rFun(d) <- bcID(duplic)
-      dm <- cbind(dm[,!(bcID(rFun(dm)) %in% bcID(dups))], d)
-      rFun(dm) <- bcID(rFun(dm))
     }
     
     adt <- getElement(object, "runDate")

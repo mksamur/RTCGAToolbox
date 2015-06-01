@@ -509,7 +509,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                       "-CNACGH.tar.gz",
                       "[.]cna__.*.__Level_3__segmentation__seg.seg.txt$",
                       TRUE,
-                      paste0(dataset,"-CNACGH-",listCount,".txt"))
+                      paste0("-CNACGH-",listCount,".txt"))
           #Get selected type only
           tmpMat = fread(paste0(runDate,"-",dataset,"-CNACGH-",listCount,".txt"),
                          header=TRUE,colClasses=c("character","numeric","numeric","numeric","numeric","numeric"), 
@@ -716,13 +716,13 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
         grepSearch = "all_data_by_genes.txt"
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste0(dataset,"-Gistic2.tar.gz"),files=fileList,exdir=todir)
+        untar(paste0(dataset,"-Gistic2.tar.gz"),files=fileList)
         tmpCNAll = fread(fileList,header=TRUE,colClasses="character", data.table = FALSE)
         file.rename(from=fileList,to=paste0(gistic2_Date,"-",dataset,"-all_data_by_genes.txt"))
         fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
         grepSearch = "all_thresholded.by_genes.txt"
         fileList = fileList[grepl(grepSearch,fileList)]
-        untar(paste0(dataset,"-Gistic2.tar.gz"),files=fileList,exdir=todir)
+        untar(paste0(dataset,"-Gistic2.tar.gz"),files=fileList)
         tmpCNThreshhold = fread(fileList,header=T,colClasses = "character", data.table = FALSE)
         file.rename(from=fileList,to=paste0(gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"))
         delFodler <- strsplit(fileList[1],"/")[[1]][1]
