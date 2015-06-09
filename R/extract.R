@@ -109,32 +109,25 @@ extract <- function(object, type, clinical = TRUE){
       dm <- apply(dm[grep("TCGA", names(dm))[1]:ncol(dm)], 2, as.numeric, as.matrix)
       rownames(dm) <- rNames
       if(any(grepl("\\.", colnames(dm)))){ colnames(dm) <- gsub("\\.", "-", colnames(dm)) }
-            
+      
       dups <- bcID(colnames(dm), sample=T, collapse = T)[duplicated(bcID(colnames(dm), sample = T, collapse = T))]
+      
     }
     rangeslots <- c("CNVSNP", "CNASNP", "CNAseq", "CNACGH")
     if(slotreq %in% rangeslots){
       if(any(grepl("\\.", dm[, "Sample"]))){ dm[, "Sample"] <- gsub("\\.", "-", dm[, "Sample"]) }
       dm <- split(dm, dm$Sample)
-      sample_type <- samptab[,2][match(bcID(names(dm), sample=TRUE), samptab[,1])]
-      normals <- dm[grepl("Normal", sample_type)]
-      tumors <- dm[grepl("Tumor", sample_type)]
-      grtums <- GRangesList(lapply(tumors, FUN = function(gr){ GRanges(seqnames = paste0("chr", Rle(gr$Chromosome)), 
-                                                                       ranges = IRanges(gr$Start, gr$End), Num_Probes = gr$Num_Probes, 
-                                                                       Segment_Mean = gr$Segment_Mean)}) )
-      grnorms <- GRangesList(lapply(normals, FUN = function(gr){ GRanges(seqnames = paste0("chr", Rle(gr$Chromosome)), 
-                                                                        ranges = IRanges(gr$Start, gr$End), Num_Probes = gr$Num_Probes, 
-                                                                        Segment_Mean = gr$Segment_Mean)}) )
-      dups <- names(tumors)[duplicated(bcID(names(tumors)))] 
+      
+      dups <- names(dm)[duplicated(bcID(names(dm), sample=T,collapse=T))]
+      
     }
     
     righttab <- rightbc(dm)
     # check if technical replicates and tumor/normals present
     if(length(dups) != 0){    
       if(!slotreq %in% rangeslots){
-        repeated <- dm[, bcID(colnames(dm)) %in% bcID(dups)]
-#         tumors <- dm[, grepl("Tumor", righttab$sample_type)]
-#         normals <- dm[, grepl("Normal", righttab$sample_type)]
+        repeated <- dm[, bcID(colnames(dm), sample=T, collapse=T) %in% dups]
+        
         if(range(bcID(colnames(dm), sample=TRUE))[2] > 19){
           controls <- dm[, righttab$sample_code >= 20 & righttab$sample_code <= 29]
           replicates <- repeated[, !bcID(colnames(repeated)) %in% bcID(colnames(normals)) & 
@@ -192,29 +185,27 @@ extract <- function(object, type, clinical = TRUE){
       pd <- getElement(object, "Clinical")
       if(any(grepl("\\.", rownames(pd)))){ rownames(pd) <- gsub("\\.", "-", rownames(pd)) }
       if(length(pd)==0){ stop("No clinical data available!") }
+      clinextra <- dlClinx(object)
+      if(any(grepl("\\.", rownames(clinextra)))){ rownames(clinextra) <- gsub("\\.", "-", rownames(clinextra)) }
+      if(length(clinextra)==0){ message("No additional clinical information found!")}
+      pd <- merge(pd, clinextra, "row.names")
+      rownames(pd) <- pd[,"Row.names"]
+      pd <- pd[,-c(1,2)]
       
-#       matches <- match(bcID(colnames(dm)), bcID(rownames(pd)))
-
-            
+      
       if(!slotreq %in% rangeslots){
-        
         clindup <- matrix(NA, nrow=ncol(dm))
         rownames(clindup) <- bcID(colnames(dm), sample=T, collapse=T)
         clindup <- cbind(clindup, pd[match(bcID(rownames(clindup)), bcID(rownames(pd))),])
         clindup <- clindup[apply(clindup, 1, function(x) !all(is.na(x))),]
         clindup <- clindup[, -c(1:2)]
         clindup <- cbind(clindup, righttab[match(rownames(clindup), rownames(righttab)),])
+        colnames(dm) <- bcID(colnames(dm), sample=T, collapse=T)
         
-        clinextra <- dlClinx(object)
+        ndm <- dm[,na.omit(match(rownames(clindup), colnames(dm)))]
         
-        phenoD <- merge(npd, clinextra, "row.names")
-        rownames(phenoD) <- phenoD[,"Row.names"]
-        phenoD <- phenoD[, -1]
-        
-        ndm <- dm[,na.omit(match(rownames(phenoD), colnames(dm)))]
-        
-        if(identical(all.equal(rownames(phenoD), colnames(ndm)), TRUE)){
-          eset <- ExpressionSet(ndm, AnnotatedDataFrame(phenoD))
+        if(identical(all.equal(rownames(clindup), colnames(ndm)), TRUE)){
+          eset <- ExpressionSet(ndm, AnnotatedDataFrame(clindup))
           if(exists("annote")){
             featureData(eset) <- AnnotatedDataFrame(annote)
           }
@@ -223,25 +214,22 @@ extract <- function(object, type, clinical = TRUE){
           stop("Couldn't match up rownames of clinical to colnames of numeric data")
           return(dm)
         }
-      } else {
-              
-        addClin <- function(object){
-          clinextra <- dlClinx(object)
-          bpd <- merge(pd, clinextra, "row.names")
-          rownames(bpd) <- bpd[,1]
-          bpd <- bpd[,-1:-2]
-          tpd <- bpd[intersect(rownames(bpd), bcID(names(object))),]
-        rownames(tpd) <- bcID(names(object), sample=T, collapse=T)[na.omit(match(rownames(tpd), bcID(names(object))))]
-        object <- object[bcID(names(object), sample=T, collapse=T) %in% rownames(tpd)]
-        mcols(object) <- tpd
-        return(object)
-        }
-        grTum <- addClin(grtums)
-        grNorm <- addClin(grnorms)
+      } else if(slotreq %in% rangeslots) {
+        clindup <- matrix(NA, nrow=length(dm))
+        rownames(clindup) <- bcID(names(dm), sample=T, collapse=T)
+        clindup <- cbind(clindup, pd[match(bcID(rownames(clindup)), bcID(rownames(pd))),])
+        clindup <- clindup[apply(clindup, 1, function(x) !all(is.na(x))),]
+        clindup <- clindup[, -c(1:2)]
+        ## rightbc should work for GRLs
+        clindup <- cbind(clindup, righttab[match(rownames(clindup), rownames(righttab)),])
+        names(dm) <- bcID(names(dm), sample=T, collapse=T)
         
-        mygrList <- list(grTum, grNorm)
-        return(mygrList)
-        # names(grtums)[bcID(names(grtums)) %in% bcID(names(grtums)[duplicated(bcID(names(grtums)))])]
+        mygrl <- GRangesList(lapply(dm, FUN = function(gr){ GRanges(seqnames = paste0("chr", Rle(gr$Chromosome)), 
+                                                                         ranges = IRanges(gr$Start, gr$End), Num_Probes = gr$Num_Probes, 
+                                                                         Segment_Mean = gr$Segment_Mean)}) )
+        mcols(mygrl) <- clindup
+        return(mygrl)
+        }
       }
     }
   } 
