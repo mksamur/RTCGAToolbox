@@ -83,7 +83,7 @@ extract <- function(object, type, clinical = TRUE){
     }
     return(bcc)
   }
-  
+  # require just character vector input
   rightbc <- function(mat){
     dmat <- dm
     if(slotreq %in% rangeslots && is(dm, "list")){
@@ -117,6 +117,7 @@ extract <- function(object, type, clinical = TRUE){
     if(slotreq %in% rangeslots){
       if(any(grepl("\\.", dm[, "Sample"]))){ dm[, "Sample"] <- gsub("\\.", "-", dm[, "Sample"]) }
       dm <- split(dm, dm$Sample)
+      sample_type <- samptab[,2][match(bcID(names(dm), sample=TRUE), samptab[,1])]
       
       dups <- names(dm)[duplicated(bcID(names(dm), sample=T,collapse=T))]
       
