@@ -109,13 +109,8 @@ extract <- function(object, type, clinical = TRUE){
       dm <- apply(dm[grep("TCGA", names(dm))[1]:ncol(dm)], 2, as.numeric, as.matrix)
       rownames(dm) <- rNames
       if(any(grepl("\\.", colnames(dm)))){ colnames(dm) <- gsub("\\.", "-", colnames(dm)) }
-      matches <- match(bcID(colnames(dm)), bcID(rownames(pd)))
+            
       dups <- bcID(colnames(dm), sample=T, collapse = T)[duplicated(bcID(colnames(dm), sample = T, collapse = T))]
-          clindup <- matrix(NA, nrow=ncol(dm))
-      rownames(clindup) <- bcID(colnames(dm), sample=T, collapse=T)
-      clindup <- cbind(clindup, pd[match(bcID(rownames(clindup)), bcID(rownames(pd))),])
-      clindup <- clindup[apply(clindup, 1, function(x) !all(is.na(x))),]
-      clindup <- clindup[, -c(1:2)]
     }
     rangeslots <- c("CNVSNP", "CNASNP", "CNAseq", "CNACGH")
     if(slotreq %in% rangeslots){
@@ -138,9 +133,8 @@ extract <- function(object, type, clinical = TRUE){
     if(length(dups) != 0){    
       if(!slotreq %in% rangeslots){
         repeated <- dm[, bcID(colnames(dm)) %in% bcID(dups)]
-        tumors <- dm[, grepl("Tumor", righttab$sample_type)]
-        browser()
-        normals <- dm[, grepl("Normal", righttab$sample_type)]
+#         tumors <- dm[, grepl("Tumor", righttab$sample_type)]
+#         normals <- dm[, grepl("Normal", righttab$sample_type)]
         if(range(bcID(colnames(dm), sample=TRUE))[2] > 19){
           controls <- dm[, righttab$sample_code >= 20 & righttab$sample_code <= 29]
           replicates <- repeated[, !bcID(colnames(repeated)) %in% bcID(colnames(normals)) & 
@@ -194,15 +188,22 @@ extract <- function(object, type, clinical = TRUE){
     }
     if(!clinical){
       return(dm)
-    } else if(clinical){ 
+    } else if(clinical){
       pd <- getElement(object, "Clinical")
       if(any(grepl("\\.", rownames(pd)))){ rownames(pd) <- gsub("\\.", "-", rownames(pd)) }
       if(length(pd)==0){ stop("No clinical data available!") }
       
+#       matches <- match(bcID(colnames(dm)), bcID(rownames(pd)))
+
+            
       if(!slotreq %in% rangeslots){
-        npd <- pd[na.omit(match(bcID(colnames(dm)), rownames(pd))),]
-        npd <- cbind(npd, righttab[match(rownames(npd), bcID(rownames(righttab))),])
-        npd <-  npd[, -1]
+        
+        clindup <- matrix(NA, nrow=ncol(dm))
+        rownames(clindup) <- bcID(colnames(dm), sample=T, collapse=T)
+        clindup <- cbind(clindup, pd[match(bcID(rownames(clindup)), bcID(rownames(pd))),])
+        clindup <- clindup[apply(clindup, 1, function(x) !all(is.na(x))),]
+        clindup <- clindup[, -c(1:2)]
+        clindup <- cbind(clindup, righttab[match(rownames(clindup), rownames(righttab)),])
         
         clinextra <- dlClinx(object)
         
