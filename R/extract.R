@@ -83,20 +83,14 @@ extract <- function(object, type, clinical = TRUE){
     }
     return(bcc)
   }
-  # require just character vector input
-  rightbc <- function(mat){
-    dmat <- dm
-    if(slotreq %in% rangeslots && is(dm, "list")){
-      FUN = names
-    } else {
-      FUN = colnames
-    }
-    sample_type <- samptab[,2][match(bcID(FUN(dmat), sample=TRUE), samptab[,1])]
-    tb <- data.frame(sample_type, sample_code = substr(bcID(FUN(dmat), sample=TRUE), 1,2), vial = substr(bcID(FUN(dmat), sample=TRUE, center=TRUE)[,1], 3,3),
-                     portion = substr(bcID(FUN(dmat), portion=TRUE), 1,2), analyte = substr(bcID(FUN(dmat), portion=TRUE), 3,3), 
-                     plate = bcID(FUN(dmat), center=T)[,1], center = bcID(FUN(dmat), center=T)[,2],  stringsAsFactors=FALSE)
+  
+  rightbc <- function(bcodes){
+    sample_type <- samptab[,2][match(bcID(bcodes, sample=TRUE), samptab[,1])]
+    tb <- data.frame(sample_type, sample_code = substr(bcID(bcodes, sample=TRUE), 1,2), vial = substr(bcID(bcodes, sample=TRUE, center=TRUE)[,1], 3,3),
+                     portion = substr(bcID(bcodes, portion=TRUE), 1,2), analyte = substr(bcID(bcodes, portion=TRUE), 3,3), 
+                     plate = bcID(bcodes, center=T)[,1], center = bcID(bcodes, center=T)[,2],  stringsAsFactors=FALSE)
     tb[, "sample_code"] <- as.numeric(tb[, "sample_code"])
-    rownames(tb) <- bcID(FUN(dmat), sample=TRUE, collapse=TRUE)
+    rownames(tb) <- bcID(bcodes, sample=TRUE, collapse=TRUE)
     return(tb)
   }
   
@@ -111,7 +105,6 @@ extract <- function(object, type, clinical = TRUE){
       if(any(grepl("\\.", colnames(dm)))){ colnames(dm) <- gsub("\\.", "-", colnames(dm)) }
       
       dups <- bcID(colnames(dm), sample=T, collapse = T)[duplicated(bcID(colnames(dm), sample = T, collapse = T))]
-      
     }
     rangeslots <- c("CNVSNP", "CNASNP", "CNAseq", "CNACGH")
     if(slotreq %in% rangeslots){
@@ -120,10 +113,11 @@ extract <- function(object, type, clinical = TRUE){
       sample_type <- samptab[,2][match(bcID(names(dm), sample=TRUE), samptab[,1])]
       
       dups <- names(dm)[duplicated(bcID(names(dm), sample=T,collapse=T))]
-      
+      righttab <- rightbc(names(dm)) 
+    } else {
+      righttab <- rightbc(colnames(dm))
     }
-    
-    righttab <- rightbc(dm)
+
     # check if technical replicates and tumor/normals present
     if(length(dups) != 0){    
       if(!slotreq %in% rangeslots){
@@ -180,6 +174,7 @@ extract <- function(object, type, clinical = TRUE){
       extracl <- extracl[,!grepl("patient_barcode", colnames(extracl))]
       return(extracl)
     }
+    
     if(!clinical){
       return(dm)
     } else if(clinical){
@@ -221,10 +216,9 @@ extract <- function(object, type, clinical = TRUE){
         clindup <- cbind(clindup, pd[match(bcID(rownames(clindup)), bcID(rownames(pd))),])
         clindup <- clindup[apply(clindup, 1, function(x) !all(is.na(x))),]
         clindup <- clindup[, -c(1:2)]
-        ## rightbc should work for GRLs
         clindup <- cbind(clindup, righttab[match(rownames(clindup), rownames(righttab)),])
         names(dm) <- bcID(names(dm), sample=T, collapse=T)
-        
+        dm <- dm[na.omit(match(rownames(clindup), names(dm)))]
         mygrl <- GRangesList(lapply(dm, FUN = function(gr){ GRanges(seqnames = paste0("chr", Rle(gr$Chromosome)), 
                                                                          ranges = IRanges(gr$Start, gr$End), Num_Probes = gr$Num_Probes, 
                                                                          Segment_Mean = gr$Segment_Mean)}) )
