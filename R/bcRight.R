@@ -5,6 +5,8 @@
 #' @param barcodes A character vector of TCGA barcodes
 #' @return A dataframe with sample type, sample code, vial, portion, analyte, plate, and center columns. 
 #' 
+#' @author Marcel Ramos
+#' 
 #' @examples 
 #' 
 #' \dontrun{

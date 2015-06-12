@@ -2,6 +2,7 @@
 #' 
 #' This function returns the specified snippet of information obtained from the TCGA barcode. 
 #' 
+#' 
 #' @param barcodes A character vector of TCGA barcodes
 #' @param part Logical (default TRUE) participant identifier chunk
 #' @param sample Logical (default FALSE) includes the numeric sample code of the barcode
@@ -11,6 +12,8 @@
 #' @param center Logical (default FALSE) returns a matrix with the plate and center codes
 #' @param collapse Logical (default FALSE) concatenates requested barcode chunks
 #' @return A character vector or data matrix of TCGA barcode information
+#' 
+#' @author Marcel Ramos
 #' 
 #' @examples 
 #' 
