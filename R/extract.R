@@ -22,12 +22,16 @@
 #' 
 #' @export
 extract <- function(object, type, clinical = TRUE){
-  choices <- c("RNAseq_Gene", "miRNASeq_Gene",
+  if(!is.character(type)){
+     stop("Data type must be a character string!")
+  }
+  type <- tolower(gsub("_", "", type))
+  choices <- tolower(gsub("_", "", c("RNAseq_Gene", "miRNASeq_Gene",
                "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP", "CNA_Seq",
                "CNA_CGH", "Methylation", "Mutation", "mRNA_Array",
-               "miRNA_Array", "RPPA") 
+               "miRNA_Array", "RPPA")))
   if(type %in% choices){
-    slotreq <- grep(paste0("^", gsub("_", "", type))  , slotNames(object), 
+    slotreq <- grep(paste0("^", type) , slotNames(object), 
                     ignore.case=TRUE, perl=TRUE, value=TRUE)
     elemlength <- length(getElement(object, slotreq))
     if(is(getElement(object, slotreq), "list")){
@@ -44,15 +48,15 @@ extract <- function(object, type, clinical = TRUE){
     } else {
       dm <- getElement(object, slotreq)
     }
-  } else if(type %in% c("GISTIC_A", "GISTIC_T")) {
-    if(type=="GISTIC_A"){
+  } else if(type %in% c("gistica", "gistict")) {
+    if(type=="gistica"){
       slotreq <- "AllByGene"
     } else {
       slotreq <- "TresholedByGene"
     }
     dm <- getElement(object@GISTIC, slotreq)
   } else {
-    stop(paste("Type not yet supported or could not be matched."))
+    stop(paste("Data type not yet supported or could not be matched."))
   }
   
   if(dim(dm)[1] == 0 | dim(dm)[2] == 0){
@@ -66,7 +70,7 @@ extract <- function(object, type, clinical = TRUE){
       dm <- apply(dm[grep("TCGA", names(dm))[1]:ncol(dm)], 2, as.numeric, as.matrix)
       rownames(dm) <- rNames
       if(any(grepl("\\.", colnames(dm)))){ colnames(dm) <- gsub("\\.", "-", colnames(dm)) }
-      
+	righttab <- bcRight(colnames(dm))
       dups <- bcIDR(colnames(dm), sample=T, collapse = T)[duplicated(bcIDR(colnames(dm), sample = T, collapse = T))]
     } else if(slotreq %in% rangeslots) {
       if(slotreq=="Mutations"){
@@ -78,6 +82,7 @@ extract <- function(object, type, clinical = TRUE){
       dups <- bcIDR(names(dm), sample=T, collapse=T)[duplicated(bcIDR(names(dm), sample=T, collapse = T))]
       righttab <- bcRight(names(dm)) 
     } else {
+      dups <- bcIDR(colnames(dm), sample=T, collapse=T)[duplicated(bcIDR(colnames(dm), sample=T, collapse = T))]
       righttab <- bcRight(colnames(dm))
     }
     
