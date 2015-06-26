@@ -143,8 +143,19 @@ extract <- function(object, type, clinical = TRUE){
       pd <- merge(pd, clinextra, "row.names")
       rownames(pd) <- pd[,"Row.names"]
       pd <- pd[,-c(1,2)]
-      
-      
+
+      cleanDupCols <- function(object){
+	if(is(object, "list")){
+	cleanObj <- lapply(object, function(UBC) {	
+	UBC[!duplicated(lapply(UBC, c))]
+	}) 
+	return(cleanObj)
+	} else if(is.data.frame(object)){
+	object <- object[,!duplicated(lapply(object, c))]
+	return(object)
+	}
+}
+	pd <- cleanDupCols(pd)    
       if(!slotreq %in% rangeslots){
         clindup <- matrix(NA, nrow=ncol(dm))
         rownames(clindup) <- bcIDR(colnames(dm), sample=T, collapse=T)
@@ -175,20 +186,28 @@ extract <- function(object, type, clinical = TRUE){
         clindup <- cbind(clindup, righttab[match(rownames(clindup), rownames(righttab)),])
         names(dm) <- bcIDR(names(dm), sample=T, collapse=T)
         dm <- dm[na.omit(match(rownames(clindup), names(dm)))]
+	# dm <- cleanDupCols(dm)
+ 	dm <- lapply(dm, FUN = function(ubc) { names(ubc) <- tolower(names(ubc)) 
+						ubc } )
         if(slotreq=="Mutations"){
-          mygrl <- GRangesList(lapply(dm, FUN = function(gr){ GRanges(seqnames = paste0("chr", Rle(gr$Chromosome)), 
-                                                                      ranges = IRanges(as.numeric(gr$Start_Position), as.numeric(gr$End_Position)), strand = gr$Strand, 
-                                                                      gr[, !grepl("Chromosome|Start_Position|End_Position|Strand", fixed = T, names(gr))] )} ))
+
+	metdat <- lapply(dm, FUN = function(lt) { lt <- lt[, !names(lt) %in% c("chromosome","start_position", "end_position", "strand", 
+		"center","start","end","gene","dataset","type","chr","ref_allele","tum_allele1","tum_allele2")]
+							lt  } )
+        mygrl <- GRangesList(lapply(dm, FUN = function(gr){ GRanges(seqnames = paste0("chr", Rle(gr$chromosome)), 
+                                                                      ranges = IRanges(as.numeric(gr$start_position), as.numeric(gr$end_position)), strand = gr$strand 
+                                                                      )}))
+	metdat <- cleanDupCols(metdat)
+	mygrl@metadata <- metdat	
         } else {
-          mygrl <- GRangesList(lapply(dm, FUN = function(gr){ GRanges(seqnames = paste0("chr", Rle(gr$Chromosome)), 
-                                                                      ranges = IRanges(gr$Start, gr$End), Num_Probes = gr$Num_Probes, 
-                                                                      Segment_Mean = gr$Segment_Mean)} ))
+        mygrl <- GRangesList(lapply(dm, FUN = function(gr){ GRanges(seqnames = paste0("chr", Rle(gr$chromosome)), 
+                                                                      ranges = IRanges(gr$start, gr$end), Num_Probes = gr$num_probes, 
+                                                                      Segment_Mean = gr$segment_mean)} ))
         }
         mcols(mygrl) <- clindup
         return(mygrl)
       }
       }
     }
-  } 
-
+}
   
