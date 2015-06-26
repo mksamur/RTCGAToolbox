@@ -87,7 +87,7 @@ extract <- function(object, type, clinical = TRUE){
     }
     
     # check for presence of technical replicates
-    if(length(dups) != 0){    
+    if(length(dups) != 0){ 
       if(!slotreq %in% rangeslots){
         repeated <- dm[, bcIDR(colnames(dm), sample=T, collapse=T) %in% dups]
         duplic <- bcIDR(colnames(repeated), sample=T, collapse=T)[duplicated(bcIDR(colnames(repeated), sample=T, collapse=T))]
@@ -100,8 +100,9 @@ extract <- function(object, type, clinical = TRUE){
         colnames(dm) <- bcIDR(colnames(dm))
       } else {
         repeated <- names(dm)[bcIDR(names(dm), sample=T, collapse=T) %in% dups]
-        duplic <- bcIDR(repeated, sample=T, collapse=T)[duplicated(bcIDR(repeated, sample=T, collapse=T))]
-        # what to do with technical replicates of range data types?
+	# dropping technical replicates 
+	dm <- dm[!duplicated(bcIDR(names(dm), sample=T, collapse=T))]
+	duplic <- bcIDR(repeated, sample=T, collapse=T)[duplicated(bcIDR(repeated, sample=T, collapse=T))]
       }
     }
     
@@ -154,8 +155,9 @@ extract <- function(object, type, clinical = TRUE){
 	object <- object[,!duplicated(lapply(object, c))]
 	return(object)
 	}
-}
+    }
 	pd <- cleanDupCols(pd)    
+
       if(!slotreq %in% rangeslots){
         clindup <- matrix(NA, nrow=ncol(dm))
         rownames(clindup) <- bcIDR(colnames(dm), sample=T, collapse=T)
@@ -186,7 +188,6 @@ extract <- function(object, type, clinical = TRUE){
         clindup <- cbind(clindup, righttab[match(rownames(clindup), rownames(righttab)),])
         names(dm) <- bcIDR(names(dm), sample=T, collapse=T)
         dm <- dm[na.omit(match(rownames(clindup), names(dm)))]
-	# dm <- cleanDupCols(dm)
  	dm <- lapply(dm, FUN = function(ubc) { names(ubc) <- tolower(names(ubc)) 
 						ubc } )
         if(slotreq=="Mutations"){
@@ -210,4 +211,4 @@ extract <- function(object, type, clinical = TRUE){
       }
     }
 }
-  
+
