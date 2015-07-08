@@ -1,4 +1,4 @@
-#' Extract data from \code{FirehoseData} object into \code{ExpressionSet} or \code{GRagesList} object
+#' Extract data from \code{FirehoseData} object into \code{ExpressionSet} or \code{GRangesList} object
 #' 
 #' This extracts data from a \code{FirehoseData} object and converts it to a structured S4 
 #' object for analysis. An option is available to retreive clinical data. The function 
@@ -206,6 +206,7 @@ extract <- function(object, type, clinical = TRUE){
                                                                       Segment_Mean = gr$segment_mean)} ))
         }
         mcols(mygrl) <- clindup
+        rownames(mygrl@elementMetadata) <- names(mygrl)
         return(mygrl)
       }
       }
