@@ -23,6 +23,6 @@ Suggests:
     knitr,
     rmarkdown
 Imports:
-    methods,XML,limma (>= 3.18),survival,RCircos,data.table (>= 1.9.4),RCurl,RJSONIO,IRanges,S4Vectors,Biobase
+    methods,XML,limma (>= 3.18),survival,RCircos,data.table (>= 1.9.4),RCurl,RJSONIO,IRanges,S4Vectors
 Depends:
-    R (>= 3.0.2), GenomicRanges
+    R (>= 3.0.2), GenomicRanges, Biobase

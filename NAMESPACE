@@ -8,7 +8,6 @@ import(RCurl)
 import(RJSONIO)
 import(S4Vectors)
 import(IRanges)
-import(Biobase)
 exportPattern("^[^\\.]")
 exportPattern("^[[:alpha:]]+")
 exportClasses(
