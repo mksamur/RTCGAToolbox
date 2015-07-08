@@ -6,6 +6,8 @@ import(RCircos)
 import(data.table)
 import(RCurl)
 import(RJSONIO)
+import(S4Vectors)
+import(IRanges)
 exportPattern("^[^\\.]")
 exportPattern("^[[:alpha:]]+")
 exportClasses(
