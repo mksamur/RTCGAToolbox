@@ -26,6 +26,7 @@ extract <- function(object, type, clinical = TRUE){
      stop("Data type must be a character string!")
   }
   type <- tolower(gsub("_", "", type))
+  if(grepl("s$", type)) {gsub("s$", "", type)}
   choices <- tolower(gsub("_", "", c("RNAseq_Gene", "miRNASeq_Gene",
                "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP", "CNA_Seq",
                "CNA_CGH", "Methylation", "Mutation", "mRNA_Array",
