@@ -735,7 +735,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         tmpCNAll = fread(paste0(gistic2_Date,"-",dataset,"-all_data_by_genes.txt"),header=TRUE,colClasses="character", data.table = FALSE)
       }
       tmpReturn <- new("FirehoseGISTIC",Dataset=dataset,AllByGene=data.frame(tmpCNAll),
-                       ThresholedByGene=data.frame(tmpCNThreshhold))
+                       ThresholdedByGene=data.frame(tmpCNThreshhold))
       resultClass@GISTIC <- tmpReturn
       }
     }

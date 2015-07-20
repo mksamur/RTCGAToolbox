@@ -14,6 +14,6 @@ An S4 class to store processed copy number data. (Data processed by using GISTIC
 
 \item{\code{AllByGene}}{A data frame that stores continuous copy number}
 
-\item{\code{ThresholedByGene}}{A data frame for discrete copy number data}
+\item{\code{ThresholdedByGene}}{A data frame for discrete copy number data}
 }}
 

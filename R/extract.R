@@ -53,7 +53,7 @@ extract <- function(object, type, clinical = TRUE){
     if(type=="gistica"){
       slotreq <- "AllByGene"
     } else {
-      slotreq <- "TresholedByGene"
+      slotreq <- "ThresholdedByGene"
     }
     dm <- getElement(object@GISTIC, slotreq)
   } else {
@@ -65,7 +65,7 @@ extract <- function(object, type, clinical = TRUE){
   } else {
     rangeslots <- c("CNVSNP", "CNASNP", "CNAseq", "CNACGH", "Mutations")
     
-    if(slotreq %in% c("Methylation", "AllByGene", "ThresholedByGene")){
+    if(slotreq %in% c("Methylation", "AllByGene", "ThresholdedByGene")){
       annote <- dm[, seq(grep("TCGA", names(dm))[1]-1) ]
       rNames <- rownames(dm)
       dm <- apply(dm[grep("TCGA", names(dm))[1]:ncol(dm)], 2, as.numeric, as.matrix)

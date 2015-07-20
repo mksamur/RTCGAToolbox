@@ -20,8 +20,8 @@ setClass("FirehosemRNAArray", representation(Filename = "character", DataMatrix 
 #'
 #' @slot Dataset Cohort name
 #' @slot AllByGene A data frame that stores continuous copy number
-#' @slot ThresholedByGene A data frame for discrete copy number data
-setClass("FirehoseGISTIC", representation(Dataset = "character", AllByGene = "data.frame",ThresholedByGene="data.frame"))
+#' @slot ThresholdedByGene A data frame for discrete copy number data
+setClass("FirehoseGISTIC", representation(Dataset = "character", AllByGene = "data.frame",ThresholdedByGene="data.frame"))
 
 #' An S4 class to store main data object from clinent function.
 #'
