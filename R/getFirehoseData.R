@@ -604,7 +604,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                       paste0("-miRNAArray-",listCount,".txt"),
                       TRUE,destdir,forceDownload,runDate)
           tmpReturn <- new("FirehosemRNAArray",Filename=ii,
-                           DataMatrix=.makeExprMat(export.file,"","miRNAArray",100,TRUE,runDate))
+                           DataMatrix=.makeExprMat(export.file,"","miRNAArray",100,TRUE))
           dataLists[[listCount]] <- tmpReturn
           listCount = listCount + 1 
         }
