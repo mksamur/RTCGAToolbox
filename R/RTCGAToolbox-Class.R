@@ -1,27 +1,67 @@
+.getListData <- function(object,platform){
+  if(is.null(platform)){stop("Please set platform")}
+  switch(class(platform),
+         "numeric"={
+           if(platform > length(object)){
+             message("Accessible platforms:")
+             for(i in 1:length(object)){
+               message(paste0("#",i," :",object[[i]]@Filename))
+             }
+             stop("Invalid list member")
+           }
+           invisible(object[[platform]]@DataMatrix)
+         },
+        {
+          message("Accessible platforms:")
+          for(i in 1:length(object)){
+            message(paste0("#",i," :",object[[i]]@Filename))
+          }
+          stop("Set a valid platfrom")
+        }
+  )
+}
+
 #' An S4 class to store data from CGA platforms
 #'
 #' @slot Filename Platform name
 #' @slot DataMatrix A data frame that stores the CGH data.
 setClass("FirehoseCGHArray", representation(Filename = "character", DataMatrix = "data.frame"))
+setMethod("show", "FirehoseCGHArray",function(object){
+  message(paste0("Platform:", object@Filename))
+  if(dim(object@DataMatrix)[1] > 0 ){message("FirehoseCGHArray object, dim: ",paste(dim(object@DataMatrix),collapse = "\t"))}
+})
 
 #' An S4 class to store data from methylation platforms
 #'
 #' @slot Filename Platform name
 #' @slot DataMatrix A data frame that stores the methylation data.
 setClass("FirehoseMethylationArray", representation(Filename = "character", DataMatrix = "data.frame"))
+setMethod("show", "FirehoseMethylationArray",function(object){
+  message(paste0("Platform:", object@Filename))
+  if(dim(object@DataMatrix)[1] > 0 ){message("FirehoseMethylationArray object, dim: ",paste(dim(object@DataMatrix),collapse = "\t"))}
+})
+
 
 #' An S4 class to store data from array (mRNA, miRNA etc.) platforms
 #'
 #' @slot Filename Platform name
 #' @slot DataMatrix A data matrix that stores the expression data.
 setClass("FirehosemRNAArray", representation(Filename = "character", DataMatrix = "matrix"))
+setMethod("show", "FirehosemRNAArray",function(object){
+  message(object@Filename)
+  if(dim(object@DataMatrix)[1] > 0 ){message("FirehoseCGHArray object, dim: ",paste(dim(object@DataMatrix),collapse = "\t"))}
+})
 
 #' An S4 class to store processed copy number data. (Data processed by using GISTIC2 algorithm)
 #'
 #' @slot Dataset Cohort name
 #' @slot AllByGene A data frame that stores continuous copy number
 #' @slot ThresholdedByGene A data frame for discrete copy number data
-setClass("FirehoseGISTIC", representation(Dataset = "character", AllByGene = "data.frame",ThresholdedByGene="data.frame"))
+setClass("FirehoseGISTIC", representation(Dataset = "character", AllByGene = "data.frame",ThresholedByGene="data.frame"))
+setMethod("show", "FirehoseGISTIC",function(object){
+  message(paste0("Dataset:", object@Dataset))
+  if(dim(object@AllByGene)[1] > 0 ){message("FirehoseGISTIC object, dim: ",paste(dim(object@AllByGene),collapse = "\t"))}
+})
 
 #' An S4 class to store main data object from clinent function.
 #'
@@ -52,7 +92,7 @@ setMethod("show", "FirehoseData",function(object){
   message(paste0(object@Dataset," FirehoseData object"))
   message(paste0("Standard data run date: ", object@runDate))
   message(paste0("Analyze running date: ", object@gistic2Date))
-  message("Available slots:")
+  message("Available data types:")
   if(dim(object@Clinical)[1] > 0 & dim(object@Clinical)[2] > 0){message("@Clinical: A data frame, dim: ",paste(dim(object@Clinical),collapse = "\t"))}
   if(dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0){message("@RNASeqGene: A matrix withraw read counts or normalized data, dim: ",paste(dim(object@RNASeqGene),collapse = "\t"))}
   if(dim(object@RNASeq2GeneNorm)[1] > 0 & dim(object@RNASeq2GeneNorm)[2] > 0){message("@RNASeq2GeneNorm: A matrix withraw read counts or normalized data, dim: ",paste(dim(object@RNASeq2GeneNorm),collapse = "\t"))}
@@ -67,6 +107,7 @@ setMethod("show", "FirehoseData",function(object){
   if(length(object@RPPAArray) > 0 ){message("@RPPAArray: A list contains FirehosemRNAArray object(s), length: ",length(object@RPPAArray))}
   if(length(object@GISTIC@Dataset) > 0){message("@GISTIC: A FirehoseGISTIC object to store copy number data")}
   if(dim(object@Mutations)[1] > 0 & dim(object@Mutations)[2] > 0){message("@Mutations: A data.frame, dim: ",paste(dim(object@Mutations),collapse = "\t"))}
+  message("To export data, you may use the extract() function.")
 }
 )
 
@@ -75,6 +116,38 @@ setMethod("show", "FirehoseData",function(object){
 #' @slot Dataset Dataset name
 #' @slot Toptable Results data frame
 setClass("DGEResult", representation(Dataset = "character", Toptable = "data.frame"))
+setMethod("show", "DGEResult",function(object){
+  message(paste0("Dataset:", object@Dataset))
+  if(dim(object@Toptable)[1] > 0 ){message("DGEResult object, dim: ",paste(dim(object@Toptable),collapse = "\t"))}
+})
+
+#' Export toptable or correlation data frame
+#' @param object A \code{\linkS4class{DGEResult}} or \code{\linkS4class{CorResult}} object
+#' @return Returns toptable or correlation data frame
+#' @examples
+#' data(RTCGASample)
+#' dgeRes = getDiffExpressedGenes(RTCGASample)
+#' dgeRes
+#' showResults(dgeRes[[1]])
+setGeneric("showResults",
+           function(object) standardGeneric("showResults")
+)
+
+#' Export toptable or correlation data frame
+#' @param object A \code{\linkS4class{DGEResult}} or \code{\linkS4class{CorResult}} object
+#' @rdname showResults-DGEResult
+#' @aliases showResults,DGEResult,DGEResult-method
+#' @return Returns toptable for DGE results
+#' @examples
+#' data(RTCGASample)
+#' dgeRes = getDiffExpressedGenes(RTCGASample)
+#' dgeRes
+#' showResults(dgeRes[[1]])
+setMethod("showResults", "DGEResult",function(object){
+  message(paste0("Dataset: ",object@Dataset))
+  print(head(object@Toptable))
+  invisible(object@Toptable)
+})
 
 #' An S4 class to store correlations between gene expression level and copy number data
 #'

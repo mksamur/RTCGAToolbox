@@ -10,7 +10,7 @@ getFirehoseData(dataset, runDate = NULL, gistic2_Date = NULL,
   CNA_Seq = FALSE, CNA_CGH = FALSE, Methylation = FALSE,
   Mutation = FALSE, mRNA_Array = FALSE, miRNA_Array = FALSE,
   RPPA = FALSE, RNAseqNorm = "raw_counts",
-  RNAseq2Norm = "normalized_count", todir = NULL, forceDownload = FALSE,
+  RNAseq2Norm = "normalized_count", forceDownload = FALSE, destdir = ".",
   fileSizeLimit = 500, getUUIDs = FALSE)
 }
 \arguments{
@@ -50,9 +50,9 @@ getFirehoseData(dataset, runDate = NULL, gistic2_Date = NULL,
 
 \item{RNAseq2Norm}{RNAseq v2 data normalization method. (Default normalized_count)}
 
-\item{todir}{The directory path to download files to and from which to read files. It will be created if necessary. Defaults to current working directory.}
+\item{forceDownload}{A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.}
 
-\item{forceDownload}{A logic (Default FALSE) key to force download files when run. By default, local files in the specified directory will be used if available.}
+\item{destdir}{Directory in which to store the resulting downloaded file. Defaults to current working directory.}
 
 \item{fileSizeLimit}{Files that are larger than set value (megabyte) won't be downloaded (Default: 500)}
 
@@ -68,8 +68,11 @@ A \code{FirehoseData} data object that stores data for selected data types.
 This is a main client function to download data from Firehose TCGA portal.
 }
 \examples{
+#Sample Dataset
+data(RTCGASample)
+RTCGASample
 \dontrun{
-a2 <- getFirehoseData(dataset="BRCA",
+BRCAdata <- getFirehoseData(dataset="BRCA",
 runDate="20140416",gistic2_Date="20140115",
 RNAseq_Gene=TRUE,Clinic=TRUE,mRNA_Array=TRUE,Mutation=TRUE)
 }

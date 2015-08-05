@@ -2,7 +2,7 @@
 % Please edit documentation in R/extract.R
 \name{extract}
 \alias{extract}
-\title{Extract data from \code{FirehoseData} object into \code{ExpressionSet} or \code{GRagesList} object}
+\title{Extract data from \code{FirehoseData} object into \code{ExpressionSet} or \code{GRangesList} object}
 \usage{
 extract(object, type, clinical = TRUE)
 }

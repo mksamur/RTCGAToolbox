@@ -24,8 +24,10 @@ Returns a list that stores results for each dataset
 }
 \examples{
 data(RTCGASample)
+corRes = getCNGECorrelation(RTCGASample)
+corRes
+showResults(corRes[[1]])
 \dontrun{
-corRes = getCNGECorrelation(a2)
 }
 }
 
