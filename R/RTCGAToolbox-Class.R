@@ -57,7 +57,7 @@ setMethod("show", "FirehosemRNAArray",function(object){
 #' @slot Dataset Cohort name
 #' @slot AllByGene A data frame that stores continuous copy number
 #' @slot ThresholdedByGene A data frame for discrete copy number data
-setClass("FirehoseGISTIC", representation(Dataset = "character", AllByGene = "data.frame",ThresholedByGene="data.frame"))
+setClass("FirehoseGISTIC", representation(Dataset = "character", AllByGene = "data.frame",ThresholdedByGene="data.frame"))
 setMethod("show", "FirehoseGISTIC",function(object){
   message(paste0("Dataset:", object@Dataset))
   if(dim(object@AllByGene)[1] > 0 ){message("FirehoseGISTIC object, dim: ",paste(dim(object@AllByGene),collapse = "\t"))}
