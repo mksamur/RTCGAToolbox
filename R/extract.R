@@ -34,13 +34,30 @@ extract <- function(object, type, clinical = TRUE){
   if(type %in% choices){
     slotreq <- grep(paste0("^", type) , slotNames(object), 
                     ignore.case=TRUE, perl=TRUE, value=TRUE)
-    elemlength <- length(getElement(object, slotreq))
     if(is(getElement(object, slotreq), "list")){
+    elemlength <- length(getElement(object, slotreq))
       if(elemlength > 1){
+	if(interactive()){
+	fileSelect <- function() {
+	g <- readline(prompt = "The selected data type has more than one file available. \nPlease select the desired file.\n_")
+	g <- suppressWarnings(as.integer(g))
+	if(is.na(g)){
+		stop("Your selection must be an integer!")
+		} else {
+	return(g) 
+	}}
+
+	sourceName <- sapply(getElement(object, slotreq), function(FHarray) { getElement(FHarray, "Filename") } )
+	cat(paste0("[", seq(length(sourceName)), "] ", sourceName), fill = TRUE, sep = "\n")
+	fileNo <- fileSelect()
+	message("Selecting file ", sourceName[fileNo])
+	dm <- getElement(object, slotreq)[[fileNo]]@DataMatrix
+	} else {
         dm <- lapply(getElement(object, slotreq), function(tmp){getElement(tmp, "DataMatrix")})
         keeplist <- which.max(sapply(dm, ncol))
         dm <- dm[[keeplist]]
         warning(paste("Taking the array platform with the greatest number of samples:", keeplist))
+	}
       } else if(elemlength == 1){
         dm <- getElement(object, slotreq)[[1]]@DataMatrix
       } else if(elemlength == 0){
@@ -207,6 +224,7 @@ extract <- function(object, type, clinical = TRUE){
                                                                       Segment_Mean = gr$segment_mean)} ))
         }
         mcols(mygrl) <- clindup
+	mygrl@metadata <- list("fileName" = sourceName[fileNo])
         rownames(mygrl@elementMetadata) <- names(mygrl)
         return(mygrl)
       }
