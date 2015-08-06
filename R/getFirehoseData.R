@@ -508,7 +508,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                       "-CNACGH.tar.gz",
                       "[.]cna__.*.__Level_3__segmentation__seg.seg.txt$",
                       TRUE,
-                      paste0(dataset,"-CNACGH-",listCount,".txt"),FALSE,destdir,forceDownload,runDate)
+                      paste0("-CNACGH-",listCount,".txt"),FALSE,destdir,forceDownload,runDate)
           #Get selected type only
           tmpMat = fread(export.file,
                          header=TRUE,colClasses=c("character","numeric","numeric","numeric","numeric","numeric"), 
@@ -615,7 +615,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                       paste0("-miRNAArray-",listCount,".txt"),
                       TRUE,destdir,forceDownload,runDate)
           tmpReturn <- new("FirehosemRNAArray",Filename=ii,
-                           DataMatrix=.makeExprMat(export.file,"","miRNAArray",100,TRUE,runDate))
+                           DataMatrix=.makeExprMat(export.file,"","miRNAArray",100,TRUE))
           dataLists[[listCount]] <- tmpReturn
           listCount = listCount + 1 
         }
