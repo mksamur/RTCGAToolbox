@@ -6,9 +6,9 @@
 #' or a data frame. 
 #' 
 #' @param object A \code{FirehoseData} object from which to extract data. 
-#' @param type The type of data to extract from the "FirehoseData" object.
+#' @param type The type of data to extract from the "FirehoseData" object. To request the clinical data frame only, set to NULL or "none".
 #' @param clinical Logical (default TRUE) includes additional clinic data, if available.
-#' @return Either an \code{\link{ExpressionSet}} object, \code{\link{GRangesList}}) object, or data frame (if no clinical data requested) for the selected data type. 
+#' @return Either an \code{\link{ExpressionSet}} object, \code{\link{GRangesList}}) object, or data frame (when no clinical data requested for the selected data type or when clinical data is exclusively requested). 
 #' Choices include: "RNAseq_Gene", "Clinic", "miRNASeq_Gene", "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP", "CNA_Seq", "CNA_CGH", "Methylation", "Mutation", "mRNA_Array", "miRNA_Array", "RPPA", "GISTIC_A", "GISTIC_T".
 #' The "GISTIC_A" type of dataset represents GISTIC data by all genes. "GISTIC_T"" represents data thresholded by genes.
 #' 
@@ -22,11 +22,49 @@
 #' 
 #' @export
 extract <- function(object, type, clinical = TRUE){
-  if(!is.character(type)){
-     stop("Data type must be a character string!")
-  }
-  type <- tolower(gsub("_", "", type))
-  if(grepl("s$", type)) {gsub("s$", "", type)}
+    if(!is.null(type)){ 
+	if(is.character(type)) { type <- tolower(gsub("_", "", type)) 
+	    } else { 
+	stop("Data type must be a character string!") }
+	}
+    dlClinx <- function(object){
+	adt <- getElement(object, "runDate")
+	dset <- getElement(object, "Dataset")
+      cl_url <- "http://gdac.broadinstitute.org/runs/stddata__"
+      cl_url <- paste0(cl_url,substr(adt,1,4),"_",substr(adt,5,6),"_",substr(adt,7,8),"/data/")
+      cl_url <- paste0(cl_url,dset,"/",adt,"/")
+      cl_url <- paste0(cl_url, "gdac.broadinstitute.org_", dset, ".Merge_Clinical.Level_1.", adt, "00.0.0.tar.gz")
+      
+      download.file(url=cl_url, destfile=paste0(dset, "-ExClinical.tar.gz"), method="auto", quiet=TRUE, mode="w")
+      fileList <- untar(paste0(dset, "-ExClinical.tar.gz"), list=TRUE)
+      fileList <- grep(".clin.merged.txt", fileList, fixed = TRUE, value=TRUE)
+      untar(paste0(dset,"-ExClinical.tar.gz"),files=fileList)
+      file.rename(from=fileList,to=paste0(adt,"-",dset,"-ExClinical.txt"))
+      file.remove(paste0(dset,"-ExClinical.tar.gz"))
+      unlink(strsplit(fileList[1],"/")[[1]][1], recursive = TRUE)
+      extracl <- fread(paste0(adt,"-",dset,"-ExClinical.txt"), data.table=FALSE)
+      colnames(extracl)[-1] <- extracl[grep("patient_barcode", extracl[, 1]),][-1]
+      rownames(extracl) <- extracl[, 1]      
+      extracl <- extracl[,-1]
+      extracl <- t(extracl)
+      extracl <- extracl[,!grepl("patient_barcode", colnames(extracl))]
+      return(extracl)
+    }
+    if(clinical){
+      pd <- getElement(object, "Clinical")
+      if(any(grepl("\\.", rownames(pd)))){ rownames(pd) <- gsub("\\.", "-", rownames(pd)) }
+      if(length(pd)==0){ stop("No clinical data available!") }
+      clinextra <- dlClinx(object)
+      if(any(grepl("\\.", rownames(clinextra)))){ rownames(clinextra) <- gsub("\\.", "-", rownames(clinextra)) }
+      if(length(clinextra)==0){ message("No additional clinical information found!")}
+      pd <- merge(pd, clinextra, "row.names")
+      rownames(pd) <- pd[,"Row.names"]
+      pd <- pd[,-c(1,2)]
+      if(is.null(type) || type == "none"){	
+	return(pd) 
+	}
+    } else { stop("Nothing to extract. Please check the arguments.") }
+  if(grepl("s$", type)) { gsub("s$", "", type) }
   choices <- tolower(gsub("_", "", c("RNAseq_Gene", "miRNASeq_Gene",
                "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP", "CNA_Seq",
                "CNA_CGH", "Methylation", "Mutation", "mRNA_Array",
@@ -39,7 +77,7 @@ extract <- function(object, type, clinical = TRUE){
       if(elemlength > 1){
 	if(interactive()){
 	fileSelect <- function() {
-	g <- readline(prompt = "The selected data type has more than one file available. \nPlease select the desired file.\n_")
+	g <- readline(prompt = "The selected data type has more than one file available.\nPlease select the desired file.\n(Enter 0 for the first file with the most number of samples)\n_")
 	g <- suppressWarnings(as.integer(g))
 	if(is.na(g)){
 		stop("Your selection must be an integer!")
@@ -48,9 +86,11 @@ extract <- function(object, type, clinical = TRUE){
 	}}
 
 	sourceName <- sapply(getElement(object, slotreq), function(FHarray) { getElement(FHarray, "Filename") } )
-	cat(paste0("[", seq(length(sourceName)), "] ", sourceName), fill = TRUE, sep = "\n")
+	dimensions <- sapply(lapply(getElement(object, slotreq), function(tmp){getElement(tmp, "DataMatrix")}), dim)
+	cat(paste0("[", seq(length(sourceName)), "] ", sourceName, paste0("\n\tNumber of rows: ", dimensions[1,], "\tNumber of columns: ", dimensions[2,]) ), fill = TRUE, sep = "\n")
 	fileNo <- fileSelect()
-	message("Selecting file ", sourceName[fileNo])
+	if(fileNo == 0) { fileNo <- which.max(sapply(lapply(getElement(object, slotreq), function(tmp){getElement(tmp, "DataMatrix")}), ncol)) }
+	message("Selecting file: [", fileNo, "] ", sourceName[fileNo])
 	dm <- getElement(object, slotreq)[[fileNo]]@DataMatrix
 	} else {
         dm <- lapply(getElement(object, slotreq), function(tmp){getElement(tmp, "DataMatrix")})
@@ -124,45 +164,6 @@ extract <- function(object, type, clinical = TRUE){
       }
     }
     
-    adt <- getElement(object, "runDate")
-    dset <- getElement(object, "Dataset")
-    
-    dlClinx <- function(object){
-      
-      cl_url <- "http://gdac.broadinstitute.org/runs/stddata__"
-      cl_url <- paste0(cl_url,substr(adt,1,4),"_",substr(adt,5,6),"_",substr(adt,7,8),"/data/")
-      cl_url <- paste0(cl_url,dset,"/",adt,"/")
-      cl_url <- paste0(cl_url, "gdac.broadinstitute.org_", dset, ".Merge_Clinical.Level_1.", adt, "00.0.0.tar.gz")
-      
-      download.file(url=cl_url, destfile=paste0(dset, "-ExClinical.tar.gz"), method="auto", quiet=TRUE, mode="w")
-      fileList <- untar(paste0(dset, "-ExClinical.tar.gz"), list=TRUE)
-      fileList <- grep(".clin.merged.txt", fileList, fixed = TRUE, value=TRUE)
-      untar(paste0(dset,"-ExClinical.tar.gz"),files=fileList)
-      file.rename(from=fileList,to=paste0(adt,"-",dset,"-ExClinical.txt"))
-      file.remove(paste0(dset,"-ExClinical.tar.gz"))
-      unlink(strsplit(fileList[1],"/")[[1]][1], recursive = TRUE)
-      extracl <- fread(paste0(adt,"-",dset,"-ExClinical.txt"), data.table=FALSE)
-      colnames(extracl)[-1] <- extracl[grep("patient_barcode", extracl[, 1]),][-1]
-      rownames(extracl) <- extracl[, 1]      
-      extracl <- extracl[,-1]
-      extracl <- t(extracl)
-      extracl <- extracl[,!grepl("patient_barcode", colnames(extracl))]
-      return(extracl)
-    }
-    
-    if(!clinical){
-      return(dm)
-    } else if(clinical){
-      pd <- getElement(object, "Clinical")
-      if(any(grepl("\\.", rownames(pd)))){ rownames(pd) <- gsub("\\.", "-", rownames(pd)) }
-      if(length(pd)==0){ stop("No clinical data available!") }
-      clinextra <- dlClinx(object)
-      if(any(grepl("\\.", rownames(clinextra)))){ rownames(clinextra) <- gsub("\\.", "-", rownames(clinextra)) }
-      if(length(clinextra)==0){ message("No additional clinical information found!")}
-      pd <- merge(pd, clinextra, "row.names")
-      rownames(pd) <- pd[,"Row.names"]
-      pd <- pd[,-c(1,2)]
-
       cleanDupCols <- function(object){
 	if(is(object, "list")){
 	cleanObj <- lapply(object, function(UBC) {	
@@ -174,7 +175,7 @@ extract <- function(object, type, clinical = TRUE){
 	return(object)
 	}
     }
-	pd <- cleanDupCols(pd)    
+    pd <- cleanDupCols(pd)    
 
       if(!slotreq %in% rangeslots){
         clindup <- matrix(NA, nrow=ncol(dm))
