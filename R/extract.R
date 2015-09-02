@@ -12,7 +12,7 @@
 #' Choices include: "RNAseq_Gene", "Clinic", "miRNASeq_Gene", "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP", "CNA_Seq", "CNA_CGH", "Methylation", "Mutation", "mRNA_Array", "miRNA_Array", "RPPA", "GISTIC_A", "GISTIC_T".
 #' The "GISTIC_A" type of dataset represents GISTIC data by all genes. "GISTIC_T"" represents data thresholded by genes.
 #' 
-#' @author Marcel Ramos
+#' @author Marcel Ramos \email{mramos09@@gmail.com}
 #' 
 #' @examples 
 #' 
