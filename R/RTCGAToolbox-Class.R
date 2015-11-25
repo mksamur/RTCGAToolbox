@@ -111,6 +111,89 @@ setMethod("show", "FirehoseData",function(object){
 }
 )
 
+#' Export data from FirehoseData object
+#' @param object A \code{\linkS4class{FirehoseData}} object
+#' @param type A data type to be exported (Data types can be seen by typing show(objectname))
+#' @param platform A list id for data types that may come from multiple platform (such as mRNAArray)
+#' @param CN A copy number data type (Default: 'All') (Possible values 'All' or 'Thresholed')
+#' @return Returns matrix or data frame depends on data type
+#' @examples
+#' data(RTCGASample)
+#' sampleClinical = getData(RTCGASample,"Clinical")
+#' sampleClinical = getData(RTCGASample,"RNASeqGene")
+setGeneric("getData",
+           function(object,type="",platform=NULL,CN="All") standardGeneric("getData")
+)
+
+#' Export data from FirehoseData object
+#' @param object A \code{\linkS4class{FirehoseData}} object
+#' @param type A data type to be exported (Data types can be seen by typing show(objectname))
+#' @param platform A list id for data types that may come from multiple platform (such as mRNAArray)
+#' @param CN A copy number data type (Default: 'All') (Possible values 'All' or 'Thresholed')
+#' @rdname getData-methods
+#' @aliases getData,FirehoseData,FirehoseData-method
+#' @return Returns matrix or data frame depends on data type
+#' @examples
+#' data(RTCGASample)
+#' sampleClinical = getData(RTCGASample,"Clinical")
+#' sampleClinical = getData(RTCGASample,"RNASeqGene")
+setMethod("getData", "FirehoseData",function(object,type="",platform=NULL,CN="All"){
+  show(object)
+  switch(type,
+         "Clinical"={
+           invisible(object@Clinical)
+         },
+         "RNASeqGene"={
+           invisible(object@RNASeqGene)
+         },
+         "RNASeq2GeneNorm"={
+           invisible(object@RNASeq2GeneNorm)
+         },
+         "miRNASeqGene"={
+           invisible(object@miRNASeqGene)
+         },
+         "CNASNP"={
+           invisible(object@CNASNP)
+         },
+         "CNVSNP"={
+           invisible(object@CNVSNP)
+         },
+         "CNAseq"={
+           invisible(object@CNAseq)
+         },
+         "CNACGH"={
+           .getListData(object@CNACGH,platform)
+         },
+         "mRNAArray"={
+           .getListData(object@mRNAArray,platform) 
+         },
+         "Methylation"={
+           .getListData(object@Methylation,platform)
+         },
+         "miRNAArray"={
+           .getListData(object@miRNAArray,platform)
+         },
+         "RPPAArray"={
+           .getListData(object@RPPAArray,platform)
+         },
+         "GISTIC"={
+           if(!CN %in% c("Thresholed","All")){stop("CN must be 'All' or 'Thresholed'")}
+           switch(CN,
+                  "All"={
+                    invisible(object@GISTIC@AllByGene)
+                  },
+                  "Thresholed"={
+                    invisible(object@GISTIC@ThresholedByGene)
+                  }
+            )
+         },
+         "Mutations"={
+           invisible(object@Mutations)
+         },
+         stop("Please specify valid data type")
+  )
+})
+
 #' An S4 class to store differential gene expression results
 #'
 #' @slot Dataset Dataset name
