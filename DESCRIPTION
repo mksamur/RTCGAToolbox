@@ -26,4 +26,4 @@ Suggests:
 Imports:
     methods,XML,limma (>= 3.18),survival,RCircos,data.table (>= 1.9.4),RCurl,RJSONIO,IRanges,S4Vectors
 Depends:
-    R (>= 3.2.0) GenomicRanges, Biobase
+    R (>= 3.2.0), GenomicRanges, Biobase
