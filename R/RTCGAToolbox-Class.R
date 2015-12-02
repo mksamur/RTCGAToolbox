@@ -237,3 +237,23 @@ setMethod("showResults", "DGEResult",function(object){
 #' @slot Dataset A cohort name
 #' @slot Correlations Results data frame
 setClass("CorResult", representation(Dataset = "character", Correlations = "data.frame"))
+setMethod("show", "CorResult",function(object){
+  message(paste0("Dataset:", object@Dataset))
+  if(dim(object@Correlations)[1] > 0 ){message("CorResult object, dim: ",paste(dim(object@Correlations),collapse = "\t"))}
+})
+
+#' Export toptable or correlation data frame
+#' @param object A \code{\linkS4class{DGEResult}} or \code{\linkS4class{CorResult}} object
+#' @rdname showResults-CorResult
+#' @aliases showResults,CorResult,CorResult-method
+#' @return Returns correlation results data frame
+#' @examples
+#' data(RTCGASample)
+#' corRes = getCNGECorrelation(RTCGASample,adj.pval = 1,raw.pval = 1)
+#' corRes
+#' showResults(corRes[[1]])
+setMethod("showResults", "CorResult",function(object){
+  message(paste0("Dataset: ",object@Dataset))
+  print(head(object@Correlations))
+  invisible(object@Correlations)
+})
