@@ -204,8 +204,9 @@ extract <- function(object, type, clinical = TRUE){
 			clindup <- clindup[apply(clindup, 1, function(x) !all(is.na(x))),]
 			clindup <- clindup[, -c(1:2)]
 			clindup <- cbind(clindup, righttab[match(rownames(clindup), rownames(righttab)),])
+			clindup <- cbind(patientids = rownames(clindup), clindup, row.names = NULL)
 			names(dm) <- bcIDR(names(dm), sample=T, collapse=T)
-			dm <- dm[na.omit(match(rownames(clindup), names(dm)))]
+			dm <- dm[na.omit(match(clindup[, "patientids"], names(dm)))]
 			dm <- lapply(dm, FUN = function(ubc) { names(ubc) <- tolower(names(ubc)) 
 						 ubc } )
 			if(slotreq=="Mutations"){
@@ -223,6 +224,7 @@ extract <- function(object, type, clinical = TRUE){
 																			ranges = IRanges(gr$start, gr$end), Num_Probes = gr$num_probes, 
 																			Segment_Mean = gr$segment_mean)} ))
 			}
+			browser()
 			mcols(mygrl) <- clindup
 			if(exists("sourceName")) { mygrl@metadata <- list("fileName" = sourceName[fileNo]) }
 			   rownames(mygrl@elementMetadata) <- names(mygrl)
@@ -230,4 +232,3 @@ extract <- function(object, type, clinical = TRUE){
 		}
 	}
 }
-
