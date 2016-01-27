@@ -1,8 +1,8 @@
 Package: RTCGAToolbox
 Type: Package
 Title: A new tool for exporting TCGA Firehose data
-Version: 2.0.2
-Date: 2015-11-25
+Version: 2.1.1
+Date: 2016-01-27
 Author: Mehmet Kemal Samur
 Maintainer: Mehmet Kemal Samur <samur@jimmy.harvard.edu>
 Description: Managing data from large scale projects such as The Cancer Genome
