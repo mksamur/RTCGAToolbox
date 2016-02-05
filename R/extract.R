@@ -13,7 +13,7 @@
   file.rename(from=fileList,to=paste0(adt,"-",dset,"-ExClinical.txt"))
   file.remove(paste0(dset,"-ExClinical.tar.gz"))
   unlink(strsplit(fileList[1],"/")[[1]][1], recursive = TRUE)
-  extracl <- fread(paste0(adt,"-",dset,"-ExClinical.txt"), data.table=FALSE)
+  extracl <- data.table::fread(paste0(adt,"-",dset,"-ExClinical.txt"), data.table=FALSE)
   colnames(extracl)[-1] <- extracl[grep("patient_barcode", extracl[, 1]),][-1]
   rownames(extracl) <- extracl[, 1]      
   extracl <- extracl[,-1]
@@ -63,6 +63,10 @@ extract <- function(object, type, clinical = TRUE){
     } else {
       stop("Data type must be a character string")
     }
+  } else {
+    if (!clinical){
+      stop("Nothing to extract. Please check the arguments.")
+    }
   }
   if(clinical){
     pd <- getElement(object, "Clinical")
@@ -85,9 +89,7 @@ extract <- function(object, type, clinical = TRUE){
     if(is.null(type) || type == "none") {	
       return(pd) 
     }
-  } else {
-    stop("Nothing to extract. Please check the arguments.")
-  }
+  } 
   if (grepl("s$", type)) {
     gsub("s$", "", type)
   }
@@ -189,6 +191,7 @@ extract <- function(object, type, clinical = TRUE){
         return(object)
       }
     }
+    if(exists("pd")){
     pd <- cleanDupCols(pd)    
     if(!slotreq %in% rangeslots){
       clindup <- matrix(NA, nrow=ncol(dm))
@@ -251,6 +254,9 @@ extract <- function(object, type, clinical = TRUE){
         mygrl@metadata <- list("fileName" = sourceName[fileNo])
       }
       return(mygrl)
+    }
+    } else {
+    return(dm)
     }
   }
 }
