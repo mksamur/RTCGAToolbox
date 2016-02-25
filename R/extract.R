@@ -10,10 +10,12 @@
   fileList <- untar(paste0(dset, "-ExClinical.tar.gz"), list=TRUE)
   fileList <- grep(".clin.merged.txt", fileList, fixed = TRUE, value=TRUE)
   untar(paste0(dset,"-ExClinical.tar.gz"),files=fileList)
-  file.rename(from=fileList,to=paste0(adt,"-",dset,"-ExClinical.txt"))
+  filename <- paste0(adt,"-",dset,"-ExClinical.txt")
+  file.rename(from=fileList,to=filename)
   file.remove(paste0(dset,"-ExClinical.tar.gz"))
   unlink(strsplit(fileList[1],"/")[[1]][1], recursive = TRUE)
-  extracl <- data.table::fread(paste0(adt,"-",dset,"-ExClinical.txt"), data.table=FALSE)
+  extracl <- data.table::fread(filename, data.table=FALSE)
+  file.remove(filename)
   colnames(extracl)[-1] <- extracl[grep("patient_barcode", extracl[, 1]),][-1]
   rownames(extracl) <- extracl[, 1]      
   extracl <- extracl[,-1]
