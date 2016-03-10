@@ -392,7 +392,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                       TRUE,
                       "-RNAseq2GeneNorm.txt",FALSE,destdir,forceDownload,runDate)
           
-          resultClass@RNASeq2GeneNorm <- .makeExprMat(export.file,RNAseq2Norm,"RNAseq2",mergeSize=1000,arrayData=FALSE)
+          resultClass@RNASeq2GeneNorm <- .makeExprMat(export.file,RNAseq2Norm,"RNAseq2",mergeSize=1000,arrayData=TRUE)
           gc() 
         }
       }
