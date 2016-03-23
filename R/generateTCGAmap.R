@@ -18,8 +18,8 @@ generateTCGAmap <- function(exlist, mPheno) {
         S4Vectors::DataFrame(assay = x[[i]], assayname = Rle(names(x)[i]))
     }, x = samps)
     full_map <- do.call(S4Vectors::rbind, listM)
-    matches <- match(full_map$assay, rownames(mPheno))
-    # matches <- match(RTCGAToolbox::bcIDR(full_map$assay), rownames(mPheno))
+    # matches <- match(full_map$assay, rownames(mPheno))
+    matches <- match(RTCGAToolbox::bcIDR(full_map$assay), rownames(mPheno))
     if (all(is.na(matches))) {
         stop("no way to map pData to Elist")
     }
