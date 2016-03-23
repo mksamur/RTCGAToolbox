@@ -238,11 +238,22 @@ extract <- function(object, type, clinical = TRUE){
         mygrl <- GRangesList(lapply(dm, FUN = function(gr){
           GRanges(seqnames = paste0("chr", Rle(gr$chromosome)), 
                   ranges = IRanges(as.numeric(gr$start_position),
-                                   as.numeric(gr$end_position)),
+                                   as.numeric(gr$end_position),
+                  names = gr$hugo_symbol),
                   strand = gr$strand)}
         ))
+        ncbi_build <- as.character(Reduce(intersect, 
+                                          lapply(metdat, function(x)
+                                          {
+                                            x[, "ncbi_build"]
+                                          })))
+        if (length(ncbi_build) == 1L) {
+          genome(mygrl) <- ncbi_build
+        } else {
+          message("NCBI build was not consistent")
+        }
         metdat <- cleanDupCols(metdat)
-        mygrl@metadata <- metdat	
+        mygrl@metadata <- metdat
       } else {
         mygrl <- GRangesList(lapply(dm, FUN = function(gr){
           GRanges(seqnames = paste0("chr", Rle(gr$chromosome)), 
