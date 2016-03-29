@@ -156,12 +156,11 @@ extract <- function(object, type, clinical = TRUE){
       } else {
         dm <- split(dm, dm$Sample)
       } 
+    ## Checking for duplicates in data
       if(any(grepl("\\.", names(dm)))){ names(dm) <- gsub("\\.", "-", names(dm)) }
       dups <- bcIDR(names(dm), sample=T, collapse=T)[duplicated(bcIDR(names(dm), sample=T, collapse = T))]
-      righttab <- bcRight(names(dm)) 
     } else {
       dups <- bcIDR(colnames(dm), sample=T, collapse=T)[duplicated(bcIDR(colnames(dm), sample=T, collapse = T))]
-      righttab <- bcRight(colnames(dm))
     }
     # check for presence of technical replicates
     if(length(dups) != 0){ 
@@ -182,9 +181,14 @@ extract <- function(object, type, clinical = TRUE){
         duplic <- bcIDR(repeated, sample=T, collapse=T)[duplicated(bcIDR(repeated, sample=T, collapse=T))]
       }
     }
+    if(!slotreq %in% rangeslots){
+      righttab <- bcRight(colnames(dm))
+    } else {
+      righttab <- bcRight(names(dm))
+    }
     cleanDupCols <- function(object){
       if(is(object, "list")){
-        cleanObj <- lapply(object, function(UBC) {	
+        cleanObj <- lapply(object, function(UBC) {
           UBC[!duplicated(lapply(UBC, c))]
         }) 
         return(cleanObj)
@@ -194,7 +198,7 @@ extract <- function(object, type, clinical = TRUE){
       }
     }
     if(exists("pd")){
-    pd <- cleanDupCols(pd)    
+    pd <- cleanDupCols(pd)
     if(!slotreq %in% rangeslots){
       clindup <- matrix(NA, nrow=ncol(dm))
       rownames(clindup) <- bcIDR(colnames(dm), sample=T, collapse=T)
@@ -216,14 +220,17 @@ extract <- function(object, type, clinical = TRUE){
       }
     } else {
       clindup <- matrix(NA, nrow=length(dm))
-      rownames(clindup) <- bcIDR(names(dm), sample=T, collapse=T)
-      clindup <- cbind(clindup, pd[match(bcIDR(rownames(clindup)), bcIDR(rownames(pd))),])
+      rnames <- bcIDR(names(dm), sample=TRUE, collapse=TRUE)
+      clindup <- pd[match(bcIDR(rnames), bcIDR(rownames(pd))),]
       clindup <- clindup[apply(clindup, 1, function(x) !all(is.na(x))),]
-      clindup <- clindup[, -c(1:2)]
-      clindup <- cbind(clindup, righttab[match(rownames(clindup), rownames(righttab)),])
-      clindup <- cbind(patientids = rownames(clindup), clindup, row.names = NULL)
-      names(dm) <- bcIDR(names(dm), sample=T, collapse=T)
-      dm <- dm[na.omit(match(clindup[, "patientids"], names(dm)))]
+      clindup <- cbind(clindup, righttab[match(rnames, rownames(righttab)),])
+      clindup <- S4Vectors::DataFrame(patientids = rownames(clindup), clindup, row.names = NULL)
+      names(dm) <- bcIDR(names(dm), sample=TRUE, collapse=TRUE)
+      matchLogic <- bcIDR(names(dm)) %in% clindup[, "patientids"]
+      if (all(!matchLogic)) {
+        stop("no names could be matched")
+      }
+      dm <- dm[matchLogic]
       dm <- lapply(dm, FUN = function(ubc) { names(ubc) <- tolower(names(ubc)) 
       ubc } )
       if(slotreq=="Mutations"){
