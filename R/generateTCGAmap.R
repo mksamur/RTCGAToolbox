@@ -12,8 +12,13 @@
 #' 
 #' @export generateTCGAmap
 generateTCGAmap <- function(exlist, mPheno) {
+    if (requireNamespace("MultiAssayExperiment", quietly = TRUE)) {
     exlist <- MultiAssayExperiment::Elist(exlist)
+    samps <- as.list(colnames(exlist))
+    } else {
     samps <- lapply(exlist, colnames)
+    warning("attempting to use colnames on each experiment")
+    }
     listM <- lapply(seq_along(samps), function(i, x) {
         S4Vectors::DataFrame(assay = x[[i]], assayname = names(x)[i])
     }, x = samps)

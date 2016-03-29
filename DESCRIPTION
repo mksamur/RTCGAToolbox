@@ -23,7 +23,8 @@ Suggests:
     knitr,
     rmarkdown,
     Homo.sapiens,
-    data.table
+    data.table,
+    MultiAssayExperiment
 Imports:
     methods,
     XML,
@@ -34,8 +35,7 @@ Imports:
     RCurl,
     RJSONIO,
     IRanges,
-    S4Vectors,
-    MultiAssayExperiment
+    S4Vectors
 Depends:
     R (>= 3.2.0),
     GenomicRanges,
