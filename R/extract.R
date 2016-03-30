@@ -149,7 +149,7 @@ extract <- function(object, type, clinical = TRUE){
       rownames(dm) <- rNames
       if(any(grepl("\\.", colnames(dm)))){ colnames(dm) <- gsub("\\.", "-", colnames(dm)) }
       righttab <- bcRight(colnames(dm))
-      dups <- bcIDR(colnames(dm), sample=T, collapse = T)[duplicated(bcIDR(colnames(dm), sample = T, collapse = T))]
+      dups <- bcIDR(colnames(dm), sample=TRUE, collapse = TRUE)[duplicated(bcIDR(colnames(dm), sample = TRUE, collapse = TRUE))]
     } else if(slotreq %in% rangeslots) {
       if(slotreq=="Mutations"){
         dm <- split(dm, dm$Tumor_Sample_Barcode)
@@ -158,15 +158,15 @@ extract <- function(object, type, clinical = TRUE){
       } 
     ## Checking for duplicates in data
       if(any(grepl("\\.", names(dm)))){ names(dm) <- gsub("\\.", "-", names(dm)) }
-      dups <- bcIDR(names(dm), sample=T, collapse=T)[duplicated(bcIDR(names(dm), sample=T, collapse = T))]
+      dups <- bcIDR(names(dm), sample=TRUE, collapse=TRUE)[duplicated(bcIDR(names(dm), sample=TRUE, collapse = TRUE))]
     } else {
-      dups <- bcIDR(colnames(dm), sample=T, collapse=T)[duplicated(bcIDR(colnames(dm), sample=T, collapse = T))]
+      dups <- bcIDR(colnames(dm), sample=TRUE, collapse=TRUE)[duplicated(bcIDR(colnames(dm), sample=TRUE, collapse = TRUE))]
     }
     # check for presence of technical replicates
     if(length(dups) != 0){ 
       if(!slotreq %in% rangeslots){
-        repeated <- dm[, bcIDR(colnames(dm), sample=T, collapse=T) %in% dups]
-        duplic <- bcIDR(colnames(repeated), sample=T, collapse=T)[duplicated(bcIDR(colnames(repeated), sample=T, collapse=T))]
+        repeated <- dm[, bcIDR(colnames(dm), sample=TRUE, collapse=TRUE) %in% dups]
+        duplic <- bcIDR(colnames(repeated), sample=TRUE, collapse=TRUE)[duplicated(bcIDR(colnames(repeated), sample=TRUE, collapse=TRUE))]
         d <- c()
         for (cc in seq(duplic)){
           d <- cbind(d, apply(repated[,bcIDR(colnames(repeated)) %in% bcIDR(duplic[cc])], 1, mean))
@@ -175,10 +175,10 @@ extract <- function(object, type, clinical = TRUE){
         dm <- cbind(dm[, !(bcIDR(colnames(dm)) %in% bcIDR(dups))], d)
         colnames(dm) <- bcIDR(colnames(dm))
       } else {
-        repeated <- names(dm)[bcIDR(names(dm), sample=T, collapse=T) %in% dups]
+        repeated <- names(dm)[bcIDR(names(dm), sample=TRUE, collapse=TRUE) %in% dups]
         # dropping technical replicates 
-        dm <- dm[!duplicated(bcIDR(names(dm), sample=T, collapse=T))]
-        duplic <- bcIDR(repeated, sample=T, collapse=T)[duplicated(bcIDR(repeated, sample=T, collapse=T))]
+        dm <- dm[!duplicated(bcIDR(names(dm), sample=TRUE, collapse=TRUE))]
+        duplic <- bcIDR(repeated, sample=TRUE, collapse=TRUE)[duplicated(bcIDR(repeated, sample=TRUE, collapse=TRUE))]
       }
     }
     if(!slotreq %in% rangeslots){
@@ -199,7 +199,7 @@ extract <- function(object, type, clinical = TRUE){
     }
     if(exists("pd")){
     pd <- cleanDupCols(pd)
-    if(!slotreq %in% rangeslots){
+    if (!slotreq %in% rangeslots) {
       clindup <- matrix(NA, nrow=ncol(dm))
       rownames(clindup) <- bcIDR(colnames(dm), sample=TRUE, collapse=TRUE)
       clindup <- cbind(clindup, pd[match(bcIDR(rownames(clindup)), bcIDR(rownames(pd))),])
