@@ -15,15 +15,15 @@
 #' }
 #' 
 #' @export
-bcRight <- function(barcodes){
-  sample_type <- as.character(samptab[,2][match(as.numeric(bcIDR(barcodes, sample = TRUE, part=F)), samptab[,1])])
-  tb <- S4Vectors::DataFrame(sample_type, 
+bcRight <- function(barcodes) {
+  sample_type <- as.character(samptab[,2][match(as.numeric(bcIDR(barcodes, sample = TRUE, part = FALSE)), samptab[,1])])
+  tb <- data.frame(sample_type, 
                    sample_code = as.character(bcIDR(barcodes, part=FALSE, sample = TRUE)), 
                    vial = as.character(substr(bcIDR(barcodes, part=FALSE, sample = TRUE, vial = TRUE), 3,3)),
                    portion = as.character(substr(bcIDR(barcodes, part = FALSE, portion = TRUE), 1,2)),
                    analyte = as.character(substr(bcIDR(barcodes, part = FALSE, portion = TRUE), 3,3)), 
                    plate = as.character(bcIDR(barcodes, part = FALSE, plate = TRUE)), 
                    center = as.character(bcIDR(barcodes, part = FALSE, center=TRUE)),
-                  row.names = bcIDR(barcodes, sample = TRUE, collapse = TRUE))
+                   patientids = bcIDR(barcodes, sample = TRUE, collapse = TRUE))
   return(tb)
 }

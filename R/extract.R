@@ -201,12 +201,15 @@ extract <- function(object, type, clinical = TRUE){
     pd <- cleanDupCols(pd)
     if(!slotreq %in% rangeslots){
       clindup <- matrix(NA, nrow=ncol(dm))
-      rownames(clindup) <- bcIDR(colnames(dm), sample=T, collapse=T)
+      rownames(clindup) <- bcIDR(colnames(dm), sample=TRUE, collapse=TRUE)
       clindup <- cbind(clindup, pd[match(bcIDR(rownames(clindup)), bcIDR(rownames(pd))),])
-      clindup <- clindup[apply(clindup, 1, function(x) !all(is.na(x))),]
-      clindup <- clindup[, -c(1:2)]
-      clindup <- cbind(clindup, righttab[match(rownames(clindup), rownames(righttab)),])
-      colnames(dm) <- bcIDR(colnames(dm), sample=T, collapse=T)
+      rowsNotEmpty <- apply(clindup, 1, function(x) !all(is.na(x)))
+      clindup <- clindup[rowsNotEmpty,]
+      clindup <- clindup[, -(which(colnames(clindup) == "clindup"))]
+      righttable <- righttab[match(rownames(clindup), righttab[, "patientids"]),]
+      righttable <- righttable[, -(which(colnames(righttable) == "patientids"))]
+      clindup <- cbind(clindup, righttable)
+      colnames(dm) <- bcIDR(colnames(dm), sample=TRUE, collapse=TRUE)
       ndm <- dm[,na.omit(match(rownames(clindup), colnames(dm)))]
       if(identical(all.equal(rownames(clindup), colnames(ndm)), TRUE)){
         eset <- ExpressionSet(ndm, AnnotatedDataFrame(clindup))
