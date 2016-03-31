@@ -223,11 +223,14 @@ extract <- function(object, type, clinical = TRUE){
       }
     } else {
       clindup <- matrix(NA, nrow=length(dm))
-      rnames <- bcIDR(names(dm), sample=TRUE, collapse=TRUE)
-      clindup <- pd[match(bcIDR(rnames), bcIDR(rownames(pd))),]
-      clindup <- clindup[apply(clindup, 1, function(x) !all(is.na(x))),]
-      clindup <- cbind(clindup, righttab[match(rnames, rownames(righttab)),])
-      clindup <- S4Vectors::DataFrame(patientids = rownames(clindup), clindup, row.names = NULL)
+      rownames(clindup) <- bcIDR(names(dm), sample=TRUE, collapse=TRUE)
+      clindup <- pd[match(bcIDR(rownames(clindup)), bcIDR(rownames(pd))),]
+      rowsNotEmpty <- apply(clindup, 1, function(x) !all(is.na(x)))
+      clindup <- clindup[rowsNotEmpty, ]
+      righttab <- righttab[match(rownames(clindup), bcIDR(righttab$patientids)),]
+      clindup <- cbind(clindup, righttab[, -length(righttab)])
+      clindup <- data.frame(patientids = rownames(clindup), clindup,
+                            row.names = NULL)
       names(dm) <- bcIDR(names(dm), sample=TRUE, collapse=TRUE)
       matchLogic <- bcIDR(names(dm)) %in% clindup[, "patientids"]
       if (all(!matchLogic)) {

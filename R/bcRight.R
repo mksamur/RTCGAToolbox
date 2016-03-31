@@ -24,6 +24,6 @@ bcRight <- function(barcodes) {
                    analyte = as.character(substr(bcIDR(barcodes, part = FALSE, portion = TRUE), 3,3)), 
                    plate = as.character(bcIDR(barcodes, part = FALSE, plate = TRUE)), 
                    center = as.character(bcIDR(barcodes, part = FALSE, center=TRUE)),
-                   patientids = bcIDR(barcodes, sample = TRUE, collapse = TRUE))
+                   patientids = bcIDR(barcodes, sample = TRUE, collapse = TRUE), stringsAsFactors = FALSE)
   return(tb)
 }
