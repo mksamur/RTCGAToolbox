@@ -1,3 +1,15 @@
+.cleanDupCols <- function(object){
+    if(is(object, "list")){
+        cleanObj <- lapply(object, function(UBC) {
+            UBC[!duplicated(lapply(UBC, c))]
+        }) 
+        return(cleanObj)
+    } else if(is.data.frame(object)){
+        object <- object[,!duplicated(lapply(object, c))]
+        return(object)
+    }
+}
+
 .dlClinx <- function(object){
   adt <- getElement(object, "runDate")
   dset <- getElement(object, "Dataset")
@@ -186,19 +198,8 @@ extract <- function(object, type, clinical = TRUE){
     } else {
       righttab <- bcRight(names(dm))
     }
-    cleanDupCols <- function(object){
-      if(is(object, "list")){
-        cleanObj <- lapply(object, function(UBC) {
-          UBC[!duplicated(lapply(UBC, c))]
-        }) 
-        return(cleanObj)
-      } else if(is.data.frame(object)){
-        object <- object[,!duplicated(lapply(object, c))]
-        return(object)
-      }
-    }
     if(exists("pd")){
-    pd <- cleanDupCols(pd)
+    pd <- .cleanDupCols(pd)
     if (!slotreq %in% rangeslots) {
       clindup <- matrix(NA, nrow=ncol(dm))
       rownames(clindup) <- bcIDR(colnames(dm), sample=TRUE, collapse=TRUE)
@@ -240,33 +241,7 @@ extract <- function(object, type, clinical = TRUE){
       dm <- lapply(dm, FUN = function(ubc) { names(ubc) <- tolower(names(ubc)) 
       ubc } )
       if(slotreq=="Mutations"){
-        metdat <- lapply(dm, FUN = function(lt) {
-          lt <- lt[, !names(lt) %in% c("chromosome","start_position",
-                                       "end_position", "strand", 
-                                       "center","start","end","gene",
-                                       "dataset","type","chr","ref_allele",
-                                       "tum_allele1","tum_allele2")]
-          return(lt)
-        })
-        mygrl <- GRangesList(lapply(dm, FUN = function(gr){
-          GRanges(seqnames = paste0("chr", Rle(gr$chromosome)), 
-                  ranges = IRanges(as.numeric(gr$start_position),
-                                   as.numeric(gr$end_position),
-                  names = gr$hugo_symbol),
-                  strand = gr$strand)}
-        ))
-        ncbi_build <- as.character(Reduce(intersect, 
-                                          lapply(metdat, function(x)
-                                          {
-                                            x[, "ncbi_build"]
-                                          })))
-        if (length(ncbi_build) == 1L) {
-          genome(mygrl) <- ncbi_build
-        } else {
-          message("NCBI build was not consistent")
-        }
-        metdat <- cleanDupCols(metdat)
-        mygrl@metadata <- metdat
+          mygrl <- makeGRangesList(dm)
       } else {
         mygrl <- GRangesList(lapply(dm, FUN = function(gr){
           GRanges(seqnames = paste0("chr", Rle(gr$chromosome)), 
