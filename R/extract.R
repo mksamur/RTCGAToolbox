@@ -70,7 +70,7 @@
 #' }
 #' 
 #' @export
-extract <- function(object, type, clinical = TRUE){
+extract <- function(object, type, clinical = TRUE) {
   if (!is.null(type)) {
     if (is.character(type)) {
       type <- tolower(gsub("_", "", type)) 
@@ -240,16 +240,7 @@ extract <- function(object, type, clinical = TRUE){
       dm <- dm[matchLogic]
       dm <- lapply(dm, FUN = function(ubc) { names(ubc) <- tolower(names(ubc)) 
       ubc } )
-      if(slotreq=="Mutations"){
-          mygrl <- makeGRangesList(dm)
-      } else {
-        mygrl <- GRangesList(lapply(dm, FUN = function(gr){
-          GRanges(seqnames = paste0("chr", Rle(gr$chromosome)), 
-                  ranges = IRanges(gr$start, gr$end),
-                  Num_Probes = gr$num_probes, 
-                  Segment_Mean = gr$segment_mean)}
-        ))
-      }
+      mygrl <- makeGRangesList(dm)
       mcols(mygrl) <- clindup
       if(exists("sourceName")) {
         mygrl@metadata <- list("fileName" = sourceName[fileNo])
