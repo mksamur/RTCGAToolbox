@@ -17,17 +17,16 @@ setClinical <- function (expData, phenodat) {
   #   }
   # }
   commonNames <- intersect(bcIDR(getNames(expData)), bcIDR(rownames(phenodat)))
-  namesRight <- getNames(expData)[bcIDR(getNames(expData)) %in% commonNames]
+  namesRight <- getNames(expData)[match(commonNames, bcIDR(getNames(expData)))]
   righttab <- bcRight(namesRight)
   clindup <- matrix(NA, nrow = length(commonNames))
   ## Rownames here use samples
   rownames(clindup) <- namesRight
   ## Match on patient identifiers
-  clindup <- phenodat[rownames(phenodat) %in% commonNames,]
-  ##
-  righttab <- righttab[match(rownames(clindup), bcIDR(righttab$patientids)),]
+  clindup <- phenodat[match(commonNames, rownames(phenodat)),]
   clindup <- cbind(clindup, righttab[, -length(righttab)])
+  ## Move patient IDs to a column (to allow any duplicates)
   clindup <- data.frame(patientids = rownames(clindup), clindup,
-                         row.names = NULL)
+                         row.names = NULL, stringsAsFactors = FALSE)
   return(clindup)
 }
