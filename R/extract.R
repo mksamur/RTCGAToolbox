@@ -163,14 +163,9 @@ extract <- function(object, type, clinical = TRUE) {
       righttab <- bcRight(colnames(dm))
       dups <- bcIDR(colnames(dm), sample=TRUE, collapse = TRUE)[duplicated(bcIDR(colnames(dm), sample = TRUE, collapse = TRUE))]
     } else if(slotreq %in% rangeslots) {
-      if(slotreq=="Mutations"){
-        dm <- split(dm, dm$Tumor_Sample_Barcode)
-      } else {
-        dm <- split(dm, dm$Sample)
-      } 
-    ## Checking for duplicates in data
-      if(any(grepl("\\.", names(dm)))){ names(dm) <- gsub("\\.", "-", names(dm)) }
-      dups <- bcIDR(names(dm), sample=TRUE, collapse=TRUE)[duplicated(bcIDR(names(dm), sample=TRUE, collapse = TRUE))]
+      mygrl <- makeGRangesList(dm)
+      ## Checking for duplicates in data
+      dups <- names(mygrl)[duplicated(names(mygrl))]
     } else {
       dups <- bcIDR(colnames(dm), sample=TRUE, collapse=TRUE)[duplicated(bcIDR(colnames(dm), sample=TRUE, collapse = TRUE))]
     }
@@ -187,68 +182,50 @@ extract <- function(object, type, clinical = TRUE) {
         dm <- cbind(dm[, !(bcIDR(colnames(dm)) %in% bcIDR(dups))], d)
         colnames(dm) <- bcIDR(colnames(dm))
       } else {
-        repeated <- names(dm)[bcIDR(names(dm), sample=TRUE, collapse=TRUE) %in% dups]
+        repeated <- names(mygrl)[names(mygrl) %in% dups]
         # dropping technical replicates 
-        dm <- dm[!duplicated(bcIDR(names(dm), sample=TRUE, collapse=TRUE))]
-        duplic <- bcIDR(repeated, sample=TRUE, collapse=TRUE)[duplicated(bcIDR(repeated, sample=TRUE, collapse=TRUE))]
+        mygrl <- mygrl[!duplicated(names(mygrl))]
+        duplic <- repeated[duplicated(repeated)]
       }
     }
     if(!slotreq %in% rangeslots){
       righttab <- bcRight(colnames(dm))
     } else {
-      righttab <- bcRight(names(dm))
+      righttab <- bcRight(names(mygrl))
     }
     if(exists("pd")){
-    pd <- .cleanDupCols(pd)
-    if (!slotreq %in% rangeslots) {
-      clindup <- matrix(NA, nrow=ncol(dm))
-      rownames(clindup) <- bcIDR(colnames(dm), sample=TRUE, collapse=TRUE)
-      clindup <- cbind(clindup, pd[match(bcIDR(rownames(clindup)), bcIDR(rownames(pd))),])
-      rowsNotEmpty <- apply(clindup, 1, function(x) !all(is.na(x)))
-      clindup <- clindup[rowsNotEmpty,]
-      clindup <- clindup[, -(which(colnames(clindup) == "clindup"))]
-      righttable <- righttab[match(rownames(clindup), righttab[, "patientids"]),]
-      righttable <- righttable[, -(which(colnames(righttable) == "patientids"))]
-      clindup <- cbind(clindup, righttable)
-      colnames(dm) <- bcIDR(colnames(dm), sample=TRUE, collapse=TRUE)
-      ndm <- dm[,na.omit(match(rownames(clindup), colnames(dm)))]
-      if(identical(all.equal(rownames(clindup), colnames(ndm)), TRUE)){
-        eset <- ExpressionSet(ndm, AnnotatedDataFrame(clindup))
-        if(exists("annote")){
-          featureData(eset) <- AnnotatedDataFrame(annote)
+      pd <- .cleanDupCols(pd)
+      clindup <- setClinical(dm, pd)
+      if (!slotreq %in% rangeslots) {
+        colnames(dm) <- bcIDR(colnames(dm), sample=TRUE, collapse=TRUE)
+        ndm <- dm[,na.omit(match(rownames(clindup), colnames(dm)))]
+        if(identical(all.equal(rownames(clindup), colnames(ndm)), TRUE)){
+          eset <- ExpressionSet(ndm, AnnotatedDataFrame(clindup))
+          if(exists("annote")){
+            featureData(eset) <- AnnotatedDataFrame(annote)
+          }
+          return(eset)
+        } else {
+          stop("Couldn't match up rownames of clinical to colnames of numeric data")
+          return(dm)
         }
-        return(eset)
       } else {
-        stop("Couldn't match up rownames of clinical to colnames of numeric data")
-        return(dm)
+        names(dm) <- bcIDR(names(dm), sample=TRUE, collapse=TRUE)
+        matchLogic <- bcIDR(names(dm)) %in% clindup[, "patientids"]
+        if (all(!matchLogic)) {
+          stop("no names could be matched")
+        }
+        dm <- dm[matchLogic]
+        dm <- lapply(dm, FUN = function(ubc) { names(ubc) <- tolower(names(ubc)) 
+        ubc } )
+        mcols(mygrl) <- clindup
+        if(exists("sourceName")) {
+          mygrl@metadata <- list("fileName" = sourceName[fileNo])
+        }
+        return(mygrl)
       }
     } else {
-      clindup <- matrix(NA, nrow=length(dm))
-      rownames(clindup) <- bcIDR(names(dm), sample=TRUE, collapse=TRUE)
-      clindup <- pd[match(bcIDR(rownames(clindup)), bcIDR(rownames(pd))),]
-      rowsNotEmpty <- apply(clindup, 1, function(x) !all(is.na(x)))
-      clindup <- clindup[rowsNotEmpty, ]
-      righttab <- righttab[match(rownames(clindup), bcIDR(righttab$patientids)),]
-      clindup <- cbind(clindup, righttab[, -length(righttab)])
-      clindup <- data.frame(patientids = rownames(clindup), clindup,
-                            row.names = NULL)
-      names(dm) <- bcIDR(names(dm), sample=TRUE, collapse=TRUE)
-      matchLogic <- bcIDR(names(dm)) %in% clindup[, "patientids"]
-      if (all(!matchLogic)) {
-        stop("no names could be matched")
-      }
-      dm <- dm[matchLogic]
-      dm <- lapply(dm, FUN = function(ubc) { names(ubc) <- tolower(names(ubc)) 
-      ubc } )
-      mygrl <- makeGRangesList(dm)
-      mcols(mygrl) <- clindup
-      if(exists("sourceName")) {
-        mygrl@metadata <- list("fileName" = sourceName[fileNo])
-      }
-      return(mygrl)
-    }
-    } else {
-    return(dm)
+      return(dm)
     }
   }
 }

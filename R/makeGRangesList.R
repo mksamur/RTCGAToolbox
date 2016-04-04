@@ -30,6 +30,8 @@ makeGRangesList <- function(inputData) {
     names(inputData) <- plyr::mapvalues(names(inputData),
                                         longNames, shortNames,
                                         warn_missing = FALSE)
+    inputData[, c("start", "end")] <-
+      sapply(inputData[, c("start", "end")], as.numeric)
     if (!all(grepl("chr", inputData$chrom[1:5], ignore.case = TRUE))) {
         inputData$chrom <- paste0("chr", inputData$chrom)
     }
