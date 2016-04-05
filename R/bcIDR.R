@@ -1,5 +1,7 @@
-#' @import methods XML limma survival RCircos data.table RCurl RJSONIO S4Vectors IRanges
+#' @import methods XML limma survival RCircos RCurl RJSONIO S4Vectors IRanges
+#' @importFrom data.table fread
 NULL
+
 #' Parse data from TCGA barcode
 #'
 #' This function returns the specified snippet of information obtained from the TCGA barcode.
