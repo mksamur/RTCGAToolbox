@@ -7,7 +7,8 @@
 makeGRangesList(inputData)
 }
 \arguments{
-\item{inputData}{A \code{data.frame} class of TCGA mutation data.}
+\item{inputData}{A \code{data.frame} or \code{list} class of TCGA
+mutation data}
 }
 \value{
 A \linkS4class{GRangesList} class object
@@ -15,6 +16,10 @@ A \linkS4class{GRangesList} class object
 \description{
 This function takes the data.frame of raw data from the output of a TCGA
 data pipeline and converts it to a \linkS4class{GRangesList} class.
+Input data can be entered as either a \code{data.frame} with a sample
+indicator titled as "tumor_sample_barcode" or "sample." If input data is a
+entered as a list, all element names are expected to be TCGA
+sample identifiers.
 }
 \author{
 Marcel Ramos \email{mramos09@gmail.com}

@@ -42,6 +42,6 @@ TCGAsamplebc <- bcIDR(barcodes, sample = TRUE, collapse = TRUE)
 
 }
 \author{
-Marcel Ramos
+Marcel Ramos \email{mramos09@gmail.com}
 }
 

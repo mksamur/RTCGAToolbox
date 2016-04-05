@@ -1,14 +1,18 @@
 #' Convert raw TCGA Mutation data to GRangesList
-#' 
+#'
 #' This function takes the data.frame of raw data from the output of a TCGA
 #' data pipeline and converts it to a \linkS4class{GRangesList} class.
-#' 
+#' Input data can be entered as either a \code{data.frame} with a sample
+#' indicator titled as "tumor_sample_barcode" or "sample." If input data is a
+#' entered as a list, all element names are expected to be TCGA
+#' sample identifiers.
+#'
 #' @param inputData A \code{data.frame} or \code{list} class of TCGA
-#' mutation data.
+#' mutation data
 #' @return A \linkS4class{GRangesList} class object
-#' 
+#'
 #' @author Marcel Ramos \email{mramos09@gmail.com}
-#' 
+#'
 #' @export
 makeGRangesList <- function(inputData) {
     if (is(inputData, "data.frame")) {
@@ -23,6 +27,7 @@ makeGRangesList <- function(inputData) {
     names(inputData) <- tolower(names(inputData))
     inputData <- lapply(inputData, function(elements) {
         names(elements) <- tolower(names(elements))
+        elements
     })
     longNames <- c("chromosome", "start_position", "end_position")
     shortNames <- c("chrom", "start", "end")
@@ -45,7 +50,6 @@ makeGRangesList <- function(inputData) {
                                            warn_missing = FALSE)
         elements
     })
-    browser()
     inputData <- lapply(inputData, function(elements) {
         elements[, c("start", "end")] <-
             sapply(elements[, c("start", "end")], as.numeric)
@@ -54,7 +58,8 @@ makeGRangesList <- function(inputData) {
     if (!all(grepl("chr", inputData[[1]]$chrom[1:5], ignore.case = TRUE))) {
         inputData <- lapply(inputData, function(elements) {
             elements[, "chrom"] <- paste0("chr", elements[, "chrom"])
-            })
+            elements
+        })
     }
     metadats <- lapply(inputData, FUN = function(mydata) {
         mydata <- mydata[, !names(mydata)

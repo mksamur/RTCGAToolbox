@@ -25,6 +25,7 @@
 #'
 #' @slot Filename Platform name
 #' @slot DataMatrix A data frame that stores the CGH data.
+#' @exportClass FirehoseCGHArray
 setClass("FirehoseCGHArray", representation(Filename = "character", DataMatrix = "data.frame"))
 setMethod("show", "FirehoseCGHArray",function(object){
   message(paste0("Platform:", object@Filename))
@@ -35,6 +36,7 @@ setMethod("show", "FirehoseCGHArray",function(object){
 #'
 #' @slot Filename Platform name
 #' @slot DataMatrix A data frame that stores the methylation data.
+#' @exportClass FirehoseMethylationArray
 setClass("FirehoseMethylationArray", representation(Filename = "character", DataMatrix = "data.frame"))
 setMethod("show", "FirehoseMethylationArray",function(object){
   message(paste0("Platform:", object@Filename))
@@ -46,6 +48,7 @@ setMethod("show", "FirehoseMethylationArray",function(object){
 #'
 #' @slot Filename Platform name
 #' @slot DataMatrix A data matrix that stores the expression data.
+#' @exportClass FirehosemRNAArray
 setClass("FirehosemRNAArray", representation(Filename = "character", DataMatrix = "matrix"))
 setMethod("show", "FirehosemRNAArray",function(object){
   message(object@Filename)
@@ -57,6 +60,7 @@ setMethod("show", "FirehosemRNAArray",function(object){
 #' @slot Dataset Cohort name
 #' @slot AllByGene A data frame that stores continuous copy number
 #' @slot ThresholdedByGene A data frame for discrete copy number data
+#' @exportClass FirehoseGISTIC
 setClass("FirehoseGISTIC", representation(Dataset = "character", AllByGene = "data.frame",ThresholdedByGene="data.frame"))
 setMethod("show", "FirehoseGISTIC",function(object){
   message(paste0("Dataset:", object@Dataset))
@@ -83,6 +87,7 @@ setMethod("show", "FirehoseGISTIC",function(object){
 #' @slot Mutations A data frame for mutation infromation from sequencing data
 #' @slot GISTIC A \code{FirehoseGISTIC} object to store processed copy number data
 #' @slot BarcodeUUID A data frame that stores the Barcodes, UUIDs and Short sample identifiers
+#' @exportClass FirehoseData
 setClass("FirehoseData", representation(Dataset = "character", runDate = "character", gistic2Date = "character", Clinical = "data.frame", RNASeqGene = "matrix",
                                         RNASeq2GeneNorm="matrix",miRNASeqGene="matrix",CNASNP="data.frame",
                                         CNVSNP="data.frame",CNAseq="data.frame",CNACGH="list",Methylation="list",
@@ -198,6 +203,7 @@ setMethod("getData", "FirehoseData",function(object,type="",platform=NULL,CN="Al
 #'
 #' @slot Dataset Dataset name
 #' @slot Toptable Results data frame
+#' @exportClass DGEResult
 setClass("DGEResult", representation(Dataset = "character", Toptable = "data.frame"))
 setMethod("show", "DGEResult",function(object){
   message(paste0("Dataset:", object@Dataset))
@@ -236,6 +242,7 @@ setMethod("showResults", "DGEResult",function(object){
 #'
 #' @slot Dataset A cohort name
 #' @slot Correlations Results data frame
+#' @exportClass CorResult
 setClass("CorResult", representation(Dataset = "character", Correlations = "data.frame"))
 setMethod("show", "CorResult",function(object){
   message(paste0("Dataset:", object@Dataset))
