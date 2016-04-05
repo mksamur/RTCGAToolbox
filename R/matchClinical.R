@@ -17,20 +17,22 @@
 #' @export matchClinical
 matchClinical <- function (expData, phenoDat) {
     if (is(expData, "list")) {
-        filler <- substr(names(expData), 5, 5)
+        filler <- substr(names(expData)[1], 5, 5)
         if (filler != ".") {
             names(expData) <- gsub(paste0("\\", filler),
                                    "\\.", names(expData)) }
         getNames <- function(x){ names(x) }
     } else {
-        filler <- substr(colnames(expData), 5, 5)
+        filler <- substr(colnames(expData)[1], 5, 5)
         if (filler != ".") {
             names(expData) <- gsub(paste0("\\", filler),
                                    "\\.", colnames(expData)) }
         getNames <- function(x) { colnames(x) }
     }
-    if (any(grepl("\\-", sample(rownames(phenoDat), 10, replace = TRUE)))) {
-        rownames(phenoDat) <- gsub("\\-", "\\.", rownames(phenoDat)) }
+    filler <- substr(rownames(phenoDat)[1], 5, 5)
+    if (filler != ".") {
+        rownames(phenoDat) <- gsub(paste0("\\", filler),
+                                   "\\.", rownames(phenoDat)) }
     commonNames <- intersect(bcIDR(getNames(expData)), bcIDR(rownames(phenoDat)))
     namesRight <- getNames(expData)[match(commonNames, bcIDR(getNames(expData)))]
     righttab <- bcRight(namesRight)
