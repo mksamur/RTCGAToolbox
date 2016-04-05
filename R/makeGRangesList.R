@@ -33,7 +33,7 @@ makeGRangesList <- function(inputData) {
     shortNames <- c("chrom", "start", "end")
     twoMeta <- ifelse(all(c("num_probes", "segment_mean") %in%
                               names(inputData[[1]])), TRUE, FALSE)
-    hugo <- ifelse("hugo_symbol" %in% names(inputData), TRUE, FALSE)
+    hugo <- ifelse("hugo_symbol" %in% names(inputData[[1]]), TRUE, FALSE)
     if ("ncbi_build" %in% names(inputData[[1]])) {
         ncbi_build <- Reduce(intersect, lapply(inputData,
                                                function(x)
