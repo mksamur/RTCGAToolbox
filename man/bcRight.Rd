@@ -24,6 +24,6 @@ right_bctable <- bcRight(barcodes)
 
 }
 \author{
-Marcel Ramos
+Marcel Ramos \email{mramos09@gmail.com}
 }
 

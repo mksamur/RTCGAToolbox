@@ -1,46 +1,66 @@
 #' Convert raw TCGA Mutation data to GRangesList
-#' 
+#'
 #' This function takes the data.frame of raw data from the output of a TCGA
 #' data pipeline and converts it to a \linkS4class{GRangesList} class.
-#' 
-#' @param inputData A \code{data.frame} class of TCGA mutation data.
+#' Input data can be entered as either a \code{data.frame} with a sample
+#' indicator titled as "tumor_sample_barcode" or "sample." If input data is a
+#' entered as a list, all element names are expected to be TCGA
+#' sample identifiers.
+#'
+#' @param inputData A \code{data.frame} or \code{list} class of TCGA
+#' mutation data
 #' @return A \linkS4class{GRangesList} class object
-#' 
+#'
 #' @author Marcel Ramos \email{mramos09@gmail.com}
-#' 
+#'
 #' @export
 makeGRangesList <- function(inputData) {
-    if (!is(inputData, "data.frame")) {
-        stop("inputData is not a data.frame")
-    }
+    if (is(inputData, "data.frame")) {
     names(inputData) <- tolower(names(inputData))
-    longNames <- c("chromosome", "start_position", "end_position")
-    shortNames <- c("chrom", "start", "end")
-    twoMeta <- ifelse(all(c("num_probes", "segment_mean") %in%
-                              names(inputData)), TRUE, FALSE)
-    hugo <- ifelse("hugo_symbol" %in% names(inputData), TRUE, FALSE)
-    if ("ncbi_build" %in% names(inputData)) {
-        ncbi_build <- Reduce(intersect, inputData$ncbi_build)
-        if (length(ncbi_build) == 1L) {
-            ncbi <- ncbi_build
-        } else {
-            message("NCBI build was not consistent")
-        }
-    }
-    names(inputData) <- plyr::mapvalues(names(inputData),
-                                        longNames, shortNames,
-                                        warn_missing = FALSE)
-    inputData[, c("start", "end")] <-
-      sapply(inputData[, c("start", "end")], as.numeric)
-    if (!all(grepl("chr", inputData$chrom[1:5], ignore.case = TRUE))) {
-        inputData$chrom <- paste0("chr", inputData$chrom)
-    }
     sampleIndicator <- ifelse(is.null(inputData$sample),
                               "tumor_sample_barcode", "sample")
     ## Convert data to list for GRangesList
     inputData <- split(inputData, bcIDR(as.character(
         inputData[, sampleIndicator]),
         sample = TRUE, collapse = TRUE))
+    }
+    names(inputData) <- tolower(names(inputData))
+    inputData <- lapply(inputData, function(elements) {
+        names(elements) <- tolower(names(elements))
+        elements
+    })
+    longNames <- c("chromosome", "start_position", "end_position")
+    shortNames <- c("chrom", "start", "end")
+    twoMeta <- ifelse(all(c("num_probes", "segment_mean") %in%
+                              names(inputData[[1]])), TRUE, FALSE)
+    hugo <- ifelse("hugo_symbol" %in% names(inputData[[1]]), TRUE, FALSE)
+    if ("ncbi_build" %in% names(inputData[[1]])) {
+        ncbi_build <- Reduce(intersect, lapply(inputData,
+                                               function(x)
+                                                   { x[, "ncbi_build"] }))
+        if (length(ncbi_build) == 1L) {
+            ncbi <- ncbi_build
+        } else {
+            message("NCBI build was not consistent")
+        }
+    }
+    inputData <- lapply(inputData, function(elements) {
+        names(elements) <- plyr::mapvalues(names(elements),
+                                           longNames, shortNames,
+                                           warn_missing = FALSE)
+        elements
+    })
+    inputData <- lapply(inputData, function(elements) {
+        elements[, c("start", "end")] <-
+            sapply(elements[, c("start", "end")], as.numeric)
+        elements
+    })
+    if (!all(grepl("chr", inputData[[1]]$chrom[1:5], ignore.case = TRUE))) {
+        inputData <- lapply(inputData, function(elements) {
+            elements[, "chrom"] <- paste0("chr", elements[, "chrom"])
+            elements
+        })
+    }
     metadats <- lapply(inputData, FUN = function(mydata) {
         mydata <- mydata[, !names(mydata)
                          %in%

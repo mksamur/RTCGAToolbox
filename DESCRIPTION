@@ -1,7 +1,7 @@
 Package: RTCGAToolbox
 Type: Package
 Title: A new tool for exporting TCGA Firehose data
-Version: 2.2.0
+Version: 2.2.52
 Date: 2016-01-27
 Author: Mehmet Kemal Samur
 Maintainer: Mehmet Kemal Samur <samur@jimmy.harvard.edu>
@@ -24,7 +24,8 @@ Suggests:
     rmarkdown,
     Homo.sapiens,
     data.table,
-    MultiAssayExperiment
+    MultiAssayExperiment,
+    readr
 Imports:
     methods,
     XML,
