@@ -1,3 +1,9 @@
+# RTCGAToolbox 2.2.53
+
+## Bug fixes and minor improvements
+
+* Reverted to using dashes "-" instead of periods "." as barcode separators
+
 # RTCGAToolbox 2.2.52
 
 ## New features
