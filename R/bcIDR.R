@@ -27,7 +27,7 @@ NULL
 #' TCGAsamplebc <- bcIDR(barcodes, sample = TRUE, collapse = TRUE)
 #' }
 #'
-#' @export
+#' @export bcIDR
 bcIDR <- function(barcodes, position = NULL, part = TRUE, sample=FALSE, vial = FALSE, portion = FALSE, plate = FALSE, center=FALSE, collapse=FALSE){
     if(!is.character(barcodes)){
         stop("Barcodes must be a character vector!")

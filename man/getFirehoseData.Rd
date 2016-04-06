@@ -76,6 +76,5 @@ BRCAdata <- getFirehoseData(dataset="BRCA",
 runDate="20140416",gistic2_Date="20140115",
 RNAseq_Gene=TRUE,Clinic=TRUE,mRNA_Array=TRUE,Mutation=TRUE)
 }
-
 }
 
