@@ -14,7 +14,7 @@
 #' right_bctable <- bcRight(barcodes)
 #' }
 #'
-#' @export
+#' @export bcRight
 bcRight <- function(barcodes) {
   sample_type <- as.character(samptab[,2][match(as.numeric(bcIDR(barcodes, sample = TRUE, part = FALSE)), samptab[,1])])
   tb <- data.frame(sample_type,

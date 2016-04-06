@@ -7,6 +7,7 @@
 #' @examples
 #' getFirehoseRunningDates()
 #' getFirehoseRunningDates(last=2)
+#' @export getFirehoseRunningDates
 getFirehoseRunningDates <- function(last=NULL){
   check.integer <- function(N){
     !length(grep("[^[:digit:]]", as.character(N)))
