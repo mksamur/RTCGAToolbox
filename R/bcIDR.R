@@ -38,8 +38,8 @@ bcIDR <- function(barcodes, position = NULL, part = TRUE, sample=FALSE, vial = F
         }
     }
     filler <- substr(barcodes[1], 5,5)
-    if (filler != ".") {
-        barcodes <- gsub(paste0("\\", filler), ".", barcodes)
+    if (filler != "-") {
+        barcodes <- gsub(paste0("\\", filler), "-", barcodes)
     }
     if(is.null(position)) {
         index <- NULL
@@ -58,13 +58,13 @@ bcIDR <- function(barcodes, position = NULL, part = TRUE, sample=FALSE, vial = F
         index <- position
     }
     if(identical(index, 1:3)){
-        bcc <- lapply(strsplit(barcodes, "\\."), "[", index)
-        bcc <- tolower(sapply(bcc, paste, collapse="."))
+        bcc <- lapply(strsplit(barcodes, "\\-"), "[", index)
+        bcc <- tolower(sapply(bcc, paste, collapse="-"))
         return(bcc)
     }
     if(collapse) {
-        bcc <- lapply(strsplit(barcodes, "\\."), "[", index)
-        bcc <- tolower(sapply(bcc, paste, collapse = "."))
+        bcc <- lapply(strsplit(barcodes, "\\-"), "[", index)
+        bcc <- tolower(sapply(bcc, paste, collapse = "-"))
         if(!vial & max(index)==4){
             if(part){
                 lettNo <- 15
@@ -74,7 +74,7 @@ bcIDR <- function(barcodes, position = NULL, part = TRUE, sample=FALSE, vial = F
             bcc <- substr(bcc, 1, lettNo)
         }
     } else {
-        bcc <- sapply(strsplit(barcodes, "\\."), "[", index)
+        bcc <- sapply(strsplit(barcodes, "\\-"), "[", index)
         if(length(index) > 1){
             bcc <- tolower(t(bcc))
         }

@@ -18,21 +18,21 @@
 matchClinical <- function (expData, phenoDat) {
     if (is(expData, "list")) {
         filler <- substr(names(expData)[1], 5, 5)
-        if (filler != ".") {
+        if (filler != "-") {
             names(expData) <- gsub(paste0("\\", filler),
-                                   "\\.", names(expData)) }
+                                   "\\-", names(expData)) }
         getNames <- function(x){ names(x) }
     } else {
         filler <- substr(colnames(expData)[1], 5, 5)
-        if (filler != ".") {
+        if (filler != "-") {
             names(expData) <- gsub(paste0("\\", filler),
-                                   "\\.", colnames(expData)) }
+                                   "\\-", colnames(expData)) }
         getNames <- function(x) { colnames(x) }
     }
     filler <- substr(rownames(phenoDat)[1], 5, 5)
-    if (filler != ".") {
+    if (filler != "-") {
         rownames(phenoDat) <- gsub(paste0("\\", filler),
-                                   "\\.", rownames(phenoDat)) }
+                                   "\\-", rownames(phenoDat)) }
     commonNames <- intersect(bcIDR(getNames(expData)), bcIDR(rownames(phenoDat)))
     namesRight <- getNames(expData)[match(commonNames, bcIDR(getNames(expData)))]
     righttab <- bcRight(namesRight)
