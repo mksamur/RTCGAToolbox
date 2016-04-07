@@ -104,7 +104,12 @@ extract <- function(object, type) {
         stop("There is no data for that data type!")
     } else {
         if (slotreq %in% c("Methylation", "AllByGene", "ThresholdedByGene")) {
-            annote <- dm[, seq(grep("TCGA", names(dm))[1]-1) ]
+            annote <- dm[, !grepl("TCGA", names(dm))]
+            isCharRow <- all(grepl("[[:alpha:]]", rownames(dm)))
+            if (!isCharRow) {
+            geneSymbols <- annote[, grep("symbol", names(annote), ignore.case = TRUE, value = TRUE)]
+            rNames <- geneSymbols
+            }
             rNames <- rownames(dm)
             dm <- apply(dm[grep("TCGA", names(dm))[1]:ncol(dm)], 2, as.numeric, as.matrix)
             rownames(dm) <- rNames
@@ -112,6 +117,7 @@ extract <- function(object, type) {
             if (filler != "-") {
                 colnames(dm) <- gsub(paste0("\\", filler), "-", colnames(dm))
             }
+            return(dm)
         } else if (slotreq %in% rangeslots) {
             colnames(dm) <- tolower(colnames(dm))
             mygrl <- makeGRangesList(dm)
