@@ -160,8 +160,13 @@ extract <- function(object, type, clinical = FALSE) {
   }
   
   if(clinical) {
+    if(slotreq %in% c("Methylation", "AllByGene", "ThresholdedByGene")){
       righttab <- bcRight(colnames(dm))
       dups <- bcIDR(colnames(dm), sample=TRUE, collapse = TRUE)[duplicated(bcIDR(colnames(dm), sample = TRUE, collapse = TRUE))]
+    }
+      if(slotreq %in% rangeslots) {
+      dups <- names(dm)[duplicated(bcIDR(names(dm)))]
+      }
   }
   
   if(dim(dm)[1] == 0 | dim(dm)[2] == 0){
@@ -179,6 +184,9 @@ extract <- function(object, type, clinical = FALSE) {
       }
     } else if(slotreq %in% rangeslots) {
       colnames(dm) <- tolower(colnames(dm))
+      mygrl <- makeGRangesList(dm)
+    }
+    
       sampleIndicator <- ifelse(is.null(dm$sample),
                                 "tumor_sample_barcode", "sample")
       ## Convert data to list for GRangesList
@@ -186,7 +194,6 @@ extract <- function(object, type, clinical = FALSE) {
         dm[, sampleIndicator]),
         sample = TRUE, collapse = TRUE))
       ## Checking for duplicates in data
-      dups <- names(dm)[duplicated(bcIDR(names(dm)))]
     } else {
       dups <- bcIDR(colnames(dm), sample=TRUE, collapse=TRUE)[duplicated(bcIDR(colnames(dm), sample=TRUE, collapse = TRUE))]
     }
