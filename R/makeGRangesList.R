@@ -13,7 +13,7 @@
 #'
 #' @author Marcel Ramos \email{mramos09@gmail.com}
 #'
-#' @export
+#' @export makeGRangesList
 makeGRangesList <- function(inputData) {
     if (is(inputData, "data.frame")) {
     names(inputData) <- tolower(names(inputData))
