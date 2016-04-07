@@ -76,7 +76,7 @@
 #' }
 #'
 #' @export
-extract <- function(object, type, clinical = TRUE) {
+extract <- function(object, type, clinical = FALSE) {
   if (!is.null(type)) {
     if (is.character(type)) {
       type <- tolower(gsub("_", "", type))
@@ -85,7 +85,7 @@ extract <- function(object, type, clinical = TRUE) {
     }
   } else {
     if (!clinical){
-      stop("Nothing to extract. Please check the arguments.")
+      stop("Nothing to extract")
     }
   }
   if(clinical){
@@ -158,6 +158,12 @@ extract <- function(object, type, clinical = TRUE) {
   } else {
     stop(paste("Data type not yet supported or could not be matched."))
   }
+  
+  if(clinical) {
+      righttab <- bcRight(colnames(dm))
+      dups <- bcIDR(colnames(dm), sample=TRUE, collapse = TRUE)[duplicated(bcIDR(colnames(dm), sample = TRUE, collapse = TRUE))]
+  }
+  
   if(dim(dm)[1] == 0 | dim(dm)[2] == 0){
     stop("There is no data for that data type!")
   } else {
@@ -171,8 +177,6 @@ extract <- function(object, type, clinical = TRUE) {
       if (filler != "-") {
        colnames(dm) <- gsub(paste0("\\", filler), "-", colnames(dm)) 
       }
-      righttab <- bcRight(colnames(dm))
-      dups <- bcIDR(colnames(dm), sample=TRUE, collapse = TRUE)[duplicated(bcIDR(colnames(dm), sample = TRUE, collapse = TRUE))]
     } else if(slotreq %in% rangeslots) {
       colnames(dm) <- tolower(colnames(dm))
       sampleIndicator <- ifelse(is.null(dm$sample),
@@ -215,8 +219,11 @@ extract <- function(object, type, clinical = TRUE) {
       if (!slotreq %in% rangeslots) {
         clindup <- matchClinical(dm, pd)
         colnames(dm) <- bcIDR(colnames(dm), sample=TRUE, collapse=TRUE)
-        ndm <- dm[,na.omit(match(rownames(clindup), colnames(dm)))]
-        if(identical(all.equal(rownames(clindup), colnames(ndm)), TRUE)){
+         # dupSamps <- bcIDR(colnames(dm))[duplicated(bcIDR(colnames(dm)))]
+        ## dropping recurring samples (not technical replicates)
+        ndm <- dm[,na.omit(match(rownames(clindup), bcIDR(colnames(dm))))]
+        browser()
+        if(identical(all.equal(rownames(clindup), bcIDR(colnames(ndm))), TRUE)){
           eset <- ExpressionSet(ndm, AnnotatedDataFrame(clindup))
           if(exists("annote")){
             featureData(eset) <- AnnotatedDataFrame(annote)
@@ -224,7 +231,6 @@ extract <- function(object, type, clinical = TRUE) {
           return(eset)
         } else {
           stop("Couldn't match up rownames of clinical to colnames of numeric data")
-          return(dm)
         }
       } else {
         clindup <- matchClinical(dm, pd)
