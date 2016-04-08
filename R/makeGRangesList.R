@@ -24,7 +24,6 @@ makeGRangesList <- function(inputData) {
         inputData[, sampleIndicator]),
         sample = TRUE, collapse = TRUE))
     }
-    names(inputData) <- tolower(names(inputData))
     inputData <- lapply(inputData, function(elements) {
         names(elements) <- tolower(names(elements))
         elements

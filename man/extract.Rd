@@ -2,27 +2,21 @@
 % Please edit documentation in R/extract.R
 \name{extract}
 \alias{extract}
-\title{Extract data from \code{FirehoseData} object into \code{ExpressionSet} or \code{GRangesList} object}
+\title{Extract data from \code{FirehoseData} object into \code{ExpressionSet} or
+\code{GRangesList} object}
 \usage{
-extract(object, type, clinical = TRUE)
+extract(object, type = NULL)
 }
 \arguments{
 \item{object}{A \code{FirehoseData} object from which to extract data.}
 
-\item{type}{The type of data to extract from the "FirehoseData" object. To request the clinical data frame only, set to NULL or "none".}
-
-\item{clinical}{Logical (default TRUE) includes additional clinic data, if available.}
-}
-\value{
-Either an \code{\link{ExpressionSet}} object, \code{\link{GRangesList}}) object, or data frame (when no clinical data requested for the selected data type or when clinical data is exclusively requested).
-Choices include: "RNAseq_Gene", "Clinic", "miRNASeq_Gene", "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP", "CNA_Seq", "CNA_CGH", "Methylation", "Mutation", "mRNA_Array", "miRNA_Array", "RPPA", "GISTIC_A", "GISTIC_T".
-The "GISTIC_A" type of dataset represents GISTIC data by all genes. "GISTIC_T"" represents data thresholded by genes.
+\item{type}{The type of data to extract from the "FirehoseData" object.}
 }
 \description{
-This extracts data from a \code{FirehoseData} object and converts it to a structured S4
-object for analysis. An option is available to retreive clinical data. The function
-returns an ExpressionSet, GRangesList class object (see \code{\link{ExpressionSet}} or \code{\link{GRangesList}})
-or a data frame.
+This extracts data from a \code{FirehoseData} object and converts it to a
+structured S4 object for analysis. The function returns an ExpressionSet or
+GRangesList #' class object (see \code{\link{ExpressionSet}} and
+\code{\link{GRangesList}}).
 }
 \examples{
 
