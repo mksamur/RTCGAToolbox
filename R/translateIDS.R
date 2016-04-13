@@ -3,8 +3,8 @@
 #' This function allows the user to enter a character vector of identifiers
 #' to translate from barcodes to UUIDs and vice versa. 
 #' 
-#' @param identifier A \code{character} vector of identifiers either TCGA
-#' barcodes or UUIDs
+#' @param identifier A \code{character} vector of either TCGA
+#' barcodes or UUID identifiers
 #' 
 #' @return A \code{data.frame} of original and translated identifiers
 #' @export translateIDS

@@ -7,8 +7,8 @@
 translateIDS(identifier)
 }
 \arguments{
-\item{identifier}{A \code{character} vector of identifiers either TCGA
-barcodes or UUIDs}
+\item{identifier}{A \code{character} vector of either TCGA
+barcodes or UUID identifiers}
 }
 \value{
 A \code{data.frame} of original and translated identifiers
