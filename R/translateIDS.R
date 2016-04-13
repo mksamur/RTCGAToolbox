@@ -10,6 +10,7 @@
 #' 
 #' @return A \code{data.frame} of original and translated identifiers
 #' @export translateIDS
+#' @importFrom httr POST content
 translateIDS <- function(identifier) {
     identifier <- unique(identifier)
     if (length(identifier) > 500) {
@@ -22,7 +23,7 @@ translateIDS <- function(identifier) {
         paste0("https://tcga-data.nci.nih.gov/uuid/uuidws/mapping/json/",
                   keyword, "/batch")
     idQuery <- paste(identifier, collapse = ",")
-    id_table <- POST(queryURL, body = idQuery, encode = "json",
+    id_table <- httr::POST(queryURL, body = idQuery, encode = "json",
                          content_type("text/plain"))
     id_table <- do.call(rbind,
                             lapply(

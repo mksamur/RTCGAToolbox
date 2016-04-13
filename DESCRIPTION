@@ -37,7 +37,8 @@ Imports:
     RJSONIO,
     IRanges,
     S4Vectors,
-    plyr
+    plyr,
+    httr
 Depends:
     R (>= 3.2.0),
     GenomicRanges,
