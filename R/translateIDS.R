@@ -1,0 +1,31 @@
+#' Translate TCGA Barcode to Universally Unique Identifiers and vice versa
+#' 
+#' This function allows the user to enter a character vector of identifiers
+#' to translate from barcodes to UUIDs and vice versa. 
+#' 
+#' @param identifier A \code{character} vector of identifiers either TCGA
+#' barcodes or UUIDs
+#' 
+#' @return A \code{data.frame} of original and translated identifiers
+#' @export translateIDS
+translateIDS <- function(identifier) {
+    identifier <- unique(identifier)
+    if (length(identifier) > 500) {
+        stop("enter 500 at a time for now")
+    }
+    keyword <- ifelse(grepl("TCGA", identifier[1], ignore.case = TRUE),
+               "barcode",
+               "uuid")
+    queryURL <-
+        paste0("https://tcga-data.nci.nih.gov/uuid/uuidws/mapping/json/",
+                  keyword, "/batch")
+    idQuery <- paste(identifier, collapse = ",")
+    id_table <- POST(queryURL, body = idQuery, encode = "json",
+                         content_type("text/plain"))
+    id_table <- do.call(rbind,
+                            lapply(
+                                httr::content(id_table,
+                                              "parsed")$uuidMapping, unlist))
+    id_table <- as.data.frame(id_table, stringsAsFactors = FALSE)
+    return(id_table)
+}

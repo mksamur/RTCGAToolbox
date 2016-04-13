@@ -21,7 +21,7 @@
 #'
 #' @param object A \code{FirehoseData} object from which to extract data.
 #' @param type The type of data to extract from the "FirehoseData" object.
-#' @return Either an \code{\link{ExpressionSet} object or a
+#' @return Either an \code{\link{ExpressionSet}} object or a
 #' \code{\link{GRangesList}}) object. Choices include: "RNAseq_Gene",
 #' "Clinic", "miRNASeq_Gene", "RNAseq2_Gene_Norm", "CNA_SNP", "CNV_SNP",
 #' "CNA_Seq", "CNA_CGH", "Methylation", "Mutation", "mRNA_Array",
