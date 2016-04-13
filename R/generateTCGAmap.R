@@ -10,6 +10,8 @@
 #' @return A \code{DataFrame} class object of mapped samples and patient
 #' identifiers including assays
 #' 
+#' @author Marcel Ramos \email{mramos09@gmail.com}
+#' 
 #' @export generateTCGAmap
 generateTCGAmap <- function(exlist, mPheno) {
     if (requireNamespace("MultiAssayExperiment", quietly = TRUE)) {

@@ -6,6 +6,8 @@
 #' @param identifier A \code{character} vector of either TCGA
 #' barcodes or UUID identifiers
 #' 
+#' @author Marcel Ramos \email{mramos09@@gmail.com}
+#' 
 #' @return A \code{data.frame} of original and translated identifiers
 #' @export translateIDS
 translateIDS <- function(identifier) {

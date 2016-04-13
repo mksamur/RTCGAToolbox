@@ -9,12 +9,19 @@
 #' as rownames
 #' @return A named \code{list} of experiments
 #' 
+#' @author Marcel Ramos \email{mramos09@@gmail.com}
+#' 
 #' @export cleanExpList
 cleanExpList <- function(exlist, mPheno) {
     sampNames <- lapply(exlist, colnames)
-    PatientsInSamp <- lapply(sampNames, function(barcode) {unique(bcIDR(barcode))})
+    PatientsInSamp <- lapply(sampNames,
+                             function(barcode) {
+                                 unique(bcIDR(barcode))
+                             })
     patientID <- rownames(mPheno)
     validIDs <- Reduce(intersect, PatientsInSamp, patientID)
-    logicSub <- lapply(exlist, function(elem) {bcIDR(colnames(elem)) %in% validIDs})
+    logicSub <- lapply(exlist, function(elem) {
+        bcIDR(colnames(elem)) %in% validIDs
+    })
     return(Map(function(x, y) {x[, y]}, x = exlist, y = logicSub))
 }

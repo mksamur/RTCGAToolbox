@@ -21,4 +21,7 @@ identifiers including assays
 This function helps create a sampleMap in preparation of a
 \code{MultiAssayExperiment} object
 }
+\author{
+Marcel Ramos \email{mramos09@gmail.com}
+}
 

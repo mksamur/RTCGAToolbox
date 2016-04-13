@@ -17,4 +17,7 @@ A \code{data.frame} of original and translated identifiers
 This function allows the user to enter a character vector of identifiers
 to translate from barcodes to UUIDs and vice versa.
 }
+\author{
+Marcel Ramos \email{mramos09@gmail.com}
+}
 
