@@ -5,6 +5,7 @@
 #' @return A character string
 #' @examples
 #' getFirehoseDatasets()
+#' @export getFirehoseDatasets
 getFirehoseDatasets <- function(){
   runDataset <- read.table("http://www.canevolve.org/fmineRdataset.txt",
                            header=FALSE, sep="\t", na.strings="NA", dec=".", strip.white=TRUE)
