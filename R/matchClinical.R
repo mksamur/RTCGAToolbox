@@ -42,8 +42,5 @@ matchClinical <- function (expData, phenoDat) {
     ## Match on patient identifiers
     clindup <- phenoDat[match(commonNames, rownames(phenoDat)),]
     clindup <- cbind(clindup, righttab[, -length(righttab)])
-    ## Move patient IDs to a column (to allow any duplicates)
-    clindup <- data.frame(patientids = rownames(clindup), clindup,
-                          row.names = NULL, stringsAsFactors = FALSE)
     return(clindup)
 }

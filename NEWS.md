@@ -1,3 +1,10 @@
+# RTCGAToolbox 2.2.55
+
+## Bug fixes and minor improvements 
+
+* `extract` now returns either `GRangesList` or `ExpressionSet` without
+clinical data
+
 # RTCGAToolbox 2.2.53
 
 ## Bug fixes and minor improvements

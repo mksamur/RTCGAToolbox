@@ -13,7 +13,7 @@
 #'
 #' @author Marcel Ramos \email{mramos09@gmail.com}
 #'
-#' @export
+#' @export makeGRangesList
 makeGRangesList <- function(inputData) {
     if (is(inputData, "data.frame")) {
     names(inputData) <- tolower(names(inputData))
@@ -24,7 +24,6 @@ makeGRangesList <- function(inputData) {
         inputData[, sampleIndicator]),
         sample = TRUE, collapse = TRUE))
     }
-    names(inputData) <- tolower(names(inputData))
     inputData <- lapply(inputData, function(elements) {
         names(elements) <- tolower(names(elements))
         elements
