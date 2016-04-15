@@ -10,10 +10,12 @@ bcRight(barcodes)
 \item{barcodes}{A character vector of TCGA barcodes}
 }
 \value{
-A dataframe with sample type, sample code, vial, portion, analyte, plate, and center columns.
+A dataframe with sample type, sample code, vial, portion, analyte,
+plate, and center columns.
 }
 \description{
-This function uses the TCGA barcode to return a data frame of the data to the right of the participant identifier.
+This function uses the full TCGA barcode to return a data frame of the
+data to the right of the participant identifier.
 }
 \examples{
 

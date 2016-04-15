@@ -10,7 +10,7 @@
 #' 
 #' @return A \code{data.frame} of original and translated identifiers
 #' @export translateIDS
-#' @importFrom httr POST content
+#' @importFrom httr POST content content_type
 translateIDS <- function(identifier) {
     identifier <- unique(identifier)
     if (length(identifier) > 500) {
@@ -24,11 +24,12 @@ translateIDS <- function(identifier) {
                   keyword, "/batch")
     idQuery <- paste(identifier, collapse = ",")
     id_table <- httr::POST(queryURL, body = idQuery, encode = "json",
-                         content_type("text/plain"))
+                         httr::content_type("text/plain"))
     id_table <- do.call(rbind,
                             lapply(
                                 httr::content(id_table,
                                               "parsed")$uuidMapping, unlist))
+    if (dim(id_table)[2] == 1L) {id_table <- t(id_table)}
     id_table <- as.data.frame(id_table, stringsAsFactors = FALSE)
     return(id_table)
 }

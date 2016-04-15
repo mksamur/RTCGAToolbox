@@ -41,6 +41,7 @@ matchClinical <- function (expData, phenoDat) {
     rownames(clindup) <- namesRight
     ## Match on patient identifiers
     clindup <- phenoDat[match(commonNames, rownames(phenoDat)),]
-    clindup <- cbind(clindup, righttab[, -length(righttab)])
+    clindup <- cbind(clindup,
+                     righttab[, -which(names(righttab) == "patientids")])
     return(clindup)
 }

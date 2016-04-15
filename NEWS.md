@@ -1,3 +1,14 @@
+# RTCGAToolbox 2.2.56
+
+## New features
+
+* `readExonFiles` function now available for TCGA exon array level data. Returns
+a `GRangesList`.
+
+## Bug fixes and minor improvements 
+
+* Import `content_type` function from the `httr` package
+
 # RTCGAToolbox 2.2.55
 
 ## Bug fixes and minor improvements 
