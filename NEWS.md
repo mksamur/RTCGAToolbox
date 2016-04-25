@@ -1,3 +1,13 @@
+# RTCGAToolbox 2.2.57
+
+## New Features
+
+* Migration from RTCGAToolbox - moving to a new package
+
+## Bug fixes
+
+* Re-added the arraydata = FALSE flag for RNAseq data type
+
 # RTCGAToolbox 2.2.56
 
 ## New features

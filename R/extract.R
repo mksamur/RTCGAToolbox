@@ -42,6 +42,7 @@ extract <- function(object, type = NULL) {
     if (!is.null(type)) {
         if (is.character(type)) {
             type <- tolower(gsub("_", "", type))
+            type <- gsub("s$", "", type)
         } else {
             stop("Data type must be a character string")
         }

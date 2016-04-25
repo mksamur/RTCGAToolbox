@@ -370,7 +370,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                        "[.]rnaseq__.*.__Level_3__gene_expression__data.data.txt$",
                        TRUE,"-RNAseqGene.txt",FALSE,destdir,forceDownload,runDate)
           #Get selected type only
-          resultClass@RNASeqGene <- .makeExprMat(export.file,RNAseqNorm,"RNAseq",mergeSize=1000,arrayData=TRUE)
+          resultClass@RNASeqGene <- .makeExprMat(export.file,RNAseqNorm,"RNAseq",mergeSize=1000,arrayData=FALSE)
           gc() 
         }
       }
