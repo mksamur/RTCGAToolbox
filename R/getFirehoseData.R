@@ -332,7 +332,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     fh_url <- "http://gdac.broadinstitute.org/runs/stddata__"
     fh_url <- paste0(fh_url,substr(runDate,1,4),"_",substr(runDate,5,6),"_",substr(runDate,7,8),"/data/")
     fh_url <- paste0(fh_url,dataset,"/",runDate,"/")
-    doc = htmlTreeParse(fh_url, useInternalNodes = TRUE)
+    doc = XML::htmlTreeParse(fh_url, useInternalNodes = TRUE)
 
     
     #Download clinical data
@@ -697,7 +697,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     fh_url <- "http://gdac.broadinstitute.org/runs/analyses__"
     fh_url <- paste(fh_url,substr(gistic2_Date,1,4),"_",substr(gistic2_Date,5,6),"_",substr(gistic2_Date,7,8),"/data/",sep="")
     fh_url <- paste(fh_url,dataset,"/",gistic2_Date,"/",sep="")
-    doc = htmlTreeParse(fh_url, useInternalNodes = TRUE)
+    doc = XML::htmlTreeParse(fh_url, useInternalNodes = TRUE)
     #Search for links
     plinks <- .getLinks("CopyNumber_Gistic2.Level_4","-TP[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$",dataset,doc)
     
