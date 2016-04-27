@@ -1,3 +1,10 @@
+#' @importFrom grDevices colorRampPalette dev.off pdf
+#' @importFrom graphics legend plot
+#' @importFrom stats cor.test heatmap model.matrix p.adjust pchisq
+#' @importFrom utils data download.file head read.csv read.delim read.table
+#' setTxtProgressBar txtProgressBar untar write.table
+NULL
+
 #' Perform correlation analysis betwwen gene expression and copy number data
 #'
 #' \code{getCNGECorrelation} returns a list that stores the results correlation between gene expression and copy number data.

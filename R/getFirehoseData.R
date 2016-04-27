@@ -282,7 +282,8 @@
 #' RNAseq_Gene=TRUE,Clinic=TRUE,mRNA_Array=TRUE,Mutation=TRUE)
 #' }
 #' @export getFirehoseData
-#' @importFrom XML xpathSApply htmlTreeParse
+#' @import XML
+#' @importFrom data.table fread
 getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gene=FALSE,Clinic=TRUE,
                             miRNASeq_Gene=FALSE, RNAseq2_Gene_Norm=FALSE,
                             CNA_SNP=FALSE,CNV_SNP=FALSE,
