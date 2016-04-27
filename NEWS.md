@@ -1,3 +1,9 @@
+# RTCGAToolbox 2.4.00
+
+## New Features
+
+* Moved to new package `TCGAmisc`! To install use `BiocInstaller::biocLite("LiNk-NY/TCGAmisc")`
+
 # RTCGAToolbox 2.2.57
 
 ## New Features

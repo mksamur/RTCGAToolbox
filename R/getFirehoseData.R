@@ -264,7 +264,7 @@
 #' @param Mutation Logical (default FALSE) parameter for mutation data from sequencing.
 #' @param mRNA_Array Logical (default FALSE) parameter for mRNA expression data from microarray.
 #' @param miRNA_Array Logical (default FALSE) parameter for miRNA expression data from microarray.
-#' @param RPPA Logical (default FALSE) parameter for RPPA data
+#' @param RPPA_Array Logical (default FALSE) parameter for RPPA data
 #' @param RNAseqNorm RNAseq data normalization method. (Default raw_counts)
 #' @param RNAseq2Norm RNAseq v2 data normalization method. (Default normalized_count)
 #' @param forceDownload A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.
@@ -286,7 +286,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                             miRNASeq_Gene=FALSE, RNAseq2_Gene_Norm=FALSE,
                             CNA_SNP=FALSE,CNV_SNP=FALSE,
                             CNA_Seq=FALSE,CNA_CGH=FALSE,Methylation=FALSE,Mutation=FALSE,mRNA_Array=FALSE,
-                            miRNA_Array=FALSE,RPPA=FALSE,RNAseqNorm="raw_counts",RNAseq2Norm="normalized_count",
+                            miRNA_Array=FALSE,RPPA_Array=FALSE,RNAseqNorm="raw_counts",RNAseq2Norm="normalized_count",
                             forceDownload=FALSE,destdir=".",fileSizeLimit=500,getUUIDs=FALSE)
 {
   
@@ -624,7 +624,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     }
     
     #Download RPPA array
-    if(RPPA)
+    if(RPPA_Array)
     {
       #Search for links
       plinks <- .getLinks("rppa_core","[.]Merge_protein_exp.*.protein_normalization__data.Level_3.*.tar[.]gz$",dataset,doc)

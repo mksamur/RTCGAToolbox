@@ -9,7 +9,7 @@ getFirehoseData(dataset, runDate = NULL, gistic2_Date = NULL,
   RNAseq2_Gene_Norm = FALSE, CNA_SNP = FALSE, CNV_SNP = FALSE,
   CNA_Seq = FALSE, CNA_CGH = FALSE, Methylation = FALSE,
   Mutation = FALSE, mRNA_Array = FALSE, miRNA_Array = FALSE,
-  RPPA = FALSE, RNAseqNorm = "raw_counts",
+  RPPA_Array = FALSE, RNAseqNorm = "raw_counts",
   RNAseq2Norm = "normalized_count", forceDownload = FALSE, destdir = ".",
   fileSizeLimit = 500, getUUIDs = FALSE)
 }
@@ -44,7 +44,7 @@ getFirehoseData(dataset, runDate = NULL, gistic2_Date = NULL,
 
 \item{miRNA_Array}{Logical (default FALSE) parameter for miRNA expression data from microarray.}
 
-\item{RPPA}{Logical (default FALSE) parameter for RPPA data}
+\item{RPPA_Array}{Logical (default FALSE) parameter for RPPA data}
 
 \item{RNAseqNorm}{RNAseq data normalization method. (Default raw_counts)}
 

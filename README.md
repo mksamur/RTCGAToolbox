@@ -1,7 +1,9 @@
 RTCGAToolbox - Marcel Ramos fork
 ============
 
-This fork adds two pieces of functionality to the main repository http://mksamur.github.io/RTCGAToolbox/:
+## Migration from RTCGAToolbox!
 
-1. An `extract()` function that creates `ExpressionSet` or `GRangesList` objects containing clinical data.
-2. Pulls an increased number of clinical variables.
+This fork is no longer the site of development for RTCGAToolbox helper functions
+
+Please see the `TCGAmisc` package for such functions. 
+It can be downloaded using `BiocInstaller::biocLite("waldronlab/TCGAmisc")`
