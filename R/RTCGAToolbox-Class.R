@@ -264,3 +264,15 @@ setMethod("showResults", "CorResult",function(object){
   print(head(object@Correlations))
   invisible(object@Correlations)
 })
+
+#' Get Clinical data from FirehoseData 
+#'
+#' @param object 
+#' @return Returns the Clinical data slot
+#' @export Clinical
+setGeneric("Clinical", function(object) standardGeneric("Clinical"))
+
+#' @describeIn FirehoseData Get the Clinical data slot from a FirehoseData object
+setMethod("Clinical", "FirehoseData", function(object) {
+           getElement(object, "Clinical")
+})
