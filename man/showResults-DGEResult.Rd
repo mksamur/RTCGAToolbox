@@ -2,8 +2,8 @@
 % Please edit documentation in R/RTCGAToolbox-Class.R
 \docType{methods}
 \name{showResults,DGEResult-method}
-\alias{showResults,DGEResult,DGEResult-method}
 \alias{showResults,DGEResult-method}
+\alias{showResults,DGEResult,DGEResult-method}
 \title{Export toptable or correlation data frame}
 \usage{
 \S4method{showResults}{DGEResult}(object)

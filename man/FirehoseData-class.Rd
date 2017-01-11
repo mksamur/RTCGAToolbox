@@ -2,8 +2,8 @@
 % Please edit documentation in R/RTCGAToolbox-Class.R
 \docType{class}
 \name{FirehoseData-class}
-\alias{Clinical,FirehoseData-method}
 \alias{FirehoseData-class}
+\alias{Clinical,FirehoseData-method}
 \title{An S4 class to store main data object from clinent function.}
 \usage{
 \S4method{Clinical}{FirehoseData}(object)

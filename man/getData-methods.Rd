@@ -2,8 +2,8 @@
 % Please edit documentation in R/RTCGAToolbox-Class.R
 \docType{methods}
 \name{getData,FirehoseData-method}
-\alias{getData,FirehoseData,FirehoseData-method}
 \alias{getData,FirehoseData-method}
+\alias{getData,FirehoseData,FirehoseData-method}
 \title{Export data from FirehoseData object}
 \usage{
 \S4method{getData}{FirehoseData}(object, type = "", platform = NULL,
