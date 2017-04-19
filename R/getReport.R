@@ -14,6 +14,7 @@
 #' locations = as.data.frame(locations)
 #' locations <- locations[,c(6,1,5,2:3)]
 #' locations <- locations[!is.na(locations[,1]),]
+#' locations <- locations[!duplicated(locations[,1]),]
 #' rownames(locations) <- locations[,1]
 #' t1=getDiffExpressedGenes(RTCGASample)
 #' \dontrun{
