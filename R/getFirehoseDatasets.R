@@ -12,3 +12,11 @@ getFirehoseDatasets <- function(){
   runDataset <- as.character(runDataset[,1])
   return(runDataset)
 }
+
+#' RTCGASample
+#' 
+#' Example dataset not biologically meaningful
+#' @docType data
+#' 
+#' @keywords data
+"RTCGASample"

@@ -1,4 +1,4 @@
-.makeExprMat <- function(file,normMethod,dataType,mergeSize=1000,arrayData=FALSE)
+.makeExprMat <- function(file,normMethod,dataType,mergeSize=1002,arrayData=FALSE)
 {
   #Get selected type only
   tmpCols = read.delim(file,nrows=1,colClasses="character")
