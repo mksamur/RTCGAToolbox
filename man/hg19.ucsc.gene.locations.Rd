@@ -17,4 +17,3 @@ The variables are as follows:
   \item End. Gene location on chromosome
 }
 }
-

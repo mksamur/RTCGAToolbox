@@ -15,6 +15,7 @@ An S4 class to store main data object from clinent function.
 \itemize{
 \item \code{Clinical}: Get the Clinical data slot from a FirehoseData object
 }}
+
 \section{Slots}{
 
 \describe{

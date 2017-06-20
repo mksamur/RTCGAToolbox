@@ -34,4 +34,3 @@ t1=getDiffExpressedGenes(RTCGASample)
 getReport(dataObject=RTCGASample,DGEResult1=t1[[1]],geneLocations=locations)
 }
 }
-

@@ -21,4 +21,3 @@ dgeRes = getDiffExpressedGenes(RTCGASample)
 dgeRes
 showResults(dgeRes[[1]])
 }
-

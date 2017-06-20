@@ -32,4 +32,3 @@ survData <- data.frame(Samples=rownames(clinicData),Time=as.numeric(clinicData[,
 Censor=as.numeric(clinicData[,1]))
 getSurvival(dataObject=RTCGASample,geneSymbols=c("FCGBP"),sampleTimeCensor=survData)
 }
-

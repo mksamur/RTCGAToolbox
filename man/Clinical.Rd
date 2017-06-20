@@ -15,4 +15,3 @@ Returns the Clinical data slot
 \description{
 Get Clinical data from FirehoseData
 }
-

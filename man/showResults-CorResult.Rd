@@ -23,4 +23,3 @@ corRes = getCNGECorrelation(RTCGASample,adj.pval = 1,raw.pval = 1)
 corRes
 showResults(corRes[[1]])
 }
-

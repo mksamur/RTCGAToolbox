@@ -26,4 +26,3 @@ data(RTCGASample)
 sampleClinical = getData(RTCGASample,"Clinical")
 sampleClinical = getData(RTCGASample,"RNASeqGene")
 }
-

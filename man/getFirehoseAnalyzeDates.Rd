@@ -19,4 +19,3 @@ A character vector for dates.
 getFirehoseAnalyzeDates()
 getFirehoseAnalyzeDates(last=2)
 }
-

@@ -15,4 +15,3 @@ A character string
 \examples{
 getFirehoseDatasets()
 }
-

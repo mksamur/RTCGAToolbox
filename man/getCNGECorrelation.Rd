@@ -30,4 +30,3 @@ showResults(corRes[[1]])
 \dontrun{
 }
 }
-

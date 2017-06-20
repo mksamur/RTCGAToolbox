@@ -16,4 +16,3 @@ how to use the \pkg{RTCGAToolbox}
 \author{
 Mehmet Kemal Samur
 }
-
