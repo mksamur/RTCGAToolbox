@@ -544,14 +544,20 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
                       paste0("-Methylation-",listCount,".txt"),FALSE,destdir,forceDownload,runDate)
           
           #Get selected type only
-          tmpCols = read.delim(export.file,nrows=1,colClasses="character")
-          colOrder <- 1:ncol(tmpCols)
-          colOrder <- colOrder[tmpCols[1,] == "Beta_value"]
-          
-          tmpMat <- fread(export.file,header=FALSE,colClasses = "character", select=c(1,3,4,5,colOrder), data.table = FALSE)
-          tmpMat <- tmpMat[,c(1,3,4,5,2,6:ncol(tmpMat))]
-          #closeAllConnections()
-          colnames(tmpMat) <- c("CompositeElementREF","Gene_Symbol","Chromosome","Genomic_Coordinate",tmpMat[1,5:ncol(tmpMat)])
+          tmpCols <- read.delim(export.file,nrows=1,colClasses="character")
+          BetaCols <- which(tmpCols[1L,] == "Beta_value")
+          fixedCols <- match(c("Composite Element REF", "Gene_Symbol", "Chromosome", "Genomic_Coordinate"), tmpCols[1L, ])
+          colOrder <- c(fixedCols, BetaCols)
+
+          tmpMat <- fread(export.file,header=FALSE,colClasses = "character", select=colOrder, data.table = FALSE,
+                          nrows = 10)
+          fixedCols <- match(c("Composite Element REF", "Gene_Symbol", "Chromosome", "Genomic_Coordinate"), tmpMat[2L, ])
+          BetaCols <- which(tmpMat[2L, ] == "Beta_value")
+          colOrder <- c(fixedCols, BetaCols)
+          tmpMat <- tmpMat[, colOrder]
+          tmpMat[2L, ] <- gsub(" ", "", tmpMat[2L, ])
+          colnames(tmpMat) <- c(tmpMat[2L, fixedCols], tmpMat[1L, BetaCols])
+
           tmpMat <- tmpMat[-c(1:2),]
           removeQM <- grepl("\\?\\|",tmpMat[,1])
           tmpMat <- tmpMat[!removeQM,]
