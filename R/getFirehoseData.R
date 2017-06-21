@@ -556,7 +556,9 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           colOrder <- c(fixedCols, BetaCols)
           tmpMat <- tmpMat[, colOrder]
           tmpMat[2L, ] <- gsub(" ", "", tmpMat[2L, ])
-          colnames(tmpMat) <- c(tmpMat[2L, fixedCols], tmpMat[1L, BetaCols])
+          firstFixed <- seq_along(fixedCols)
+          BetaCols <- setdiff(seq_along(tmpMat), firstFixed)
+          colnames(tmpMat) <- unlist(c(tmpMat[2L, firstFixed], tmpMat[1L, BetaCols]))
 
           tmpMat <- tmpMat[-c(1:2),]
           removeQM <- grepl("\\?\\|",tmpMat[,1])
@@ -566,27 +568,27 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           rownames(tmpMat) <- names1
           tmpReturn <- new("FirehoseMethylationArray",Filename=ii,DataMatrix=tmpMat)
           dataLists[[listCount]] <- tmpReturn
-          listCount = listCount + 1 
+          listCount = listCount + 1
         }
       }
       resultClass@Methylation <- dataLists
     }
-    
+
     #Download mRNA array
-    if(mRNA_Array)
+    if (mRNA_Array)
     {
       #Search for links
       plinks1 <- .getLinks("Merge_transcriptome__agilentg4502a_07","[.]Merge_transcriptome__agilentg4502a_.*.__Level_3__unc_lowess_normalization_gene_level__data.Level_3.*.tar[.]gz$",dataset,doc)
       plinks2 <- .getLinks("Merge_transcriptome__ht_hg_u133a","[.]Merge_transcriptome__ht_hg_u133a__.*.__Level_3__gene_rma__data.Level_3.*.tar[.]gz$",dataset,doc)
       plinks3 <- .getLinks("Merge_exon__huex_1_0_st_v2","[.]Merge_exon__huex_1_0_st_v2__.*.__Level_3__quantile_normalization_gene__data.Level_3.*.tar[.]gz$",dataset,doc)
-      
+
       plinks = c(plinks1,plinks2,plinks3)
       plinks = unique(plinks[plinks != ""])
       dataLists <- list()
       listCount = 1
       for(ii in trim(plinks))
       {
-        if(.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
+        if (.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
         {
           export.file <- .exportFiles(paste0(fh_url,ii),dataset,
                       "-mRNAArray.tar.gz",
@@ -597,24 +599,24 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           tmpReturn <- new("FirehosemRNAArray",Filename=ii,
                            DataMatrix=.makeExprMat(export.file,"","mRNAArray",1000,TRUE))
           dataLists[[listCount]] <- tmpReturn
-          listCount = listCount + 1 
+          listCount = listCount + 1
         }
       }
       resultClass@mRNAArray <- dataLists
     }
-    
+
     #Download miRNA array
-    if(miRNA_Array)
+    if (miRNA_Array)
     {
       #Search for links
       plinks <- .getLinks("h_mirna_8x15k","[.]Merge_mirna__h_mirna_8x15k.*.data.Level_3.*.tar[.]gz$",dataset,doc)
       plinks = unique(plinks[plinks != ""])
-      
+
       dataLists <- list()
       listCount = 1
       for(ii in trim(plinks))
       {
-        if(.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
+        if (.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
         {
           export.file <- .exportFiles(paste0(fh_url,ii),dataset,
                       "-miRNAArray.tar.gz",
@@ -625,24 +627,24 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           tmpReturn <- new("FirehosemRNAArray",Filename=ii,
                            DataMatrix=.makeExprMat(export.file,"","miRNAArray",100,TRUE))
           dataLists[[listCount]] <- tmpReturn
-          listCount = listCount + 1 
+          listCount = listCount + 1
         }
       }
       resultClass@miRNAArray <- dataLists
     }
-    
+
     #Download RPPA array
-    if(RPPA_Array)
+    if (RPPA_Array)
     {
       #Search for links
       plinks <- .getLinks("rppa_core","[.]Merge_protein_exp.*.protein_normalization__data.Level_3.*.tar[.]gz$",dataset,doc)
       plinks = unique(plinks[plinks != ""])
-      
+
       dataLists <- list()
       listCount = 1
       for(ii in trim(plinks))
       {
-        if(.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
+        if (.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
         {
           export.file <- .exportFiles(paste0(fh_url,ii),dataset,
                       "-RPPAArray.tar.gz",
@@ -653,27 +655,26 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           tmpReturn <- new("FirehosemRNAArray",Filename=ii,
                            DataMatrix=.makeExprMat(export.file,"","RPPAArray",100,TRUE))
           dataLists[[listCount]] <- tmpReturn
-          listCount = listCount + 1 
+          listCount = listCount + 1
         }
       }
       resultClass@RPPAArray <- dataLists
     }
-    
+
     #Download RPPA array
-    if(Mutation)
+    if (Mutation)
     {
-      #Search for links 
+      #Search for links
       plinks <- .getLinks("Mutation_Packager_Calls","[.]Mutation_Packager_Calls[.]Level_3[.].*.tar[.]gz$",dataset,doc)
       plinks = unique(plinks[plinks != ""])
-      
+
       dataLists <- list()
       listCount = 1
       for(ii in trim(plinks))
       {
-        if(.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
+        if (.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
         {
-          if(forceDownload || !file.exists(paste0(destdir,"/",runDate,"-",dataset,"-Mutations-AllSamples.txt")))
-          {
+          if (forceDownload || !file.exists(paste0(destdir,"/",runDate,"-",dataset,"-Mutations-AllSamples.txt"))) {
             download_link = paste(fh_url,ii,sep="")
             download.file(url=download_link,destfile=paste(dataset,"-Mutation.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "wb")
             fileList <- untar(paste0(dataset,"-Mutation.tar.gz"),list=TRUE)
@@ -681,26 +682,23 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
             fileList = fileList[!grepl(grepSearch,fileList)]
             ###
             untar(paste(dataset,"-Mutation.tar.gz",sep=""),files=fileList)
-            retMutations <- do.call("rbind",lapply(fileList,FUN=function(files){
+            retMutations <- do.call("rbind",lapply(fileList,FUN=function(files) {
               read.delim(files,header=TRUE,colClasses="character")
             }))
             delFodler <- paste(getwd(),"/",strsplit(fileList[1],"/")[[1]][1],sep="")
             unlink(delFodler, recursive = TRUE)
             file.remove(paste(dataset,"-Mutation.tar.gz",sep=""))
             write.table(retMutations,file=paste0(destdir,"/",runDate,"-",dataset,"-Mutations-AllSamples.txt"),sep="\t",row.names=FALSE,quote=FALSE)
-          }
-          else
-          {
+          } else {
             #retMutations <- read.delim(file=paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"),header = TRUE,sep="\t")
             retMutations <- fread(paste0(destdir,"/",runDate,"-",dataset,"-Mutations-AllSamples.txt"),header=TRUE,colClasses="character", data.table = FALSE)
           }
-          resultClass@Mutations <- retMutations 
+          resultClass@Mutations <- retMutations
         }
       }
     }
   }
-  if(!is.null(gistic2_Date))
-  {
+  if (!is.null(gistic2_Date)) {
     ##build URL for getting file links
     fh_url <- "http://gdac.broadinstitute.org/runs/analyses__"
     fh_url <- paste(fh_url,substr(gistic2_Date,1,4),"_",substr(gistic2_Date,5,6),"_",substr(gistic2_Date,7,8),"/data/",sep="")
@@ -708,13 +706,11 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     doc = htmlTreeParse(fh_url, useInternalNodes = TRUE)
     #Search for links
     plinks <- .getLinks("CopyNumber_Gistic2.Level_4","-TP[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$",dataset,doc)
-    
+
     for(ii in trim(plinks))
     {
-      if(.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
-      {
-        if(forceDownload || !file.exists(paste0(destdir,"/",gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt")))
-        {
+      if (.checkFileSize(paste0(fh_url,ii),fileSizeLimit)) {
+        if (forceDownload || !file.exists(paste0(destdir,"/",gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"))) {
           download_link = paste(fh_url,ii,sep="")
           download.file(url=download_link,destfile=paste0(dataset,"-Gistic2.tar.gz"),method="auto",quiet = FALSE, mode = "wb")
           fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
