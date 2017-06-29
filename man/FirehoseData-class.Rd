@@ -37,7 +37,7 @@ An S4 class to store main data object from clinent function.
 
 \item{\code{CNVSNP}}{A data frame to store germline copy number variants from SNP array platform}
 
-\item{\code{CNAseq}}{A data frame to store somatic copy number alterations from sequencing platform}
+\item{\code{CNASeq}}{A data frame to store somatic copy number alterations from sequencing platform}
 
 \item{\code{CNACGH}}{A list that stores \code{FirehoseCGHArray} object for somatic copy number alterations from CGH platform}
 
@@ -49,7 +49,7 @@ An S4 class to store main data object from clinent function.
 
 \item{\code{RPPAArray}}{A list that stores \code{FirehosemRNAArray} object for RPPA data}
 
-\item{\code{Mutations}}{A data frame for mutation infromation from sequencing data}
+\item{\code{Mutation}}{A data frame for mutation infromation from sequencing data}
 
 \item{\code{GISTIC}}{A \code{FirehoseGISTIC} object to store processed copy number data}
 

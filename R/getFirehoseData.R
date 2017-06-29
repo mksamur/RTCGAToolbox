@@ -97,9 +97,9 @@
   if (length(object@GISTIC@Dataset) > 0) {
     barcodes <- c(barcodes,colnames(object@GISTIC@AllByGene)[-c(1:3)])
   }
-  if (dim(object@Mutations)[1] > 0 & dim(object@Mutations)[2] > 0) {
-    barcodes <- c(barcodes,unique(as.character(object@Mutations[,16])))
-    barcodes <- c(barcodes,unique(as.character(object@Mutations[,17])))
+  if (dim(object@Mutation)[1] > 0 & dim(object@Mutation)[2] > 0) {
+    barcodes <- c(barcodes,unique(as.character(object@Mutation[,16])))
+    barcodes <- c(barcodes,unique(as.character(object@Mutation[,17])))
   }
   barcodes <- unique(barcodes)
   barcodes <- toupper(barcodes)
@@ -203,20 +203,20 @@
 #'
 #' @param dataset A cohort name. All dataset names can be accessible via \code{\link{getFirehoseDatasets}}
 #' @param runDate Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}
-#' @param gistic2_Date Analyze running dates for GISTIC processed copy number data. Date list can be accessible via \code{\link{getFirehoseAnalyzeDates}}
-#' @param RNAseq_Gene Logical (default FALSE) parameter for RNAseq data.
+#' @param gistic2Date Analyze running dates for GISTIC processed copy number data. Date list can be accessible via \code{\link{getFirehoseAnalyzeDates}}
+#' @param RNASeqGene Logical (default FALSE) parameter for RNAseq data.
 #' @param Clinic Logical (default TRUE) parameter for clinical data.
-#' @param RNAseq2_Gene_Norm Logical (default FALSE) parameter for RNAseq v2 (RSEM processed) data.
-#' @param miRNASeq_Gene Logical (default FALSE) parameter for smallRNAseq data.
-#' @param CNA_SNP Logical (default FALSE) parameter for somatic copy number alterations data from SNP array.
-#' @param CNV_SNP Logical (default FALSE) parameter for germline copy number variants data from SNP array.
-#' @param CNA_Seq Logical (default FALSE) parameter for somatic copy number alterations data from sequencing.
-#' @param CNA_CGH Logical (default FALSE) parameter for somatic copy number alterations data from CGH.
+#' @param RNASeq2GeneNorm Logical (default FALSE) parameter for RNAseq v2 (RSEM processed) data.
+#' @param miRNASeqGene Logical (default FALSE) parameter for smallRNAseq data.
+#' @param CNASNP Logical (default FALSE) parameter for somatic copy number alterations data from SNP array.
+#' @param CNVSNP Logical (default FALSE) parameter for germline copy number variants data from SNP array.
+#' @param CNASeq Logical (default FALSE) parameter for somatic copy number alterations data from sequencing.
+#' @param CNACGH Logical (default FALSE) parameter for somatic copy number alterations data from CGH.
 #' @param Methylation Logical (default FALSE) parameter for methylation data.
 #' @param Mutation Logical (default FALSE) parameter for mutation data from sequencing.
-#' @param mRNA_Array Logical (default FALSE) parameter for mRNA expression data from microarray.
-#' @param miRNA_Array Logical (default FALSE) parameter for miRNA expression data from microarray.
-#' @param RPPA_Array Logical (default FALSE) parameter for RPPA data
+#' @param mRNAArray Logical (default FALSE) parameter for mRNA expression data from microarray.
+#' @param miRNAArray Logical (default FALSE) parameter for miRNA expression data from microarray.
+#' @param RPPAArray Logical (default FALSE) parameter for RPPA data
 #' @param RNAseqNorm RNAseq data normalization method. (Default raw_counts)
 #' @param RNAseq2Norm RNAseq v2 data normalization method. (Default normalized_count)
 #' @param forceDownload A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.
@@ -230,17 +230,17 @@
 #' RTCGASample
 #' \dontrun{
 #' BRCAdata <- getFirehoseData(dataset="BRCA",
-#' runDate="20140416",gistic2_Date="20140115",
-#' RNAseq_Gene=TRUE,Clinic=TRUE,mRNA_Array=TRUE,Mutation=TRUE)
+#' runDate="20140416",gistic2Date="20140115",
+#' RNASeqGene=TRUE,Clinic=TRUE,mRNAArray=TRUE,Mutation=TRUE)
 #' }
 #' @export getFirehoseData
 #' @import XML
 #' @importFrom data.table fread
-getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gene=FALSE,Clinic=TRUE,
-                            miRNASeq_Gene=FALSE, RNAseq2_Gene_Norm=FALSE,
-                            CNA_SNP=FALSE,CNV_SNP=FALSE,
-                            CNA_Seq=FALSE,CNA_CGH=FALSE,Methylation=FALSE,Mutation=FALSE,mRNA_Array=FALSE,
-                            miRNA_Array=FALSE,RPPA_Array=FALSE,RNAseqNorm="raw_counts",RNAseq2Norm="normalized_count",
+getFirehoseData <- function(dataset, runDate=NULL, gistic2Date=NULL, RNASeqGene=FALSE,Clinic=TRUE,
+                            miRNASeqGene=FALSE, RNASeq2GeneNorm=FALSE,
+                            CNASNP=FALSE,CNVSNP=FALSE,
+                            CNASeq=FALSE,CNACGH=FALSE,Methylation=FALSE,Mutation=FALSE,mRNAArray=FALSE,
+                            miRNAArray=FALSE,RPPAArray=FALSE,RNAseqNorm="raw_counts",RNAseq2Norm="normalized_count",
                             forceDownload=FALSE,destdir=".",fileSizeLimit=500,getUUIDs=FALSE)
 {
 
@@ -262,15 +262,15 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
         }
   }
 
-  if (!is.null(gistic2_Date)) {
-    if (!class(gistic2_Date)=="character" || !length(gistic2_Date) == 1 || !nchar(gistic2_Date) == 8) {
-        stop('Please set "gistic2_Date" parameter! You should specify one Firehose run date. Ex: gistic2_Date="20140115"...')
+  if (!is.null(gistic2Date)) {
+    if (!class(gistic2Date)=="character" || !length(gistic2Date) == 1 || !nchar(gistic2Date) == 8) {
+        stop('Please set "gistic2Date" parameter! You should specify one Firehose run date. Ex: gistic2Date="20140115"...')
         }
     runGisticDate <- getFirehoseAnalyzeDates()
-    if (!any(runGisticDate==gistic2_Date)) {
+    if (!any(runGisticDate==gistic2Date)) {
         stop('Please use valid analyze date for GISTIC! "getFirehoseAnalyzeDates" function gives you the vector of valid dates!')}
   }
-  if (is.null(gistic2_Date) & is.null(runDate)) {
+  if (is.null(gistic2Date) & is.null(runDate)) {
       stop("Please specify run date or/and gistic date!")
       }
 
@@ -282,8 +282,8 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
   } else {
     resultClass@runDate <- "N/A"
   }
-  if (!is.null(gistic2_Date)) {
-    resultClass@gistic2Date <- gistic2_Date
+  if (!is.null(gistic2Date)) {
+    resultClass@gistic2Date <- gistic2Date
   } else {
     resultClass@gistic2Date <- "N/A"
   }
@@ -319,7 +319,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     }
 
     #Download RNAseq gene level data
-    if (RNAseq_Gene)
+    if (RNASeqGene)
     {
       #Search for links
       plinks <- .getLinks("Level_3__gene_expression__data.Level_3","*.Merge_rnaseq__.*._rnaseq__.*.tar[.]gz$",NULL,doc)
@@ -339,7 +339,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     }
 
     #Download RNAseq2 gene level data
-    if (RNAseq2_Gene_Norm)
+    if (RNASeq2GeneNorm)
     {
       #Search for links
       plinks <- .getLinks("Level_3__RSEM_genes_normalized__data.Level_3","*.Merge_rnaseqv2__.*._rnaseqv2__.*.tar[.]gz$",NULL,doc)
@@ -361,7 +361,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     }
 
     #Download miRNAseq gene level data
-    if (miRNASeq_Gene)
+    if (miRNASeqGene)
     {
       #Search for links
       plinks <- .getLinks("Level_3__miR_gene_expression__data.Level_3","[.]Merge_mirnaseq__.*.hiseq_mirnaseq__.*.tar[.]gz$",dataset,doc)
@@ -383,7 +383,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     }
 
     #Download CNA SNP data
-    if (CNA_SNP)
+    if (CNASNP)
     {
       #Search for links
       plinks <- .getLinks("Level_3__segmented_scna_hg19__seg.Level_3","[.]Merge_snp__.*.__Level_3__segmented_scna_hg19__seg.Level_3.*.tar[.]gz$",dataset,doc)
@@ -406,7 +406,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     }
 
     #Download CNV SNP data
-    if (CNV_SNP)
+    if (CNVSNP)
     {
       #Search for links
       plinks <- .getLinks("Level_3__segmented_scna_minus_germline_cnv_hg19__seg.Level_3","[.]Merge_snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.Level_3.*.tar[.]gz$",dataset,doc)
@@ -429,7 +429,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     }
 
     #Download CNA DNAseq data
-    if (CNA_Seq)
+    if (CNASeq)
     {
       #Search for links
       plinks <- .getLinks("__Level_3__segmentation__seg.Level_3","[.]Merge_cna__.*.dnaseq.*.__Level_3__segmentation__seg.Level_3.*.tar[.]gz$",dataset,doc)
@@ -455,7 +455,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     }
 
     #Download CNA CGH data
-    if (CNA_CGH)
+    if (CNACGH)
     {
       #Search for links
       plinks <- .getLinks("__Level_3__segmentation__seg.Level_3","[.]Merge_cna__.*.cgh.*.__Level_3__segmentation__seg.Level_3.*.tar[.]gz$",dataset,doc)
@@ -534,7 +534,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     }
 
     #Download mRNA array
-    if (mRNA_Array)
+    if (mRNAArray)
     {
       #Search for links
       plinks1 <- .getLinks("Merge_transcriptome__agilentg4502a_07","[.]Merge_transcriptome__agilentg4502a_.*.__Level_3__unc_lowess_normalization_gene_level__data.Level_3.*.tar[.]gz$",dataset,doc)
@@ -565,7 +565,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     }
 
     #Download miRNA array
-    if (miRNA_Array)
+    if (miRNAArray)
     {
       #Search for links
       plinks <- .getLinks("h_mirna_8x15k","[.]Merge_mirna__h_mirna_8x15k.*.data.Level_3.*.tar[.]gz$",dataset,doc)
@@ -593,7 +593,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     }
 
     #Download RPPA array
-    if (RPPA_Array)
+    if (RPPAArray)
     {
       #Search for links
       plinks <- .getLinks("rppa_core","[.]Merge_protein_exp.*.protein_normalization__data.Level_3.*.tar[.]gz$",dataset,doc)
@@ -652,16 +652,16 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
             #retMutations <- read.delim(file=paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"),header = TRUE,sep="\t")
             retMutations <- fread(paste0(destdir,"/",runDate,"-",dataset,"-Mutations-AllSamples.txt"),header=TRUE,colClasses="character", data.table = FALSE)
           }
-          resultClass@Mutations <- retMutations
+          resultClass@Mutation <- retMutations
         }
       }
     }
   }
-  if (!is.null(gistic2_Date)) {
+  if (!is.null(gistic2Date)) {
     ##build URL for getting file links
     fh_url <- "http://gdac.broadinstitute.org/runs/analyses__"
-    fh_url <- paste(fh_url,substr(gistic2_Date,1,4),"_",substr(gistic2_Date,5,6),"_",substr(gistic2_Date,7,8),"/data/",sep="")
-    fh_url <- paste(fh_url,dataset,"/",gistic2_Date,"/",sep="")
+    fh_url <- paste(fh_url,substr(gistic2Date,1,4),"_",substr(gistic2Date,5,6),"_",substr(gistic2Date,7,8),"/data/",sep="")
+    fh_url <- paste(fh_url,dataset,"/",gistic2Date,"/",sep="")
     doc = htmlTreeParse(fh_url, useInternalNodes = TRUE)
     #Search for links
     plinks <- .getLinks("CopyNumber_Gistic2.Level_4","-TP[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$",dataset,doc)
@@ -669,7 +669,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
     for(ii in trim(plinks))
     {
       if (.checkFileSize(paste0(fh_url,ii),fileSizeLimit)) {
-        if (forceDownload || !file.exists(paste0(destdir,"/",gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"))) {
+        if (forceDownload || !file.exists(paste0(destdir,"/",gistic2Date,"-",dataset,"-all_thresholded.by_genes.txt"))) {
           download_link = paste(fh_url,ii,sep="")
           download.file(url=download_link,destfile=paste0(dataset,"-Gistic2.tar.gz"),method="auto",quiet = FALSE, mode = "wb")
           fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
@@ -677,19 +677,19 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gen
           fileList = fileList[grepl(grepSearch,fileList)]
           untar(paste(dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
           tmpCNAll = fread(fileList,header=TRUE,colClasses="character", data.table = FALSE)
-          file.rename(from=fileList,to=paste0(destdir,"/",gistic2_Date,"-",dataset,"-all_data_by_genes.txt"))
+          file.rename(from=fileList,to=paste0(destdir,"/",gistic2Date,"-",dataset,"-all_data_by_genes.txt"))
           fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
           grepSearch = "all_thresholded.by_genes.txt"
           fileList = fileList[grepl(grepSearch,fileList)]
           untar(paste(dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
           tmpCNThreshhold = fread(fileList,header=TRUE,colClasses = "character", data.table = FALSE)
-          file.rename(from=fileList,to=paste0(destdir,"/",gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"))
+          file.rename(from=fileList,to=paste0(destdir,"/",gistic2Date,"-",dataset,"-all_thresholded.by_genes.txt"))
           delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
           unlink(delFodler, recursive = TRUE)
           file.remove(paste0(dataset,"-Gistic2.tar.gz"))
         } else {
-          tmpCNThreshhold = fread(paste0(destdir,"/",gistic2_Date,"-",dataset,"-all_thresholded.by_genes.txt"),header=TRUE,colClasses = "character", data.table = FALSE)
-          tmpCNAll = fread(paste0(destdir,"/",gistic2_Date,"-",dataset,"-all_data_by_genes.txt"),header=TRUE,colClasses="character", data.table = FALSE)
+          tmpCNThreshhold = fread(paste0(destdir,"/",gistic2Date,"-",dataset,"-all_thresholded.by_genes.txt"),header=TRUE,colClasses = "character", data.table = FALSE)
+          tmpCNAll = fread(paste0(destdir,"/",gistic2Date,"-",dataset,"-all_data_by_genes.txt"),header=TRUE,colClasses="character", data.table = FALSE)
         }
         tmpReturn <- new("FirehoseGISTIC",Dataset=dataset,AllByGene=data.frame(tmpCNAll),
                          ThresholdedByGene=data.frame(tmpCNThreshhold))
