@@ -68,8 +68,8 @@
   if (dim(object@CNVSNP)[1] > 0 & dim(object@CNVSNP)[2] > 0) {
     barcodes <- c(barcodes,as.character(object@CNVSNP[,1]))
   }
-  if (dim(object@CNAseq)[1] > 0 & dim(object@CNAseq)[2] > 0) {
-    barcodes <- c(barcodes,as.character(object@CNAseq[,1]))
+  if (dim(object@CNASeq)[1] > 0 & dim(object@CNASeq)[2] > 0) {
+    barcodes <- c(barcodes,as.character(object@CNASeq[,1]))
   }
   if (length(object@CNACGH) > 0 ) {
     barcodes <- c(barcodes,as.character(object@CNACGH[,1]))
@@ -449,7 +449,7 @@ getFirehoseData <- function(dataset, runDate=NULL, gistic2Date=NULL, RNASeqGene=
                          data.table = FALSE)
           #tmpMat = read.delim(paste0(runDate,"-",dataset,"-CNAseq.txt"),header=TRUE,colClasses=c("character","numeric","numeric",
           #                                                                                 "numeric","numeric"))
-          resultClass@CNAseq <- tmpMat
+          resultClass@CNASeq <- tmpMat
         }
       }
     }
