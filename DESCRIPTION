@@ -1,7 +1,7 @@
 Package: RTCGAToolbox
 Type: Package
 Title: A new tool for exporting TCGA Firehose data
-Version: 2.7.12
+Version: 2.7.13
 Author: Mehmet Kemal Samur
 Maintainer: Marcel Ramos <marcel.ramos@roswellpark.org>
 Description: Managing data from large scale projects such as The Cancer Genome
@@ -20,30 +20,29 @@ LazyLoad: yes
 Depends:
     R (>= 3.4.0)
 Imports:
-    methods,
-    XML,
-    GenomicRanges,
     Biobase,
     BiocGenerics,
-    limma (>= 3.18),
-    survival,
-    RCircos,
     data.table (>= 1.9.4),
+    GenomicRanges,
+    httr,
+    IRanges,
+    limma (>= 3.18),
+    methods,
+    plyr,
+    RCircos,
     RCurl,
     RJSONIO,
-    IRanges,
     S4Vectors,
-    plyr,
-    httr
+    survival,
+    XML
 Suggests:
     BiocStyle,
-    knitr,
-    rmarkdown,
     Homo.sapiens,
-    data.table,
+    knitr,
     MultiAssayExperiment,
-    readr
-biocViews: Sequencing, DifferentialExpression, GeneExpression
+    readr,
+    rmarkdown
+biocViews: DifferentialExpression, GeneExpression, Sequencing
 URL: http://mksamur.github.io/RTCGAToolbox/
 BugReports: https://github.com/mksamur/RTCGAToolbox/issues
 VignetteBuilder: knitr
