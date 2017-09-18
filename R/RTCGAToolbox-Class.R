@@ -72,7 +72,7 @@ setMethod("show", "FirehoseGISTIC",function(object){
 #' @slot Dataset A cohort name
 #' @slot runDate Standard data run date from \code{\link{getFirehoseRunningDates}}
 #' @slot gistic2Date Analyze running date from \code{\link{getFirehoseAnalyzeDates}}
-#' @slot Clinical Clinical data frame
+#' @slot clinical clinical data frame
 #' @slot RNASeqGene Gene level expression data matrix from RNAseq
 #' @slot RNASeq2GeneNorm Gene level expression data matrix from RNAseq (RSEM)
 #' @slot miRNASeqGene miRNA expression data from matrix smallRNAseq
@@ -88,17 +88,23 @@ setMethod("show", "FirehoseGISTIC",function(object){
 #' @slot GISTIC A \code{FirehoseGISTIC} object to store processed copy number data
 #' @slot BarcodeUUID A data frame that stores the Barcodes, UUIDs and Short sample identifiers
 #' @exportClass FirehoseData
-setClass("FirehoseData", representation(Dataset = "character", runDate = "character", gistic2Date = "character", Clinical = "data.frame", RNASeqGene = "matrix",
-                                        RNASeq2GeneNorm="matrix",miRNASeqGene="matrix",CNASNP="data.frame",
-                                        CNVSNP="data.frame",CNASeq="data.frame",CNACGH="list",Methylation="list",
-                                        mRNAArray="list",miRNAArray="list",RPPAArray="list",Mutation="data.frame",
-                                        GISTIC="FirehoseGISTIC",BarcodeUUID="data.frame"))
+setClass("FirehoseData", representation(Dataset = "character",
+    runDate = "character", gistic2Date = "character", clinical = "data.frame",
+    RNASeqGene = "matrix", RNASeq2GeneNorm="matrix", miRNASeqGene="matrix",
+    CNASNP="data.frame", CNVSNP="data.frame",CNASeq="data.frame", CNACGH="list",
+    Methylation="list", mRNAArray="list", miRNAArray="list", RPPAArray="list",
+    Mutation="data.frame", GISTIC="FirehoseGISTIC", BarcodeUUID="data.frame"))
+
 setMethod("show", "FirehoseData",function(object){
+    if (.hasOldAPI(object)) {
+        object <- updateObject(object)
+    warning("'FirehoseData' object is outdated, please run 'updateObject()'")
+    }
   message(paste0(object@Dataset," FirehoseData object"))
   message(paste0("Standard data run date: ", object@runDate))
   message(paste0("Analyze running date: ", object@gistic2Date))
   message("Available data types:")
-  if(dim(object@Clinical)[1] > 0 & dim(object@Clinical)[2] > 0){message("Clinical: A data frame, dim: ",paste(dim(object@Clinical),collapse = "\t"))}
+  if(dim(object@clinical)[1] > 0 & dim(object@clinical)[2] > 0){message("Clinical: A data frame, dim: ",paste(dim(object@clinical),collapse = "\t"))}
   if(dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0){message("RNASeqGene: A matrix with raw read counts or normalized data, dim: ",paste(dim(object@RNASeqGene),collapse = "\t"))}
   if(dim(object@RNASeq2GeneNorm)[1] > 0 & dim(object@RNASeq2GeneNorm)[2] > 0){message("RNASeq2GeneNorm: A matrix with raw read counts or normalized data, dim: ",paste(dim(object@RNASeq2GeneNorm),collapse = "\t"))}
   if(dim(object@miRNASeqGene)[1] > 0 & dim(object@miRNASeqGene)[2] > 0){message("miRNASeqGene: A matrix, dim: ",paste(dim(object@miRNASeqGene),collapse = "\t"))}
@@ -124,7 +130,7 @@ setMethod("show", "FirehoseData",function(object){
 #' @return Returns matrix or data frame depends on data type
 #' @examples
 #' data(RTCGASample)
-#' sampleClinical = getData(RTCGASample,"Clinical")
+#' sampleClinical = getData(RTCGASample,"clinical")
 #' sampleClinical = getData(RTCGASample,"RNASeqGene")
 setGeneric("getData",
            function(object,type="",platform=NULL,CN="All") standardGeneric("getData")
@@ -140,13 +146,13 @@ setGeneric("getData",
 #' @return Returns matrix or data frame depends on data type
 #' @examples
 #' data(RTCGASample)
-#' sampleClinical = getData(RTCGASample,"Clinical")
+#' sampleClinical = getData(RTCGASample,"clinical")
 #' sampleClinical = getData(RTCGASample,"RNASeqGene")
 setMethod("getData", "FirehoseData",function(object,type="",platform=NULL,CN="All"){
   show(object)
   switch(type,
-         "Clinical"={
-           invisible(object@Clinical)
+         "clinical"={
+           invisible(object@clinical)
          },
          "RNASeqGene"={
            invisible(object@RNASeqGene)
@@ -267,10 +273,37 @@ setMethod("showResults", "CorResult",function(object){
 })
 
 #' @keywords internal
-setGeneric("Clinical", function(object) standardGeneric("Clinical"))
+setGeneric("clinical", function(object) standardGeneric("clinical"))
 
-#' @describeIn FirehoseData Get the Clinical data slot from a FirehoseData object
-#' @exportMethod Clinical
-setMethod("Clinical", "FirehoseData", function(object) {
-           getElement(object, "Clinical")
+#' @describeIn FirehoseData Get the clinical data slot from a FirehoseData object
+#' @exportMethod clinical
+setMethod("clinical", "FirehoseData", function(object) {
+           getElement(object, "clinical")
+})
+
+.hasOldAPI <- function(object) {
+    isTRUE(methods::.hasSlot(object, "RNAseq")) ||
+        isTRUE(methods::.hasSlot(object, "Mutations"))
+}
+
+#' @name FirehoseData-class
+#' @description \code{updateObject}: update old RTCGAToolbox objects to the
+#' new API
+#' @param verbose logical (default FALSE) whether to print extra messages
+#' @exportMethod updateObject
+setMethod("updateObject", "FirehoseData",
+    function(object, ..., verbose = FALSE) {
+    if (verbose)
+        message("updateObject(object = 'FirehoseData')")
+    oldAPI <- try(object@CNASeq, silent = TRUE)
+    object <- new(class(object), Dataset = object@Dataset,
+        runDate = NA_character_, gistic2Date = NA_character_,
+        clinical = object@Clinical, RNASeqGene = object@RNASeqGene,
+        RNASeq2GeneNorm = object@RNASeq2GeneNorm, miRNASeqGene = object@miRNASeqGene,
+        CNASNP = object@CNASNP, CNVSNP = object@CNVSNP, CNASeq = object@CNAseq,
+        CNACGH = object@CNACGH, Methylation = object@Methylation,
+        mRNAArray = object@mRNAArray, miRNAArray = object@miRNAArray,
+        RPPAArray = object@RPPAArray, Mutation = object@Mutations,
+        GISTIC = object@GISTIC, BarcodeUUID = object@BarcodeUUID)
+    return(object)
 })

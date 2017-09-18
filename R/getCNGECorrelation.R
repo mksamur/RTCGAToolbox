@@ -1,3 +1,4 @@
+#' @importFrom BiocGenerics updateObject
 #' @importFrom grDevices colorRampPalette dev.off pdf
 #' @importFrom limma voom
 #' @importFrom graphics legend plot

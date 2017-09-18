@@ -26,6 +26,6 @@ Export data from FirehoseData object
 }
 \examples{
 data(RTCGASample)
-sampleClinical = getData(RTCGASample,"Clinical")
+sampleClinical = getData(RTCGASample,"clinical")
 sampleClinical = getData(RTCGASample,"RNASeqGene")
 }

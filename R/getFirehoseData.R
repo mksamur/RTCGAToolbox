@@ -315,7 +315,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
           raw.clin <- read.delim(export.file,colClasses="character")
           df.clin <- data.frame(do.call(rbind, raw.clin[, -1]),stringsAsFactors = FALSE)
           colnames(df.clin) <- raw.clin[, 1]
-          resultClass@Clinical <- df.clin
+          resultClass@clinical <- df.clin
           gc()
         }
       }
