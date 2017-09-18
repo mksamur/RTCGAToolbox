@@ -1,8 +1,13 @@
 # History files
 .Rhistory
-
+# Temp Vim files
+*.swp
+*~
 # Example code in package build process
 *-Ex.R
-
 # R data files from past sessions
 .Rdata
+.Rproj.user
+*.Rproj
+*.txt
+*.tar.gz
