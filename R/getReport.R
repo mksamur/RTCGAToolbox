@@ -94,7 +94,7 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
   }
   if(!is.null(dataObject@GISTIC) & class(dataObject@GISTIC)=="FirehoseGISTIC" & length(dataObject@GISTIC@Dataset) > 0)
   {
-    cnMat <- dataObject@GISTIC@ThresholedByGene
+    cnMat <- dataObject@GISTIC@ThresholdedByGene
     rownames(cnMat) <- cnMat[,1]
     cnMat <- cnMat[,4:ncol(cnMat)]
     intGenes <- intersect(rownames(cnMat),rownames(geneLocations))

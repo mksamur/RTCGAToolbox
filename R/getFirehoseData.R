@@ -281,7 +281,9 @@
 #' runDate="20140416",gistic2_Date="20140115",
 #' RNAseq_Gene=TRUE,Clinic=TRUE,mRNA_Array=TRUE,Mutation=TRUE)
 #' }
-#' 
+#' @export getFirehoseData
+#' @import XML
+#' @importFrom data.table fread
 getFirehoseData <- function(dataset, runDate=NULL, gistic2_Date=NULL, RNAseq_Gene=FALSE,Clinic=TRUE,
                             miRNASeq_Gene=FALSE, RNAseq2_Gene_Norm=FALSE,
                             CNA_SNP=FALSE,CNV_SNP=FALSE,
