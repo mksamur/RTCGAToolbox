@@ -70,45 +70,49 @@ setMethod("show", "FirehoseGISTIC",function(object){
 #' An S4 class to store main data object from clinent function.
 #'
 #' @slot Dataset A cohort name
+#' @slot runDate Standard data run date from \code{\link{getFirehoseRunningDates}}
+#' @slot gistic2Date Analyze running date from \code{\link{getFirehoseAnalyzeDates}}
 #' @slot Clinical Clinical data frame
 #' @slot RNASeqGene Gene level expression data matrix from RNAseq
 #' @slot RNASeq2GeneNorm Gene level expression data matrix from RNAseq (RSEM)
 #' @slot miRNASeqGene miRNA expression data from matrix smallRNAseq
 #' @slot CNASNP A data frame to store somatic copy number alterations from SNP array platform
 #' @slot CNVSNP A data frame to store germline copy number variants from SNP array platform
-#' @slot CNAseq A data frame to store somatic copy number alterations from sequencing platform
+#' @slot CNASeq A data frame to store somatic copy number alterations from sequencing platform
 #' @slot CNACGH A list that stores \code{FirehoseCGHArray} object for somatic copy number alterations from CGH platform
 #' @slot Methylation A list that stores \code{FirehoseMethylationArray} object for methylation data
 #' @slot mRNAArray A list that stores \code{FirehosemRNAArray} object for gene expression data from microarray
 #' @slot miRNAArray A list that stores \code{FirehosemRNAArray} object for miRNA expression data from microarray
 #' @slot RPPAArray A list that stores \code{FirehosemRNAArray} object for RPPA data
-#' @slot Mutations A data frame for mutation infromation from sequencing data
+#' @slot Mutation A data frame for mutation infromation from sequencing data
 #' @slot GISTIC A \code{FirehoseGISTIC} object to store processed copy number data
 #' @slot BarcodeUUID A data frame that stores the Barcodes, UUIDs and Short sample identifiers
 #' @exportClass FirehoseData
-setClass("FirehoseData", representation(Dataset = "character", Clinical = "data.frame", RNASeqGene = "matrix",
+setClass("FirehoseData", representation(Dataset = "character", runDate = "character", gistic2Date = "character", Clinical = "data.frame", RNASeqGene = "matrix",
                                         RNASeq2GeneNorm="matrix",miRNASeqGene="matrix",CNASNP="data.frame",
-                                        CNVSNP="data.frame",CNAseq="data.frame",CNACGH="list",Methylation="list",
-                                        mRNAArray="list",miRNAArray="list",RPPAArray="list",Mutations="data.frame",
+                                        CNVSNP="data.frame",CNASeq="data.frame",CNACGH="list",Methylation="list",
+                                        mRNAArray="list",miRNAArray="list",RPPAArray="list",Mutation="data.frame",
                                         GISTIC="FirehoseGISTIC",BarcodeUUID="data.frame"))
 setMethod("show", "FirehoseData",function(object){
   message(paste0(object@Dataset," FirehoseData object"))
+  message(paste0("Standard data run date: ", object@runDate))
+  message(paste0("Analyze running date: ", object@gistic2Date))
   message("Available data types:")
   if(dim(object@Clinical)[1] > 0 & dim(object@Clinical)[2] > 0){message("Clinical: A data frame, dim: ",paste(dim(object@Clinical),collapse = "\t"))}
-  if(dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0){message("RNASeqGene: A matrix withraw read counts or normalized data, dim: ",paste(dim(object@RNASeqGene),collapse = "\t"))}
-  if(dim(object@RNASeq2GeneNorm)[1] > 0 & dim(object@RNASeq2GeneNorm)[2] > 0){message("RNASeq2GeneNorm: A matrix withraw read counts or normalized data, dim: ",paste(dim(object@RNASeq2GeneNorm),collapse = "\t"))}
+  if(dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0){message("RNASeqGene: A matrix with raw read counts or normalized data, dim: ",paste(dim(object@RNASeqGene),collapse = "\t"))}
+  if(dim(object@RNASeq2GeneNorm)[1] > 0 & dim(object@RNASeq2GeneNorm)[2] > 0){message("RNASeq2GeneNorm: A matrix with raw read counts or normalized data, dim: ",paste(dim(object@RNASeq2GeneNorm),collapse = "\t"))}
   if(dim(object@miRNASeqGene)[1] > 0 & dim(object@miRNASeqGene)[2] > 0){message("miRNASeqGene: A matrix, dim: ",paste(dim(object@miRNASeqGene),collapse = "\t"))}
   if(dim(object@CNASNP)[1] > 0 & dim(object@CNASNP)[2] > 0){message("CNASNP: A data.frame, dim: ",paste(dim(object@CNASNP),collapse = "\t"))}
   if(dim(object@CNVSNP)[1] > 0 & dim(object@CNVSNP)[2] > 0){message("CNVSNP: A data.frame, dim: ",paste(dim(object@CNVSNP),collapse = "\t"))}
-  if(dim(object@CNAseq)[1] > 0 & dim(object@CNAseq)[2] > 0){message("CNAseq: A data.frame, dim: ",paste(dim(object@CNAseq),collapse = "\t"))}
+  if(dim(object@CNASeq)[1] > 0 & dim(object@CNASeq)[2] > 0){message("CNASeq: A data.frame, dim: ",paste(dim(object@CNASeq),collapse = "\t"))}
   if(length(object@CNACGH) > 0 ){message("CNACGH: A list contains FirehoseCGHArray object(s), length: ",length(object@CNACGH))}
   if(length(object@Methylation) > 0 ){message("Methylation: A list contains FirehoseMethylationArray object(s), length: ",length(object@Methylation))}
   if(length(object@mRNAArray) > 0 ){message("mRNAArray: A list contains FirehosemRNAArray object(s), length: ",length(object@mRNAArray))}
   if(length(object@miRNAArray) > 0 ){message("miRNAArray: A list contains FirehosemRNAArray object(s), length: ",length(object@miRNAArray))}
   if(length(object@RPPAArray) > 0 ){message("RPPAArray: A list contains FirehosemRNAArray object(s), length: ",length(object@RPPAArray))}
   if(length(object@GISTIC@Dataset) > 0){message("GISTIC: A FirehoseGISTIC object to store copy number data")}
-  if(dim(object@Mutations)[1] > 0 & dim(object@Mutations)[2] > 0){message("Mutations: A data.frame, dim: ",paste(dim(object@Mutations),collapse = "\t"))}
-  message("To export data, you may use getData() function.")
+  if(dim(object@Mutation)[1] > 0 & dim(object@Mutation)[2] > 0){message("Mutation: A data.frame, dim: ",paste(dim(object@Mutation),collapse = "\t"))}
+  message("To export data from this class, you may use the 'extract' function.\nSee ?extract for more information.")
 }
 )
 
@@ -159,8 +163,8 @@ setMethod("getData", "FirehoseData",function(object,type="",platform=NULL,CN="Al
          "CNVSNP"={
            invisible(object@CNVSNP)
          },
-         "CNAseq"={
-           invisible(object@CNAseq)
+         "CNASeq"={
+           invisible(object@CNASeq)
          },
          "CNACGH"={
            .getListData(object@CNACGH,platform)
@@ -188,8 +192,8 @@ setMethod("getData", "FirehoseData",function(object,type="",platform=NULL,CN="Al
                   }
             )
          },
-         "Mutations"={
-           invisible(object@Mutations)
+         "Mutation"={
+           invisible(object@Mutation)
          },
          stop("Please specify valid data type")
   )
@@ -265,6 +269,7 @@ setMethod("showResults", "CorResult",function(object){
 setGeneric("Clinical", function(object) standardGeneric("Clinical"))
 
 #' @describeIn FirehoseData Get the Clinical data slot from a FirehoseData object
+#' @exportMethod Clinical
 setMethod("Clinical", "FirehoseData", function(object) {
            getElement(object, "Clinical")
 })

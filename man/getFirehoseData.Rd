@@ -4,47 +4,47 @@
 \alias{getFirehoseData}
 \title{Get data from Firehose portal.}
 \usage{
-getFirehoseData(dataset, runDate = NULL, gistic2_Date = NULL,
-  RNAseq_Gene = FALSE, Clinic = TRUE, miRNASeq_Gene = FALSE,
-  RNAseq2_Gene_Norm = FALSE, CNA_SNP = FALSE, CNV_SNP = FALSE,
-  CNA_Seq = FALSE, CNA_CGH = FALSE, Methylation = FALSE,
-  Mutation = FALSE, mRNA_Array = FALSE, miRNA_Array = FALSE,
-  RPPA = FALSE, RNAseqNorm = "raw_counts",
-  RNAseq2Norm = "normalized_count", forceDownload = FALSE, destdir = ".",
-  fileSizeLimit = 500, getUUIDs = FALSE)
+getFirehoseData(dataset, runDate = NULL, gistic2Date = NULL,
+  RNASeqGene = FALSE, Clinic = TRUE, miRNASeqGene = FALSE,
+  RNASeq2GeneNorm = FALSE, CNASNP = FALSE, CNVSNP = FALSE,
+  CNASeq = FALSE, CNACGH = FALSE, Methylation = FALSE, Mutation = FALSE,
+  mRNAArray = FALSE, miRNAArray = FALSE, RPPAArray = FALSE,
+  RNAseqNorm = "raw_counts", RNAseq2Norm = "normalized_count",
+  forceDownload = FALSE, destdir = ".", fileSizeLimit = 500,
+  getUUIDs = FALSE)
 }
 \arguments{
 \item{dataset}{A cohort name. All dataset names can be accessible via \code{\link{getFirehoseDatasets}}}
 
 \item{runDate}{Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}}
 
-\item{gistic2_Date}{Analyze running dates for GISTIC processed copy number data. Date list can be accessible via \code{\link{getFirehoseAnalyzeDates}}}
+\item{gistic2Date}{Analyze running dates for GISTIC processed copy number data. Date list can be accessible via \code{\link{getFirehoseAnalyzeDates}}}
 
-\item{RNAseq_Gene}{Logical (default FALSE) parameter for RNAseq data.}
+\item{RNASeqGene}{Logical (default FALSE) parameter for RNAseq data.}
 
 \item{Clinic}{Logical (default TRUE) parameter for clinical data.}
 
-\item{miRNASeq_Gene}{Logical (default FALSE) parameter for smallRNAseq data.}
+\item{miRNASeqGene}{Logical (default FALSE) parameter for smallRNAseq data.}
 
-\item{RNAseq2_Gene_Norm}{Logical (default FALSE) parameter for RNAseq v2 (RSEM processed) data.}
+\item{RNASeq2GeneNorm}{Logical (default FALSE) parameter for RNAseq v2 (RSEM processed) data.}
 
-\item{CNA_SNP}{Logical (default FALSE) parameter for somatic copy number alterations data from SNP array.}
+\item{CNASNP}{Logical (default FALSE) parameter for somatic copy number alterations data from SNP array.}
 
-\item{CNV_SNP}{Logical (default FALSE) parameter for germline copy number variants data from SNP array.}
+\item{CNVSNP}{Logical (default FALSE) parameter for germline copy number variants data from SNP array.}
 
-\item{CNA_Seq}{Logical (default FALSE) parameter for somatic copy number alterations data from sequencing.}
+\item{CNASeq}{Logical (default FALSE) parameter for somatic copy number alterations data from sequencing.}
 
-\item{CNA_CGH}{Logical (default FALSE) parameter for somatic copy number alterations data from CGH.}
+\item{CNACGH}{Logical (default FALSE) parameter for somatic copy number alterations data from CGH.}
 
 \item{Methylation}{Logical (default FALSE) parameter for methylation data.}
 
 \item{Mutation}{Logical (default FALSE) parameter for mutation data from sequencing.}
 
-\item{mRNA_Array}{Logical (default FALSE) parameter for mRNA expression data from microarray.}
+\item{mRNAArray}{Logical (default FALSE) parameter for mRNA expression data from microarray.}
 
-\item{miRNA_Array}{Logical (default FALSE) parameter for miRNA expression data from microarray.}
+\item{miRNAArray}{Logical (default FALSE) parameter for miRNA expression data from microarray.}
 
-\item{RPPA}{Logical (default FALSE) parameter for RPPA data}
+\item{RPPAArray}{Logical (default FALSE) parameter for RPPA data}
 
 \item{RNAseqNorm}{RNAseq data normalization method. (Default raw_counts)}
 
@@ -65,7 +65,7 @@ A \code{FirehoseData} data object that stores data for selected data types.
 \code{getFirehoseData} returns \code{FirehoseData} object that stores TCGA data.
 }
 \details{
-This is a main client fruntion to download data from Firehose TCGA portal.
+This is a main client function to download data from Firehose TCGA portal.
 }
 \examples{
 #Sample Dataset
@@ -73,7 +73,7 @@ data(RTCGASample)
 RTCGASample
 \dontrun{
 BRCAdata <- getFirehoseData(dataset="BRCA",
-runDate="20140416",gistic2_Date="20140115",
-RNAseq_Gene=TRUE,Clinic=TRUE,mRNA_Array=TRUE,Mutation=TRUE)
+runDate="20140416",gistic2Date="20140115",
+RNASeqGene=TRUE,Clinic=TRUE,mRNAArray=TRUE,Mutation=TRUE)
 }
 }
