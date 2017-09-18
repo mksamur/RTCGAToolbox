@@ -1,4 +1,4 @@
-.makeExprMat <- function(file,normMethod,dataType,mergeSize=1002,arrayData=FALSE)
+.makeExprMat <- function(file,normMethod,dataType,mergeSize=1000,arrayData=FALSE)
 {
   #Get selected type only
   tmpCols = read.delim(file,nrows=1,colClasses="character")
@@ -236,12 +236,15 @@
 #' @export getFirehoseData
 #' @import XML
 #' @importFrom data.table fread
-getFirehoseData <- function(dataset, runDate=NULL, gistic2Date=NULL, RNASeqGene=FALSE,Clinic=TRUE,
+getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
+                            RNASeqGene=FALSE,Clinic=TRUE,
                             miRNASeqGene=FALSE, RNASeq2GeneNorm=FALSE,
                             CNASNP=FALSE,CNVSNP=FALSE,
-                            CNASeq=FALSE,CNACGH=FALSE,Methylation=FALSE,Mutation=FALSE,mRNAArray=FALSE,
-                            miRNAArray=FALSE,RPPAArray=FALSE,RNAseqNorm="raw_counts",RNAseq2Norm="normalized_count",
-                            forceDownload=FALSE,destdir=".",fileSizeLimit=500,getUUIDs=FALSE)
+                            CNASeq=FALSE,CNACGH=FALSE,Methylation=FALSE,
+                            Mutation=FALSE,mRNAArray=FALSE, miRNAArray=FALSE,
+                            RPPAArray=FALSE,RNAseqNorm="raw_counts",
+                            RNAseq2Norm="normalized_count", forceDownload=FALSE,
+                            destdir=".",fileSizeLimit=500,getUUIDs=FALSE)
 {
 
   #check input parameters
