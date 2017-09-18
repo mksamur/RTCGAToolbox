@@ -227,6 +227,7 @@ setGeneric("showResults",
 #' @rdname showResults-DGEResult
 #' @aliases showResults,DGEResult,DGEResult-method
 #' @return Returns toptable for DGE results
+#' @export
 #' @examples
 #' data(RTCGASample)
 #' dgeRes = getDiffExpressedGenes(RTCGASample)

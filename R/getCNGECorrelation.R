@@ -1,4 +1,5 @@
 #' @importFrom grDevices colorRampPalette dev.off pdf
+#' @importFrom limma voom
 #' @importFrom graphics legend plot
 #' @importFrom stats cor.test heatmap model.matrix p.adjust pchisq
 #' @importFrom utils data download.file head read.csv read.delim read.table
@@ -17,11 +18,9 @@ NULL
 #' @export
 #' @examples
 #' data(RTCGASample)
-#' corRes = getCNGECorrelation(RTCGASample)
+#' corRes <- getCNGECorrelation(RTCGASample)
 #' corRes
 #' showResults(corRes[[1]])
-#' \dontrun{
-#' }
 getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval=0.05)
 {
   if(is.null(dataObject) | class(dataObject) != "FirehoseData")
@@ -89,7 +88,7 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
       tmpMat2 <- tmpMat2[,4:ncol(tmpMat2)]
       colnames(tmpMat2) <- sampleIDs2
       commonSamples <- intersect(sampleIDs1,sampleIDs2)
-      if(controlVal){tmpMat1=voom(tmpMat1)$E}
+      if (controlVal) { tmpMat1 <- limma::voom(tmpMat1)[["E"]] }
       if(length(commonSamples) > 5)
       {
         tmpMat1 <- tmpMat1[,commonSamples]
