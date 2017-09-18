@@ -14,6 +14,7 @@ NULL
 #' @param adj.pval Adjusted p value cut off for results table (Default 0.05)
 #' @param raw.pval raw p value cut off for results table (Default 0.05)
 #' @return Returns a list that stores results for each dataset
+#' @export
 #' @examples
 #' data(RTCGASample)
 #' corRes = getCNGECorrelation(RTCGASample)
