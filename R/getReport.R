@@ -29,7 +29,9 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations) 
   if (!is.null(DGEResult2) & class(DGEResult2) != "DGEResult"){stop("DGEResult2 must be DGEResult class!")}
   pdf(file=paste(dataObject@Dataset,"-reportImage.pdf",sep=""),height=30,width=30)
   plotpos <- 1
-  data(UCSC.HG19.Human.CytoBandIdeogram,package = "RCircos")
+  localData <- new.env(parent = emptyenv())
+  data(UCSC.HG19.Human.CytoBandIdeogram, package = "RCircos", envir = local_data)
+  UCSC.HG19.Human.CytoBandIdeogram <- localData[["UCSC.HG19.Human.CytoBandIdeogram"]]
   RCircos.Set.Core.Components(cyto.info = UCSC.HG19.Human.CytoBandIdeogram,
                               chr.exclude = NULL, tracks.inside = 3,
                               tracks.outside =  3)
