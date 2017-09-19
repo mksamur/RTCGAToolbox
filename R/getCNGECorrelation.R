@@ -1,8 +1,16 @@
 #' @importFrom BiocGenerics updateObject
-#' @importFrom grDevices colorRampPalette dev.off pdf
-#' @importFrom limma voom lmFit makeContrasts contrasts.fit eBayes
 #' @importFrom graphics legend plot
+#' @importFrom grDevices colorRampPalette dev.off pdf
+#' @importFrom limma voom lmFit makeContrasts contrasts.fit eBayes topTable
+#' volcanoplot
+#' @importFrom methods new is
+#' @importFrom RCurl getURL
+#' @importFrom RCircos RCircos.Set.Core.Components RCircos.Get.Plot.Parameters
+#' RCircos.Reset.Plot.Parameters RCircos.Set.Plot.Area RCircos.Scatter.Plot
+#' RCircos.Heatmap.Plot RCircos.Gene.Connector.Plot RCircos.Gene.Name.Plot
+#' @importFrom RJSONIO fromJSON
 #' @importFrom stats cor.test heatmap model.matrix p.adjust pchisq
+#' @importFrom survival survfit survdiff Surv
 #' @importFrom utils data download.file head read.csv read.delim read.table
 #' setTxtProgressBar txtProgressBar untar write.table
 NULL

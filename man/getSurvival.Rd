@@ -22,8 +22,9 @@ Draws a KM plot
 \code{getSurvival} draws a KM plot and show survival analysis results between groups that are defined by gene expression data
 }
 \examples{
-## get data with  getFirehoseData() function and call survival analysis
+## get data with  getFirehoseData function and call survival analysis
 ## Always check clinical data file for structural changes
+
 data(RTCGASample)
 clinicData <- getData(RTCGASample,"clinical")
 clinicData = clinicData[,3:5]

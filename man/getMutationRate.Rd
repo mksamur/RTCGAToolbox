@@ -17,7 +17,7 @@ Make a table for mutation rate of each gene in the cohort
 }
 \examples{
 data(RTCGASample)
-mutRate = getMutationRate(dataObject=RTCGASample)
+mutRate <- getMutationRate(dataObject=RTCGASample)
 mutRate <- mutRate[order(mutRate[,2],decreasing = TRUE),]
 head(mutRate)
 \dontrun{

@@ -134,9 +134,9 @@ setMethod("show", "FirehoseData",function(object){
 #' data(RTCGASample)
 #' sampleClinical = getData(RTCGASample,"clinical")
 #' sampleClinical = getData(RTCGASample,"RNASeqGene")
-setGeneric("getData",
-           function(object,type="",platform=NULL,CN="All") standardGeneric("getData")
-)
+setGeneric("getData", function(object,type="",platform=NULL,CN="All") {
+    standardGeneric("getData")
+})
 
 #' Export data from FirehoseData object
 #' @param object A \code{\linkS4class{FirehoseData}} object
@@ -152,7 +152,6 @@ setGeneric("getData",
 #' sampleClinical = getData(RTCGASample,"clinical")
 #' sampleClinical = getData(RTCGASample,"RNASeqGene")
 setMethod("getData", "FirehoseData",function(object,type="",platform=NULL,CN="All"){
-  show(object)
   switch(type,
          "clinical"={
            invisible(object@clinical)
@@ -275,15 +274,6 @@ setMethod("showResults", "CorResult",function(object){
   invisible(object@Correlations)
 })
 
-#' @keywords internal
-#' @describeIn FirehoseData clinical extractor generic
-setGeneric("clinical", function(object) standardGeneric("clinical"))
-
-#' @describeIn FirehoseData Get the clinical data slot from a FirehoseData object
-#' @exportMethod clinical
-setMethod("clinical", "FirehoseData", function(object) {
-           getElement(object, "clinical")
-})
 
 .hasOldAPI <- function(object) {
     isTRUE(methods::.hasSlot(object, "RNAseq")) ||

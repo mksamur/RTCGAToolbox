@@ -7,9 +7,11 @@
 #' @param geneSymbols Gene symbol that is going to be tested
 #' @param sampleTimeCensor a data frame that stores clinical data. First column should store sample IDs, second column should have time and third column should have event information. For more information please see vignette.
 #' @return Draws a KM plot
+#' @export
 #' @examples
-#' ## get data with  getFirehoseData() function and call survival analysis
+#' ## get data with  getFirehoseData function and call survival analysis
 #' ## Always check clinical data file for structural changes
+#' 
 #' data(RTCGASample)
 #' clinicData <- getData(RTCGASample,"clinical")
 #' clinicData = clinicData[,3:5]
@@ -91,7 +93,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
               time.group <- as.numeric(sampleTimeCensor[c(g1s,g2s),2])
               censor.group <- as.numeric(sampleTimeCensor[c(g1s,g2s),3])
               surv.group <- rep (1:2, c(length(g1s), length(g2s)))
-              surv.fit <- survfit (Surv(time.group,censor.group)~surv.group)
+              surv.fit <- survival::survfit(Surv(time.group,censor.group)~surv.group)
               surv.diff <- survdiff (Surv(time.group,censor.group)~surv.group)
               pvalue <- 1- pchisq (surv.diff$chisq[1], df=1)
               plot(surv.fit, xlab="Time", ylab="Survival", main=paste("RNASeq -",myG), col=c(2,4))

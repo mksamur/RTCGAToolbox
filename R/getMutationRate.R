@@ -2,9 +2,10 @@
 #'
 #' @param dataObject This must be \code{FirehoseData} object.
 #' @return Returns a data table
+#' @export getMutationRate
 #' @examples
 #' data(RTCGASample)
-#' mutRate = getMutationRate(dataObject=RTCGASample)
+#' mutRate <- getMutationRate(dataObject=RTCGASample)
 #' mutRate <- mutRate[order(mutRate[,2],decreasing = TRUE),]
 #' head(mutRate)
 #' \dontrun{
@@ -12,9 +13,9 @@
 getMutationRate <- function(dataObject)
 {
   if(is.null(dataObject) | class(dataObject) != "FirehoseData"){stop("'dataObject' must be 'FirehoseData' class!")}
-  if(!is.null(dataObject@Mutations) & dim(dataObject@Mutations)[1] > 0 & dim(dataObject@Mutations)[2] > 0)
+  if(!is.null(dataObject@Mutation) & dim(dataObject@Mutation)[1] > 0 & dim(dataObject@Mutation)[2] > 0)
   {
-    mutAll <- dataObject@Mutations
+    mutAll <- dataObject@Mutation
     uniqueGenes <- unique(mutAll[,1])
     uniqueSamples <- unique(mutAll[,16])
     countsMut <- matrix(0,length(uniqueGenes),length(uniqueSamples))
