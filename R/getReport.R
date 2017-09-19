@@ -30,7 +30,7 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations) 
   pdf(file=paste(dataObject@Dataset,"-reportImage.pdf",sep=""),height=30,width=30)
   plotpos <- 1
   localData <- new.env(parent = emptyenv())
-  data(UCSC.HG19.Human.CytoBandIdeogram, package = "RCircos", envir = local_data)
+  data(UCSC.HG19.Human.CytoBandIdeogram, package = "RCircos", envir = localData)
   UCSC.HG19.Human.CytoBandIdeogram <- localData[["UCSC.HG19.Human.CytoBandIdeogram"]]
   RCircos.Set.Core.Components(cyto.info = UCSC.HG19.Human.CytoBandIdeogram,
                               chr.exclude = NULL, tracks.inside = 3,
