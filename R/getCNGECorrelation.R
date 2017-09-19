@@ -1,6 +1,6 @@
 #' @importFrom BiocGenerics updateObject
 #' @importFrom grDevices colorRampPalette dev.off pdf
-#' @importFrom limma voom
+#' @importFrom limma voom lmFit makeContrasts contrasts.fit eBayes
 #' @importFrom graphics legend plot
 #' @importFrom stats cor.test heatmap model.matrix p.adjust pchisq
 #' @importFrom utils data download.file head read.csv read.delim read.table

@@ -7,43 +7,43 @@
 #' @param DGEResult2 Differential gene expression results object (Optional)
 #' @param geneLocations Gene coordinates.
 #' @return Draws a circle plot
+#' @export getReport
 #' @examples
 #' data(RTCGASample)
 #' require("Homo.sapiens")
-#' locations = genes(Homo.sapiens,columns="SYMBOL")
-#' locations = as.data.frame(locations)
+#' locations <- genes(Homo.sapiens,columns="SYMBOL")
+#' locations <- as.data.frame(locations)
 #' locations <- locations[,c(6,1,5,2:3)]
 #' locations <- locations[!is.na(locations[,1]),]
 #' locations <- locations[!duplicated(locations[,1]),]
 #' rownames(locations) <- locations[,1]
-#' t1=getDiffExpressedGenes(RTCGASample)
+#' t1 <- getDiffExpressedGenes(RTCGASample)
 #' \dontrun{
 #' getReport(dataObject=RTCGASample,DGEResult1=t1[[1]],geneLocations=locations)
 #' }
-getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations)
-{
-  if(is.null(dataObject) | class(dataObject) != "FirehoseData")
-  {stop("Please set a valid object! dataObject must be set as FirehoseData class!")}
-  if(!is.null(DGEResult1) & class(DGEResult1) != "DGEResult"){stop("DGEResult1 must be DGEResult class!")}
-  if(!is.null(DGEResult2) & class(DGEResult2) != "DGEResult"){stop("DGEResult2 must be DGEResult class!")}
+getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations) {
+  if (is.null(dataObject) | class(dataObject) != "FirehoseData") {
+      stop("Please set a valid FirehoseData class!")
+      }
+  if (!is.null(DGEResult1) & class(DGEResult1) != "DGEResult"){stop("DGEResult1 must be DGEResult class!")}
+  if (!is.null(DGEResult2) & class(DGEResult2) != "DGEResult"){stop("DGEResult2 must be DGEResult class!")}
   pdf(file=paste(dataObject@Dataset,"-reportImage.pdf",sep=""),height=30,width=30)
-  plotpos = 1;
-  #require("RCircos")
+  plotpos <- 1
   data(UCSC.HG19.Human.CytoBandIdeogram,package = "RCircos")
-  cyto.info <- UCSC.HG19.Human.CytoBandIdeogram
-  RCircos.Set.Core.Components(cyto.info, chr.exclude=NULL, 3, 3);
-  params <- RCircos.Get.Plot.Parameters();
-  params$radius.len <- 3.0;
+  RCircos.Set.Core.Components(cyto.info = UCSC.HG19.Human.CytoBandIdeogram,
+                              chr.exclude = NULL, tracks.inside = 3,
+                              tracks.outside =  3)
+  params <- RCircos.Get.Plot.Parameters()
+  params$radius.len <- 3.0
   params$track.background <- "white"
   params$track.height <- 0.4
   params$point.size <- 2
   params$text.size <- 3
   params$track.out.start <- 0.05
   RCircos.Reset.Plot.Parameters(params)
-  RCircos.Set.Plot.Area();
-  RCircos.Chromosome.Ideogram.Plot();
-  if(!is.null(DGEResult1))
-  {
+  RCircos.Set.Plot.Area()
+  RCircos.Chromosome.Ideogram.Plot()
+  if (!is.null(DGEResult1)) {
     #if(DGEResult1@Dataset=="RNASeq" | DGEResult1@Dataset=="RNASeq2")
     #{
     rnaseqGenes <- rownames(DGEResult1@Toptable)

@@ -95,6 +95,8 @@ setClass("FirehoseData", representation(Dataset = "character",
     Methylation="list", mRNAArray="list", miRNAArray="list", RPPAArray="list",
     Mutation="data.frame", GISTIC="FirehoseGISTIC", BarcodeUUID="data.frame"))
 
+#' @describeIn FirehoseData show method
+#' @param object A FirehoseData object
 setMethod("show", "FirehoseData",function(object){
     if (.hasOldAPI(object)) {
         object <- updateObject(object)
@@ -144,6 +146,7 @@ setGeneric("getData",
 #' @rdname getData-methods
 #' @aliases getData,FirehoseData,FirehoseData-method
 #' @return Returns matrix or data frame depends on data type
+#' @exportMethod getData
 #' @examples
 #' data(RTCGASample)
 #' sampleClinical = getData(RTCGASample,"clinical")
@@ -273,6 +276,7 @@ setMethod("showResults", "CorResult",function(object){
 })
 
 #' @keywords internal
+#' @describeIn FirehoseData clinical extractor generic
 setGeneric("clinical", function(object) standardGeneric("clinical"))
 
 #' @describeIn FirehoseData Get the clinical data slot from a FirehoseData object
@@ -290,12 +294,14 @@ setMethod("clinical", "FirehoseData", function(object) {
 #' @description \code{updateObject}: update old RTCGAToolbox objects to the
 #' new API
 #' @param verbose logical (default FALSE) whether to print extra messages
+#' @param ... additional arguments for updateObject
 #' @exportMethod updateObject
 setMethod("updateObject", "FirehoseData",
     function(object, ..., verbose = FALSE) {
     if (verbose)
         message("updateObject(object = 'FirehoseData')")
     oldAPI <- try(object@CNASeq, silent = TRUE)
+    if (is(oldAPI, "try-error")) {
     object <- new(class(object), Dataset = object@Dataset,
         runDate = NA_character_, gistic2Date = NA_character_,
         clinical = object@Clinical, RNASeqGene = object@RNASeqGene,
@@ -305,5 +311,6 @@ setMethod("updateObject", "FirehoseData",
         mRNAArray = object@mRNAArray, miRNAArray = object@miRNAArray,
         RPPAArray = object@RPPAArray, Mutation = object@Mutations,
         GISTIC = object@GISTIC, BarcodeUUID = object@BarcodeUUID)
+    }
     return(object)
 })

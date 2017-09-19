@@ -35,11 +35,9 @@ Returns a list that stores results for each dataset
 }
 \examples{
 data(RTCGASample)
-dgegenes = getDiffExpressedGenes(RTCGASample)
+dgegenes <- getDiffExpressedGenes(RTCGASample)
 dgegenes
 showResults(dgegenes[[1]])
-dgegenes = showResults(dgegenes[[1]])
+dgegenes <- showResults(dgegenes[[1]])
 head(dgegenes)
-\dontrun{
-}
 }

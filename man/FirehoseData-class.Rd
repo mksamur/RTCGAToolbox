@@ -3,15 +3,22 @@
 \docType{class}
 \name{FirehoseData-class}
 \alias{FirehoseData-class}
+\alias{show,FirehoseData-method}
 \alias{clinical,FirehoseData-method}
 \alias{FirehoseData-class}
 \title{An S4 class to store main data object from clinent function.}
 \usage{
+\S4method{show}{FirehoseData}(object)
+
 \S4method{clinical}{FirehoseData}(object)
 
 \S4method{updateObject}{FirehoseData}(object, ..., verbose = FALSE)
 }
 \arguments{
+\item{object}{A FirehoseData object}
+
+\item{...}{additional arguments for updateObject}
+
 \item{verbose}{logical (default FALSE) whether to print extra messages}
 }
 \description{
@@ -22,6 +29,8 @@ new API
 }
 \section{Methods (by generic)}{
 \itemize{
+\item \code{show}: show method
+
 \item \code{clinical}: Get the clinical data slot from a FirehoseData object
 }}
 
