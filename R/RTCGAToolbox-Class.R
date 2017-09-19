@@ -26,10 +26,13 @@
 #' @slot Filename Platform name
 #' @slot DataMatrix A data frame that stores the CGH data.
 #' @exportClass FirehoseCGHArray
-setClass("FirehoseCGHArray", representation(Filename = "character", DataMatrix = "data.frame"))
+setClass("FirehoseCGHArray", representation(Filename = "character",
+    DataMatrix = "data.frame"))
 setMethod("show", "FirehoseCGHArray",function(object){
-  message(paste0("Platform:", object@Filename))
-  if(dim(object@DataMatrix)[1] > 0 ){message("FirehoseCGHArray object, dim: ",paste(dim(object@DataMatrix),collapse = "\t"))}
+    message(paste0("Platform:", object@Filename))
+    if (dim(object@DataMatrix)[1] > 0 ) {
+        message("FirehoseCGHArray object, dim: ", paste(dim(object@DataMatrix),
+        collapse = "\t"))}
 })
 
 #' An S4 class to store data from methylation platforms
@@ -40,7 +43,7 @@ setMethod("show", "FirehoseCGHArray",function(object){
 setClass("FirehoseMethylationArray", representation(Filename = "character", DataMatrix = "data.frame"))
 setMethod("show", "FirehoseMethylationArray",function(object){
   message(paste0("Platform:", object@Filename))
-  if(dim(object@DataMatrix)[1] > 0 ){message("FirehoseMethylationArray object, dim: ",paste(dim(object@DataMatrix),collapse = "\t"))}
+  if(dim(object@DataMatrix)[1] > 0 ){message("FirehoseMethylationArray object, dim: ", paste(dim(object@DataMatrix),collapse = "\t"))}
 })
 
 
@@ -52,7 +55,7 @@ setMethod("show", "FirehoseMethylationArray",function(object){
 setClass("FirehosemRNAArray", representation(Filename = "character", DataMatrix = "matrix"))
 setMethod("show", "FirehosemRNAArray",function(object){
   message(object@Filename)
-  if(dim(object@DataMatrix)[1] > 0 ){message("FirehoseCGHArray object, dim: ",paste(dim(object@DataMatrix),collapse = "\t"))}
+  if(dim(object@DataMatrix)[1] > 0 ){message("FirehoseCGHArray object, dim: ", paste(dim(object@DataMatrix),collapse = "\t"))}
 })
 
 #' An S4 class to store processed copy number data. (Data processed by using GISTIC2 algorithm)
@@ -64,7 +67,7 @@ setMethod("show", "FirehosemRNAArray",function(object){
 setClass("FirehoseGISTIC", representation(Dataset = "character", AllByGene = "data.frame",ThresholdedByGene="data.frame"))
 setMethod("show", "FirehoseGISTIC",function(object){
   message(paste0("Dataset:", object@Dataset))
-  if(dim(object@AllByGene)[1] > 0 ){message("FirehoseGISTIC object, dim: ",paste(dim(object@AllByGene),collapse = "\t"))}
+  if(dim(object@AllByGene)[1] > 0 ){message("FirehoseGISTIC object, dim: ", paste(dim(object@AllByGene),collapse = "\t"))}
 })
 
 #' An S4 class to store main data object from clinent function.
@@ -97,32 +100,55 @@ setClass("FirehoseData", representation(Dataset = "character",
 
 #' @describeIn FirehoseData show method
 #' @param object A FirehoseData object
-setMethod("show", "FirehoseData",function(object){
+setMethod("show", "FirehoseData",function(object) {
     if (.hasOldAPI(object)) {
         object <- updateObject(object)
     warning("'FirehoseData' object is outdated, please run 'updateObject()'")
     }
-  message(paste0(object@Dataset," FirehoseData object"))
-  message(paste0("Standard data run date: ", object@runDate))
-  message(paste0("Analyze running date: ", object@gistic2Date))
-  message("Available data types:")
-  if(dim(object@clinical)[1] > 0 & dim(object@clinical)[2] > 0){message("Clinical: A data frame, dim: ",paste(dim(object@clinical),collapse = "\t"))}
-  if(dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0){message("RNASeqGene: A matrix with raw read counts or normalized data, dim: ",paste(dim(object@RNASeqGene),collapse = "\t"))}
-  if(dim(object@RNASeq2GeneNorm)[1] > 0 & dim(object@RNASeq2GeneNorm)[2] > 0){message("RNASeq2GeneNorm: A matrix with raw read counts or normalized data, dim: ",paste(dim(object@RNASeq2GeneNorm),collapse = "\t"))}
-  if(dim(object@miRNASeqGene)[1] > 0 & dim(object@miRNASeqGene)[2] > 0){message("miRNASeqGene: A matrix, dim: ",paste(dim(object@miRNASeqGene),collapse = "\t"))}
-  if(dim(object@CNASNP)[1] > 0 & dim(object@CNASNP)[2] > 0){message("CNASNP: A data.frame, dim: ",paste(dim(object@CNASNP),collapse = "\t"))}
-  if(dim(object@CNVSNP)[1] > 0 & dim(object@CNVSNP)[2] > 0){message("CNVSNP: A data.frame, dim: ",paste(dim(object@CNVSNP),collapse = "\t"))}
-  if(dim(object@CNASeq)[1] > 0 & dim(object@CNASeq)[2] > 0){message("CNASeq: A data.frame, dim: ",paste(dim(object@CNASeq),collapse = "\t"))}
-  if(length(object@CNACGH) > 0 ){message("CNACGH: A list contains FirehoseCGHArray object(s), length: ",length(object@CNACGH))}
-  if(length(object@Methylation) > 0 ){message("Methylation: A list contains FirehoseMethylationArray object(s), length: ",length(object@Methylation))}
-  if(length(object@mRNAArray) > 0 ){message("mRNAArray: A list contains FirehosemRNAArray object(s), length: ",length(object@mRNAArray))}
-  if(length(object@miRNAArray) > 0 ){message("miRNAArray: A list contains FirehosemRNAArray object(s), length: ",length(object@miRNAArray))}
-  if(length(object@RPPAArray) > 0 ){message("RPPAArray: A list contains FirehosemRNAArray object(s), length: ",length(object@RPPAArray))}
-  if(length(object@GISTIC@Dataset) > 0){message("GISTIC: A FirehoseGISTIC object to store copy number data")}
-  if(dim(object@Mutation)[1] > 0 & dim(object@Mutation)[2] > 0){message("Mutation: A data.frame, dim: ",paste(dim(object@Mutation),collapse = "\t"))}
-  message("To export data from this class, you may use the 'extract' function.\nSee ?extract for more information.")
-}
-)
+    cat(paste0(object@Dataset," FirehoseData object"))
+    cat(paste0("Standard run date: ", object@runDate))
+    cat(paste0("Analysis running date: ", object@gistic2Date))
+    cat("Available data types:")
+    if (dim(object@clinical)[1] > 0 & dim(object@clinical)[2] > 0) {
+        cat("clinical: A data frame, dim: ", paste(dim(object@clinical),
+        collapse = "\t"))}
+    if (dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0) {
+        cat("RNASeqGene: A matrix with raw read counts or normalized data, dim: ",
+                paste(dim(object@RNASeqGene),collapse = "\t"))}
+    if (dim(object@RNASeq2GeneNorm)[1] > 0 & dim(object@RNASeq2GeneNorm)[2] > 0) {
+        cat("RNASeq2GeneNorm: A matrix with raw read counts or normalized data, dim: ",
+                paste(dim(object@RNASeq2GeneNorm), collapse = "\t"))}
+    if (dim(object@miRNASeqGene)[1] > 0 & dim(object@miRNASeqGene)[2] > 0) {
+        cat("miRNASeqGene: A matrix, dim: ", paste(dim(object@miRNASeqGene),collapse = "\t"))}
+    if (dim(object@CNASNP)[1] > 0 & dim(object@CNASNP)[2] > 0) {
+        cat("CNASNP: A data.frame, dim: ", paste(dim(object@CNASNP),
+          collapse = "\t"))}
+    if (dim(object@CNVSNP)[1] > 0 & dim(object@CNVSNP)[2] > 0) {
+        cat("CNVSNP: A data.frame, dim: ", paste(dim(object@CNVSNP),collapse = "\t"))}
+    if (dim(object@CNASeq)[1] > 0 & dim(object@CNASeq)[2] > 0) {
+        cat("CNASeq: A data.frame, dim: ", paste(dim(object@CNASeq),collapse = "\t"))}
+    if (length(object@CNACGH) > 0 ) {
+        cat("CNACGH: A list contains FirehoseCGHArray object(s), length: ",
+                length(object@CNACGH))}
+    if (length(object@Methylation) > 0 ) {
+        cat("Methylation: A list contains FirehoseMethylationArray object(s), length: ",
+                length(object@Methylation))}
+    if (length(object@mRNAArray) > 0 ) {
+        cat("mRNAArray: A list contains FirehosemRNAArray object(s), length: ",
+                length(object@mRNAArray))}
+    if (length(object@miRNAArray) > 0 ) {
+        cat("miRNAArray: A list contains FirehosemRNAArray object(s), length: ",
+                length(object@miRNAArray))}
+    if (length(object@RPPAArray) > 0 ) {
+        cat("RPPAArray: A list contains FirehosemRNAArray object(s), length: ",
+                length(object@RPPAArray))}
+    if (length(object@GISTIC@Dataset) > 0) {
+        cat("GISTIC: A FirehoseGISTIC object to store copy number data")}
+    if (dim(object@Mutation)[2] > 0 & dim(object@Mutation)[2] > 0) {
+        cat("Mutation: A data.frame, dim: ", paste(dim(object@Mutation),
+        collapse = "\t"))}
+    cat("To export data, use the 'getData' function.")
+})
 
 #' Export data from FirehoseData object
 #' @param object A \code{\linkS4class{FirehoseData}} object
@@ -215,7 +241,7 @@ setMethod("getData", "FirehoseData",function(object,type="",platform=NULL,CN="Al
 setClass("DGEResult", representation(Dataset = "character", Toptable = "data.frame"))
 setMethod("show", "DGEResult",function(object){
   message(paste0("Dataset:", object@Dataset))
-  if(dim(object@Toptable)[1] > 0 ){message("DGEResult object, dim: ",paste(dim(object@Toptable),collapse = "\t"))}
+  if(dim(object@Toptable)[1] > 0 ){message("DGEResult object, dim: ", paste(dim(object@Toptable),collapse = "\t"))}
 })
 
 #' Export toptable or correlation data frame
@@ -255,7 +281,7 @@ setMethod("showResults", "DGEResult",function(object){
 setClass("CorResult", representation(Dataset = "character", Correlations = "data.frame"))
 setMethod("show", "CorResult",function(object){
   message(paste0("Dataset:", object@Dataset))
-  if(dim(object@Correlations)[1] > 0 ){message("CorResult object, dim: ",paste(dim(object@Correlations),collapse = "\t"))}
+  if(dim(object@Correlations)[1] > 0 ){message("CorResult object, dim: ", paste(dim(object@Correlations),collapse = "\t"))}
 })
 
 #' Export toptable or correlation data frame

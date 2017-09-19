@@ -5,7 +5,7 @@
 \title{Get data from Firehose portal.}
 \usage{
 getFirehoseData(dataset, runDate = "20160128", gistic2Date = "20160128",
-  RNASeqGene = FALSE, clinic = TRUE, miRNASeqGene = FALSE,
+  RNASeqGene = FALSE, clinical = TRUE, miRNASeqGene = FALSE,
   RNASeq2GeneNorm = FALSE, CNASNP = FALSE, CNVSNP = FALSE,
   CNASeq = FALSE, CNACGH = FALSE, Methylation = FALSE, Mutation = FALSE,
   mRNAArray = FALSE, miRNAArray = FALSE, RPPAArray = FALSE,
@@ -22,7 +22,7 @@ getFirehoseData(dataset, runDate = "20160128", gistic2Date = "20160128",
 
 \item{RNASeqGene}{Logical (default FALSE) parameter for RNAseq data.}
 
-\item{clinic}{Logical (default TRUE) parameter for clinical data.}
+\item{clinical}{Logical (default TRUE) parameter for clinical data.}
 
 \item{miRNASeqGene}{Logical (default FALSE) parameter for smallRNAseq data.}
 
@@ -74,6 +74,6 @@ RTCGASample
 \dontrun{
 BRCAdata <- getFirehoseData(dataset="BRCA",
 runDate="20140416",gistic2Date="20140115",
-RNASeqGene=TRUE,Clinic=TRUE,mRNAArray=TRUE,Mutation=TRUE)
+RNASeqGene=TRUE,clinical=TRUE,mRNAArray=TRUE,Mutation=TRUE)
 }
 }
