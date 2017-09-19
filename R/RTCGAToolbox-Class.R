@@ -280,9 +280,8 @@ setMethod("showResults", "CorResult",function(object){
         isTRUE(methods::.hasSlot(object, "Mutations"))
 }
 
-#' @name FirehoseData-class
-#' @description \code{updateObject}: update old RTCGAToolbox objects to the
-#' new API
+#' @describeIn FirehoseData Update an old RTCGAToolbox FirehoseData object to
+#' the most recent API
 #' @param verbose logical (default FALSE) whether to print extra messages
 #' @param ... additional arguments for updateObject
 #' @exportMethod updateObject

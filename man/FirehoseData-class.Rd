@@ -4,7 +4,7 @@
 \name{FirehoseData-class}
 \alias{FirehoseData-class}
 \alias{show,FirehoseData-method}
-\alias{FirehoseData-class}
+\alias{updateObject,FirehoseData-method}
 \alias{clinical,FirehoseData-method}
 \alias{RNASeqGene,FirehoseData-method}
 \alias{RNASeq2GeneNorm,FirehoseData-method}
@@ -62,13 +62,13 @@
 }
 \description{
 An S4 class to store main data object from clinent function.
-
-\code{updateObject}: update old RTCGAToolbox objects to the
-new API
 }
 \section{Methods (by generic)}{
 \itemize{
 \item \code{show}: show method
+
+\item \code{updateObject}: Update an old RTCGAToolbox FirehoseData object to
+the most recent API
 
 \item \code{clinical}: Extract clinical data
 
