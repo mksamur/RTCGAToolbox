@@ -8,6 +8,7 @@
 #' @importFrom RCircos RCircos.Set.Core.Components RCircos.Get.Plot.Parameters
 #' RCircos.Reset.Plot.Parameters RCircos.Set.Plot.Area RCircos.Scatter.Plot
 #' RCircos.Heatmap.Plot RCircos.Gene.Connector.Plot RCircos.Gene.Name.Plot
+#' RCircos.Chromosome.Ideogram.Plot
 #' @importFrom RJSONIO fromJSON
 #' @importFrom stats cor.test heatmap model.matrix p.adjust pchisq
 #' @importFrom survival survfit survdiff Surv
