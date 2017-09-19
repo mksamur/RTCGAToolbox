@@ -4,7 +4,7 @@
 \alias{getFirehoseData}
 \title{Get data from Firehose portal.}
 \usage{
-getFirehoseData(dataset, runDate = NULL, gistic2Date = NULL,
+getFirehoseData(dataset, runDate = "20160128", gistic2Date = "20160128",
   RNASeqGene = FALSE, Clinic = TRUE, miRNASeqGene = FALSE,
   RNASeq2GeneNorm = FALSE, CNASNP = FALSE, CNVSNP = FALSE,
   CNASeq = FALSE, CNACGH = FALSE, Methylation = FALSE, Mutation = FALSE,

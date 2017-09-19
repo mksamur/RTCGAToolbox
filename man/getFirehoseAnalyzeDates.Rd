@@ -16,6 +16,5 @@ A character vector for dates.
 \code{getFirehoseAnalyzeDates} returns the character vector for analyze release dates.
 }
 \examples{
-getFirehoseAnalyzeDates()
 getFirehoseAnalyzeDates(last=2)
 }

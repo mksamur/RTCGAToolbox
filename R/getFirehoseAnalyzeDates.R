@@ -5,7 +5,6 @@
 #' @param last To list last n dates. (Default NULL)
 #' @return A character vector for dates.
 #' @examples
-#' getFirehoseAnalyzeDates()
 #' getFirehoseAnalyzeDates(last=2)
 #' @export getFirehoseAnalyzeDates
 getFirehoseAnalyzeDates <- function(last=NULL){
