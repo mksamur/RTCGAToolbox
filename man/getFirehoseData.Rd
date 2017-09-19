@@ -5,7 +5,7 @@
 \title{Get data from Firehose portal.}
 \usage{
 getFirehoseData(dataset, runDate = "20160128", gistic2Date = "20160128",
-  RNASeqGene = FALSE, Clinic = TRUE, miRNASeqGene = FALSE,
+  RNASeqGene = FALSE, clinic = TRUE, miRNASeqGene = FALSE,
   RNASeq2GeneNorm = FALSE, CNASNP = FALSE, CNVSNP = FALSE,
   CNASeq = FALSE, CNACGH = FALSE, Methylation = FALSE, Mutation = FALSE,
   mRNAArray = FALSE, miRNAArray = FALSE, RPPAArray = FALSE,
@@ -22,7 +22,7 @@ getFirehoseData(dataset, runDate = "20160128", gistic2Date = "20160128",
 
 \item{RNASeqGene}{Logical (default FALSE) parameter for RNAseq data.}
 
-\item{Clinic}{Logical (default TRUE) parameter for clinical data.}
+\item{clinic}{Logical (default TRUE) parameter for clinical data.}
 
 \item{miRNASeqGene}{Logical (default FALSE) parameter for smallRNAseq data.}
 
@@ -68,7 +68,7 @@ A \code{FirehoseData} data object that stores data for selected data types.
 This is a main client function to download data from Firehose TCGA portal.
 }
 \examples{
-#Sample Dataset
+# Sample Dataset
 data(RTCGASample)
 RTCGASample
 \dontrun{

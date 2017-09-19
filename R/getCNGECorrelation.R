@@ -1,4 +1,6 @@
+#' @import XML
 #' @importFrom BiocGenerics updateObject
+#' @importFrom data.table fread
 #' @importFrom graphics legend plot
 #' @importFrom grDevices colorRampPalette dev.off pdf
 #' @importFrom limma voom lmFit makeContrasts contrasts.fit eBayes topTable

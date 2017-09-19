@@ -205,7 +205,7 @@
 #' @param runDate Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}
 #' @param gistic2Date Analyze running dates for GISTIC processed copy number data. Date list can be accessible via \code{\link{getFirehoseAnalyzeDates}}
 #' @param RNASeqGene Logical (default FALSE) parameter for RNAseq data.
-#' @param Clinic Logical (default TRUE) parameter for clinical data.
+#' @param clinical Logical (default TRUE) parameter for clinical data.
 #' @param RNASeq2GeneNorm Logical (default FALSE) parameter for RNAseq v2 (RSEM processed) data.
 #' @param miRNASeqGene Logical (default FALSE) parameter for smallRNAseq data.
 #' @param CNASNP Logical (default FALSE) parameter for somatic copy number alterations data from SNP array.
@@ -225,28 +225,21 @@
 #' @param getUUIDs Logical key to get UUIDs from barcode (Default: FALSE)
 #' @return A \code{FirehoseData} data object that stores data for selected data types.
 #' @examples
-#' #Sample Dataset
+#' # Sample Dataset
 #' data(RTCGASample)
 #' RTCGASample
 #' \dontrun{
 #' BRCAdata <- getFirehoseData(dataset="BRCA",
 #' runDate="20140416",gistic2Date="20140115",
-#' RNASeqGene=TRUE,Clinic=TRUE,mRNAArray=TRUE,Mutation=TRUE)
+#' RNASeqGene=TRUE,clinical=TRUE,mRNAArray=TRUE,Mutation=TRUE)
 #' }
 #' @export getFirehoseData
-#' @import XML
-#' @importFrom data.table fread
 getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
-                            RNASeqGene=FALSE,Clinic=TRUE,
-                            miRNASeqGene=FALSE, RNASeq2GeneNorm=FALSE,
-                            CNASNP=FALSE,CNVSNP=FALSE,
-                            CNASeq=FALSE,CNACGH=FALSE,Methylation=FALSE,
-                            Mutation=FALSE,mRNAArray=FALSE, miRNAArray=FALSE,
-                            RPPAArray=FALSE,RNAseqNorm="raw_counts",
-                            RNAseq2Norm="normalized_count", forceDownload=FALSE,
-                            destdir=".",fileSizeLimit=500,getUUIDs=FALSE)
-{
-
+    RNASeqGene=FALSE, clinical=TRUE, miRNASeqGene=FALSE, RNASeq2GeneNorm=FALSE,
+    CNASNP=FALSE, CNVSNP=FALSE, CNASeq=FALSE, CNACGH=FALSE, Methylation=FALSE,
+    Mutation=FALSE, mRNAArray=FALSE, miRNAArray=FALSE, RPPAArray=FALSE,
+    RNAseqNorm="raw_counts", RNAseq2Norm="normalized_count",
+    forceDownload=FALSE, destdir=".", fileSizeLimit=500, getUUIDs=FALSE) {
   #check input parameters
   if (!class(dataset)=="character" || is.null(dataset) || !length(dataset) == 1 || nchar(dataset) < 2) {
       stop('Please set "dataset" parameter! You should specify one dataset name. Ex: dataset="BRCA"...')
@@ -301,7 +294,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
 
 
     #Download clinical data
-    if (Clinic)
+    if (clinical)
     {
       #Search for links
       plinks <- .getLinks(".Clinical_Pick_Tier1.Level_4","*.tar[.]gz$",NULL,doc)
