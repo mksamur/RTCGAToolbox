@@ -7,7 +7,6 @@ output:
     toc: true
     number_sections: true
 
-
 references:
 - id: ref1
   title: Comprehensive genomic characterization defines human glioblastoma genes and core pathways
@@ -86,10 +85,6 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
-
----
-
-
 
 # Introduction
 
@@ -245,7 +240,7 @@ This function also needs a survival data, which can be obtained using clinical d
 # Creating survival data frame and running analysis for  
 # FCGBP which is one of the most frequently mutated gene in the toy data
 # Running following code will provide following KM plot.
-clinicData <- getData(RTCGASample,"Clinical")
+clinicData <- getData(RTCGASample,"clinical")
 head(clinicData)
 clinicData = clinicData[,3:5]
 clinicData[is.na(clinicData[,3]),3] = clinicData[is.na(clinicData[,3]),2]
