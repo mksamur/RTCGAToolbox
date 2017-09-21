@@ -64,10 +64,18 @@ setMethod("show", "FirehosemRNAArray",function(object){
 #' @slot AllByGene A data frame that stores continuous copy number
 #' @slot ThresholdedByGene A data frame for discrete copy number data
 #' @exportClass FirehoseGISTIC
-setClass("FirehoseGISTIC", representation(Dataset = "character", AllByGene = "data.frame",ThresholdedByGene="data.frame"))
-setMethod("show", "FirehoseGISTIC",function(object){
-  message(paste0("Dataset:", object@Dataset))
-  if(dim(object@AllByGene)[1] > 0 ){message("FirehoseGISTIC object, dim: ", paste(dim(object@AllByGene),collapse = "\t"))}
+setClass("FirehoseGISTIC", representation(Dataset = "character",
+    AllByGene = "data.frame", ThresholdedByGene="data.frame"))
+
+setMethod("show", "FirehoseGISTIC", function(object){
+    if (.hasOldGISTIC(object)) {
+        warning("'FirehoseGISTIC' object is outdated, please run 'updateObject()'")
+    }
+    message(paste0("Dataset:", object@Dataset))
+    if (dim(object@AllByGene)[1L] > 0L) {
+        message("FirehoseGISTIC object, dim: ", paste(dim(object@AllByGene),
+            collapse = "\t"))
+    }
 })
 
 #' An S4 class to store main data object from clinent function.
@@ -303,7 +311,11 @@ setMethod("showResults", "CorResult",function(object){
 
 .hasOldAPI <- function(object) {
     isTRUE(methods::.hasSlot(object, "RNAseq")) ||
-        isTRUE(methods::.hasSlot(object, "Mutations"))
+    isTRUE(methods::.hasSlot(object, "Mutations"))
+}
+
+.hasOldGISTIC <- function(object) {
+    isTRUE(methods::.hasSlot(object, "ThresholedByGene"))
 }
 
 #' @describeIn FirehoseData Update an old RTCGAToolbox FirehoseData object to
@@ -315,8 +327,9 @@ setMethod("updateObject", "FirehoseData",
     function(object, ..., verbose = FALSE) {
     if (verbose)
         message("updateObject(object = 'FirehoseData')")
-    oldAPI <- try(object@CNASeq, silent = TRUE)
-    if (is(oldAPI, "try-error")) {
+    oldAPI <- .hasOldAPI(object)
+    oldGISTIC <- .hasOldGISTIC(GISTIC(object))
+    if (oldAPI) {
     object <- new(class(object), Dataset = object@Dataset,
         runDate = NA_character_, gistic2Date = NA_character_,
         clinical = object@Clinical, RNASeqGene = object@RNASeqGene,
@@ -326,6 +339,22 @@ setMethod("updateObject", "FirehoseData",
         mRNAArray = object@mRNAArray, miRNAArray = object@miRNAArray,
         RPPAArray = object@RPPAArray, Mutation = object@Mutations,
         GISTIC = object@GISTIC, BarcodeUUID = object@BarcodeUUID)
+    }
+    if (oldGISTIC) {
+       object@GISTIC <- updateObject(GISTIC(object))
+    }
+    return(object)
+})
+
+setMethod("updateObject", "FirehoseGISTIC",
+    function(object, ..., verbose = FALSE) {
+    if (verbose)
+        message("updateObject(object = 'FirehoseGISTIC')")
+    oldGISTIC <- .hasOldGISTIC(object)
+    if (oldGISTIC) {
+        object <- new("FirehoseGISTIC", Dataset = object@Dataset,
+            AllByGene = object@AllByGene,
+            ThresholdedByGene = object@ThresholedByGene)
     }
     return(object)
 })
