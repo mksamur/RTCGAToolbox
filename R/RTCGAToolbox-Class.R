@@ -163,7 +163,7 @@ setMethod("show", "FirehoseData",function(object) {
 #' @param object A \code{\linkS4class{FirehoseData}} object
 #' @param type A data type to be exported (Data types can be seen by typing show(objectname))
 #' @param platform A list id for data types that may come from multiple platform (such as mRNAArray)
-#' @param CN A copy number data type (Default: 'All') (Possible values 'All' or 'Thresholed')
+#' @param CN A copy number data type (Default: 'All') (Possible values 'All' or 'Thresholded')
 #' @return Returns matrix or data frame depends on data type
 #' @examples
 #' data(RTCGASample)
@@ -177,7 +177,7 @@ setGeneric("getData", function(object,type="",platform=NULL,CN="All") {
 #' @param object A \code{\linkS4class{FirehoseData}} object
 #' @param type A data type to be exported (Data types can be seen by typing show(objectname))
 #' @param platform A list id for data types that may come from multiple platform (such as mRNAArray)
-#' @param CN A copy number data type (Default: 'All') (Possible values 'All' or 'Thresholed')
+#' @param CN A copy number data type (Default: 'All') (Possible values 'All' or 'Thresholded')
 #' @rdname getData-methods
 #' @aliases getData,FirehoseData,FirehoseData-method
 #' @return Returns matrix or data frame depends on data type
@@ -225,13 +225,13 @@ setMethod("getData", "FirehoseData",function(object,type="",platform=NULL,CN="Al
            .getListData(object@RPPAArray,platform)
          },
          "GISTIC"={
-           if(!CN %in% c("Thresholed","All")){stop("CN must be 'All' or 'Thresholed'")}
+           if(!CN %in% c("Thresholded","All")){stop("CN must be 'All' or 'Thresholded'")}
            switch(CN,
                   "All"={
                     invisible(object@GISTIC@AllByGene)
                   },
-                  "Thresholed"={
-                    invisible(object@GISTIC@ThresholedByGene)
+                  "Thresholded"={
+                    invisible(object@GISTIC@ThresholdedByGene)
                   }
             )
          },

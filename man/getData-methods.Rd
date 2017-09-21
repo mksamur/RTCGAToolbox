@@ -16,7 +16,7 @@
 
 \item{platform}{A list id for data types that may come from multiple platform (such as mRNAArray)}
 
-\item{CN}{A copy number data type (Default: 'All') (Possible values 'All' or 'Thresholed')}
+\item{CN}{A copy number data type (Default: 'All') (Possible values 'All' or 'Thresholded')}
 }
 \value{
 Returns matrix or data frame depends on data type
