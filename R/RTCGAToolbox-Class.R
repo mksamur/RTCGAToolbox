@@ -347,6 +347,12 @@ setMethod("updateObject", "FirehoseData",
     return(object)
 })
 
+#' @describeIn FirehoseGISTIC Update an old FirehoseGISTIC object to
+#' the most recent API
+#' @param object A \code{FirehoseGISTIC} object
+#' @param verbose logical (default FALSE) whether to print extra messages
+#' @param ... additional arguments for updateObject
+#' @exportMethod updateObject
 setMethod("updateObject", "FirehoseGISTIC",
     function(object, ..., verbose = FALSE) {
     if (verbose)
