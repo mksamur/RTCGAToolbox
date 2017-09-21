@@ -141,7 +141,7 @@ When the dates and datasets are determined users can call data client function (
 ```{r eval=TRUE,message=FALSE}
 # READ mutation data and clinical data 
 brcaData = getFirehoseData (dataset="READ", runDate="20150402",forceDownload = TRUE,
-               Clinic=TRUE, Mutation=TRUE)
+               clinic=TRUE, Mutation=TRUE)
 ```
 Users has to set several parameters to get data they need. Below "getFirehoseData" options has been explained:
 
@@ -257,7 +257,7 @@ You can export downloaded data from FirehoseData object by using 'getData()' fun
 RTCGASample
 ```
 ```{r message=FALSE}
-RTCGASampleClinical = getData(RTCGASample,"Clinical")
+RTCGASampleClinical = getData(RTCGASample,"clinical")
 RTCGASampleRNAseqCounts = getData(RTCGASample,"RNASeqGene")
 RTCGASampleCN = getData(RTCGASample,"GISTIC")
 ```
@@ -269,7 +269,7 @@ Following code block is provided to reproduce case study in the RTCGAToolbox pap
 # mutation data and clinical data 
 # (Depends on bandwidth this process may take long time)
 brcaData = getFirehoseData (dataset="BRCA", runDate="20140416", gistic2_Date="20140115",
-               Clinic=TRUE, RNAseq_Gene=TRUE, mRNA_Array=TRUE, Mutation=TRUE)
+               clinic=TRUE, RNAseq_Gene=TRUE, mRNA_Array=TRUE, Mutation=TRUE)
 
 # Differential gene expression analysis for gene level RNA data.
 # Heatmaps are given below.
@@ -295,7 +295,7 @@ head(mutFrq[order(mutFrq[,2],decreasing=TRUE),])
 
 # PIK3CA which is one of the most frequently mutated gene in BRCA dataset
 # KM plot is given below.
-clinicData <- getData(brcaData,"Clinical")
+clinicData <- getData(brcaData,"clinical")
 head(clinicData)
 clinicData = clinicData[,3:5]
 clinicData[is.na(clinicData[,3]),3] = clinicData[is.na(clinicData[,3]),2]
