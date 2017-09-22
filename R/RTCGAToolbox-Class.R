@@ -312,7 +312,8 @@ setMethod("showResults", "CorResult",function(object){
 
 .hasOldAPI <- function(object) {
     isTRUE(methods::.hasSlot(object, "RNAseq")) ||
-    isTRUE(methods::.hasSlot(object, "Mutations"))
+    isTRUE(methods::.hasSlot(object, "Mutations")) ||
+    isTRUE(methods::.hasSlot(object, "Clinical"))
 }
 
 .hasOldGISTIC <- function(object) {
