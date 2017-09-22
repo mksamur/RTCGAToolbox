@@ -334,12 +334,19 @@ setMethod("updateObject", "FirehoseData",
     if (oldAPI) {
     object <- new(class(object), Dataset = object@Dataset,
         runDate = NA_character_, gistic2Date = NA_character_,
-        clinical = object@Clinical, RNASeqGene = object@RNASeqGene,
-        RNASeq2GeneNorm = object@RNASeq2GeneNorm, miRNASeqGene = object@miRNASeqGene,
-        CNASNP = object@CNASNP, CNVSNP = object@CNVSNP, CNASeq = object@CNAseq,
+        clinical = if (.hasSlot(object, "Clinical")) { object@Clinical }
+        else { object@clinical },
+        RNASeqGene = object@RNASeqGene,
+        RNASeq2GeneNorm = object@RNASeq2GeneNorm,
+        miRNASeqGene = object@miRNASeqGene, CNASNP = object@CNASNP,
+        CNVSNP = object@CNVSNP,
+        CNASeq = if (.hasSlot(object, "CNAseq")) { object@CNAseq }
+        else { object@CNASeq },
         CNACGH = object@CNACGH, Methylation = object@Methylation,
         mRNAArray = object@mRNAArray, miRNAArray = object@miRNAArray,
-        RPPAArray = object@RPPAArray, Mutation = object@Mutations,
+        RPPAArray = object@RPPAArray,
+        Mutation = if (.hasSlot(object, "Mutations")) { object@Mutations }
+        else { object@Mutation },
         GISTIC = object@GISTIC, BarcodeUUID = object@BarcodeUUID)
     }
     if (oldGISTIC) {
