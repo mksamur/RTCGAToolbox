@@ -1,7 +1,6 @@
 #' @include RTCGAToolbox-Class.R
 NULL
 
-#' @name selectType
 #' @title Accessor function for the FirehoseData object
 #' @description An accessor function for the \linkS4class{FirehoseData}
 #' class. An argument will specify the data type to return
@@ -32,7 +31,6 @@ setGeneric("selectType", function(object, dataType) standardGeneric("selectType"
 
 
 #' @describeIn FirehoseData Extract data type
-#' @aliases NULL
 #' @exportMethod selectType
 #' @param dataType An available data type, see object show method
 setMethod("selectType", "FirehoseData", function(object, dataType) {
