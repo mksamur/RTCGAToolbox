@@ -109,7 +109,7 @@ setClass("FirehoseData", representation(Dataset = "character",
 #' @describeIn FirehoseData show method
 #' @param object A FirehoseData object
 setMethod("show", "FirehoseData",function(object) {
-    if (.hasOldAPI(object) || .hasOldGISTIC(GISTIC(object))) {
+    if (.hasOldAPI(object) || .hasOldGISTIC(selectType(object, "GISTIC"))) {
         object <- updateObject(object)
     warning("'FirehoseData' object is outdated, please run 'updateObject()'")
     }
@@ -193,9 +193,9 @@ setMethod("getData", "FirehoseData",
             if (!platform %in% c("ThresholdedByGene", "AllByGene") ||
                 !S4Vectors::isSingleString(platform))
         stop("GISTIC platforms available: 'AllByGene' or 'ThresholdedByGene'")
-            res <-  getElement(GISTIC(object), platform)
+            res <-  getElement(selectType(object, "GISTIC"), platform)
         } else {
-            res <- getElement(object, type)
+            res <- selectType(object, type)
         }
         if (!length(res))
             stop("No data available for that type")
@@ -290,7 +290,7 @@ setMethod("updateObject", "FirehoseData",
     if (verbose)
         message("updateObject(object = 'FirehoseData')")
     oldAPI <- .hasOldAPI(object)
-    oldGISTIC <- .hasOldGISTIC(GISTIC(object))
+    oldGISTIC <- .hasOldGISTIC(selectType(object, "GISTIC"))
     if (oldAPI) {
     object <- new(class(object), Dataset = object@Dataset,
         runDate = NA_character_, gistic2Date = NA_character_,
@@ -310,7 +310,7 @@ setMethod("updateObject", "FirehoseData",
         GISTIC = object@GISTIC, BarcodeUUID = object@BarcodeUUID)
     }
     if (oldGISTIC) {
-       object@GISTIC <- updateObject(GISTIC(object))
+       object@GISTIC <- updateObject(selectType(object, "GISTIC"))
     }
     return(object)
 })

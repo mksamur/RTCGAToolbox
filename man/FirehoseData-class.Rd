@@ -5,53 +5,13 @@
 \alias{FirehoseData-class}
 \alias{show,FirehoseData-method}
 \alias{updateObject,FirehoseData-method}
-\alias{clinical,FirehoseData-method}
-\alias{RNASeqGene,FirehoseData-method}
-\alias{RNASeq2GeneNorm,FirehoseData-method}
-\alias{miRNASeqGene,FirehoseData-method}
-\alias{CNASNP,FirehoseData-method}
-\alias{CNVSNP,FirehoseData-method}
-\alias{CNASeq,FirehoseData-method}
-\alias{CNACGH,FirehoseData-method}
-\alias{Methylation,FirehoseData-method}
-\alias{mRNAArray,FirehoseData-method}
-\alias{miRNAArray,FirehoseData-method}
-\alias{RPPAArray,FirehoseData-method}
-\alias{Mutation,FirehoseData-method}
-\alias{GISTIC,FirehoseData-method}
 \title{An S4 class to store main data object from clinent function.}
 \usage{
 \S4method{show}{FirehoseData}(object)
 
 \S4method{updateObject}{FirehoseData}(object, ..., verbose = FALSE)
 
-\S4method{clinical}{FirehoseData}(object)
-
-\S4method{RNASeqGene}{FirehoseData}(object)
-
-\S4method{RNASeq2GeneNorm}{FirehoseData}(object)
-
-\S4method{miRNASeqGene}{FirehoseData}(object)
-
-\S4method{CNASNP}{FirehoseData}(object)
-
-\S4method{CNVSNP}{FirehoseData}(object)
-
-\S4method{CNASeq}{FirehoseData}(object)
-
-\S4method{CNACGH}{FirehoseData}(object)
-
-\S4method{Methylation}{FirehoseData}(object)
-
-\S4method{mRNAArray}{FirehoseData}(object)
-
-\S4method{miRNAArray}{FirehoseData}(object)
-
-\S4method{RPPAArray}{FirehoseData}(object)
-
-\S4method{Mutation}{FirehoseData}(object)
-
-\S4method{GISTIC}{FirehoseData}(object)
+\S4method{selectType}{FirehoseData}(object, dataType)
 }
 \arguments{
 \item{object}{A FirehoseData object}
@@ -70,34 +30,7 @@ An S4 class to store main data object from clinent function.
 \item \code{updateObject}: Update an old RTCGAToolbox FirehoseData object to
 the most recent API
 
-\item \code{clinical}: Extract clinical data
-
-\item \code{RNASeqGene}: Extract RNASeqGene
-
-\item \code{RNASeq2GeneNorm}: Extract RNASeq2GeneNorm normalized
-
-\item \code{miRNASeqGene}: Extract miRNASeqGene microRNA
-
-\item \code{CNASNP}: Extract Copy Number Alterations
-
-\item \code{CNVSNP}: Extract Copy Number Variations
-
-\item \code{CNASeq}: Copy Number Alterations Sequencing
-
-\item \code{CNACGH}: Copy Number Alterations Comparative Genomic
-Hybridization
-
-\item \code{Methylation}: Methylation
-
-\item \code{mRNAArray}: Methylation
-
-\item \code{miRNAArray}: microRNA array
-
-\item \code{RPPAArray}: Reverse Phase Protein Array
-
-\item \code{Mutation}: Mutation
-
-\item \code{GISTIC}: GISTIC v2 thresholded by gene
+\item \code{selectType}: Extract data type
 }}
 
 \section{Slots}{
