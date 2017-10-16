@@ -159,20 +159,22 @@ setMethod("show", "FirehoseData",function(object) {
     cat("To export data, use the 'getData' function.\n")
 })
 
-#' @title Export data from FirehoseData object
+#' @title Extract data from FirehoseData object
 #'
-#' @details Available datatypes for a particular object can be seen by
-#' entering the object name in the console ('show' method)
+#' @description A go-to function for getting top level information from a
+#' \code{\linkS4class{FirehoseData}} object. Available datatypes for a
+#' particular object can be seen by entering the object name in the
+#' console ('show' method).
 #'
 #' @param object A \code{\linkS4class{FirehoseData}} object
-#' @param type A data type to be exported (default "clinical")
+#' @param type A data type to be extracted
 #' @param platform An index for data types that may come from multiple
 #' platforms (such as mRNAArray), for GISTIC data, one of the options:
 #' 'AllByGene' or 'ThresholdedByGene'
 #'
 #' @examples
 #' data(RTCGASample)
-#' getData(RTCGASample)
+#' getData(RTCGASample, "clinical")
 #' getData(RTCGASample, "RNASeqGene")
 #'
 #' @return Returns matrix or data.frame depending on data type
@@ -180,13 +182,18 @@ setGeneric("getData", function(object, type, platform) {
     standardGeneric("getData")
 })
 
-#' @describeIn getData Get a matrix or data.frame from \code{FirehoseData}
-#' @aliases NULL
+#' @describeIn FirehoseData Get a matrix or data.frame from \code{FirehoseData}
+#' @param type A data type to be extracted
+#' @param platform An index for data types that may come from multiple
+#' platforms (such as mRNAArray), for GISTIC data, one of the options:
+#' 'AllByGene' or 'ThresholdedByGene'
 #' @exportMethod getData
 setMethod("getData", "FirehoseData",
-    function(object, type = "clinical", platform) {
+    function(object, type, platform) {
         withPlat <- c("CNACGH", "mRNAArray", "Methylation", "miRNAArray",
             "RPPAArray")
+        if (missing(type))
+            stop("Enter a data type")
         if (type %in% withPlat) {
             res <- .getListData(getElement(object, type), platform)
         } else if (identical(type, "GISTIC")) {
