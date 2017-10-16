@@ -34,6 +34,7 @@ setGeneric("selectType", function(object, dataType) standardGeneric("selectType"
 #' @describeIn FirehoseData Extract data type
 #' @aliases NULL
 #' @exportMethod selectType
+#' @param dataType An available data type, see object show method
 setMethod("selectType", "FirehoseData", function(object, dataType) {
     getElement(object, dataType)
 })

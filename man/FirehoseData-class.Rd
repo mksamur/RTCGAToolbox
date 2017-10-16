@@ -19,6 +19,8 @@
 \item{...}{additional arguments for updateObject}
 
 \item{verbose}{logical (default FALSE) whether to print extra messages}
+
+\item{dataType}{An available data type, see object show method}
 }
 \description{
 An S4 class to store main data object from clinent function.
