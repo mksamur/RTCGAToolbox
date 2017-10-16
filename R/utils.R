@@ -403,29 +403,6 @@
     idx
 }
 
-#' Obtain minimum necessary names for the creation of a GRangesList object
-#'
-#' This function attempts to match chromosome, start position, end position and
-#' strand names in the given character vector. Modified unexported helper from
-#' the \code{GenomicRanges} package.
-#'
-#' @param df_colnames A \code{character} vector of names in a dataset
-#' @param seqnames.field A \code{character} vector of the chromosome name
-#' @param start.field A \code{character} vector that indicates the column name
-#' of the start positions of ranged data
-#' @param end.field A \code{character} vector that indicates the end position
-#' of ranged data
-#' @param strand.field A \code{character} vector of the column name that
-#' indicates the strand type
-#' @param ignore.strand logical (default FALSE) whether to ignore the strand
-#' field in the data
-#' @return Index positions vector indicating columns with appropriate names
-#'
-#' @keywords internal
-#' @examples
-#' myDataColNames <- c("Start_position", "End_position", "strand",
-#'                  "chromosome", "num_probes", "segment_mean")
-#' findGRangesCols(myDataColNames)
 findGRangesCols <- function (df_colnames,
                              seqnames.field = c("seqnames", "seqname",
                                                 "chromosome", "chrom", "chr",
