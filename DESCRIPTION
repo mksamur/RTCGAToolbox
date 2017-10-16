@@ -1,7 +1,7 @@
 Package: RTCGAToolbox
 Type: Package
 Title: A new tool for exporting TCGA Firehose data
-Version: 2.7.37
+Version: 2.7.38
 Author: Mehmet Kemal Samur
 Maintainer: Marcel Ramos <marcel.ramos@roswellpark.org>
 Description: Managing data from large scale projects such as The Cancer Genome
@@ -49,7 +49,6 @@ VignetteBuilder: knitr
 RoxygenNote: 6.0.1
 Collate: 
     'RTCGAToolbox-Class.R'
-    'Firehose-extractors.R'
     'RTCGAToolbox.R'
     'utils.R'
     'biocExtract.R'
@@ -62,3 +61,4 @@ Collate:
     'getMutationRate.R'
     'getReport.R'
     'getSurvival.R'
+    'selectType.R'
