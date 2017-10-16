@@ -159,87 +159,47 @@ setMethod("show", "FirehoseData",function(object) {
     cat("To export data, use the 'getData' function.\n")
 })
 
-#' Export data from FirehoseData object
+#' @title Export data from FirehoseData object
+#'
+#' @details Available datatypes for a particular object can be seen by
+#' entering the object name in the console ('show' method)
+#'
 #' @param object A \code{\linkS4class{FirehoseData}} object
-#' @param type A data type to be exported (Data types can be seen by typing show(objectname))
-#' @param platform A list id for data types that may come from multiple platform (such as mRNAArray)
-#' @param CN A copy number data type (Default: 'All') (Possible values 'All' or 'Thresholded')
-#' @return Returns matrix or data frame depends on data type
+#' @param type A data type to be exported (default "clinical")
+#' @param platform An index for data types that may come from multiple
+#' platforms (such as mRNAArray), for GISTIC data, one of the options:
+#' 'AllByGene' or 'ThresholdedByGene'
+#'
 #' @examples
 #' data(RTCGASample)
-#' sampleClinical = getData(RTCGASample,"clinical")
-#' sampleClinical = getData(RTCGASample,"RNASeqGene")
-setGeneric("getData", function(object,type="",platform=NULL,CN="All") {
+#' getData(RTCGASample)
+#' getData(RTCGASample, "RNASeqGene")
+#'
+#' @return Returns matrix or data.frame depending on data type
+setGeneric("getData", function(object, type, platform) {
     standardGeneric("getData")
 })
 
-#' Export data from FirehoseData object
-#' @param object A \code{\linkS4class{FirehoseData}} object
-#' @param type A data type to be exported (Data types can be seen by typing show(objectname))
-#' @param platform A list id for data types that may come from multiple platform (such as mRNAArray)
-#' @param CN A copy number data type (Default: 'All') (Possible values 'All' or 'Thresholded')
-#' @rdname getData-methods
-#' @aliases getData,FirehoseData,FirehoseData-method
-#' @return Returns matrix or data frame depends on data type
+#' @describeIn getData Get a matrix or data.frame from \code{FirehoseData}
+#' @aliases NULL
 #' @exportMethod getData
-#' @examples
-#' data(RTCGASample)
-#' sampleClinical = getData(RTCGASample,"clinical")
-#' sampleClinical = getData(RTCGASample,"RNASeqGene")
-setMethod("getData", "FirehoseData",function(object,type="",platform=NULL,CN="All"){
-  switch(type,
-         "clinical"={
-           invisible(object@clinical)
-         },
-         "RNASeqGene"={
-           invisible(object@RNASeqGene)
-         },
-         "RNASeq2GeneNorm"={
-           invisible(object@RNASeq2GeneNorm)
-         },
-         "miRNASeqGene"={
-           invisible(object@miRNASeqGene)
-         },
-         "CNASNP"={
-           invisible(object@CNASNP)
-         },
-         "CNVSNP"={
-           invisible(object@CNVSNP)
-         },
-         "CNASeq"={
-           invisible(object@CNASeq)
-         },
-         "CNACGH"={
-           .getListData(object@CNACGH,platform)
-         },
-         "mRNAArray"={
-           .getListData(object@mRNAArray,platform)
-         },
-         "Methylation"={
-           .getListData(object@Methylation,platform)
-         },
-         "miRNAArray"={
-           .getListData(object@miRNAArray,platform)
-         },
-         "RPPAArray"={
-           .getListData(object@RPPAArray,platform)
-         },
-         "GISTIC"={
-           if(!CN %in% c("Thresholded","All")){stop("CN must be 'All' or 'Thresholded'")}
-           switch(CN,
-                  "All"={
-                    invisible(object@GISTIC@AllByGene)
-                  },
-                  "Thresholded"={
-                    invisible(object@GISTIC@ThresholdedByGene)
-                  }
-            )
-         },
-         "Mutation"={
-           invisible(object@Mutation)
-         },
-         stop("Please specify valid data type")
-  )
+setMethod("getData", "FirehoseData",
+    function(object, type = "clinical", platform) {
+        withPlat <- c("CNACGH", "mRNAArray", "Methylation", "miRNAArray",
+            "RPPAArray")
+        if (type %in% withPlat) {
+            res <- .getListData(getElement(object, type), platform)
+        } else if (identical(type, "GISTIC")) {
+            if (!platform %in% c("ThresholdedByGene", "AllByGene") ||
+                !S4Vectors::isSingleString(platform))
+        stop("GISTIC platforms available: 'AllByGene' or 'ThresholdedByGene'")
+            res <-  getElement(GISTIC(object), platform)
+        } else {
+            res <- getElement(object, type)
+        }
+        if (!length(res))
+            stop("No data available for that type")
+        res
 })
 
 #' An S4 class to store differential gene expression results
