@@ -1,12 +1,13 @@
 #' @include RTCGAToolbox-Class.R
 NULL
 
-#' @name FirehoseData-extractors
-#' @title Accessor methods for the FirehoseData object
-#' @description A list of accessor functions for the \linkS4class{FirehoseData}
-#' class. Each exposing a unique element of the \linkS4class{FirehoseData}
-#' object. See \link{FirehoseData-class} for more details.
-#' 
+#' @name selectType
+#' @title Accessor function for the FirehoseData object
+#' @description An accessor function for the \linkS4class{FirehoseData}
+#' class. An argument will specify the data type to return
+#' See \link{FirehoseData-class} for more details.
+#'
+#' @details
 #' \itemize{
 #'     \item{clinical} - Get the clinical data slot
 #'     \item{RNASeqGene} - RNASeqGene
@@ -22,134 +23,17 @@ NULL
 #'     \item{RPPAArray} - Reverse Phase Protein Array
 #'     \item{Mutation} - Mutations
 #'     \item{GISTIC} - GISTIC v2 scores and probabilities
-#' } 
+#' }
+#'
 #' @param object A \code{FirehoseData} class object
-NULL
+#' @param dataType A data type, see details.
+#' @return The data type element of the \code{FirehoseData} object
+setGeneric("selectType", function(object, dataType) standardGeneric("selectType"))
 
 
-#' @rdname FirehoseData-extractors 
-#' @export
-setGeneric("clinical", function(object) standardGeneric("clinical"))
-
-#' @describeIn FirehoseData Extract clinical data
-setMethod("clinical", "FirehoseData", function(object) {
-    getElement(object, "clinical")
-})
-
-#' @rdname FirehoseData-extractors
-#' @export
-setGeneric("RNASeqGene", function(object) standardGeneric("RNASeqGene"))
-
-#' @describeIn FirehoseData Extract RNASeqGene
-setMethod("RNASeqGene", "FirehoseData", function(object) {
-    getElement(object, "RNASeqGene")
-})
-
-#' @rdname FirehoseData-extractors
-#' @export
-setGeneric("RNASeq2GeneNorm", function(object) standardGeneric("RNASeq2GeneNorm"))
-
-#' @describeIn FirehoseData Extract RNASeq2GeneNorm normalized
-setMethod("RNASeq2GeneNorm", "FirehoseData", function(object) {
-    getElement(object, "RNASeq2GeneNorm")
-})
-
-#' @rdname FirehoseData-extractors
-#' @export
-setGeneric("miRNASeqGene", function(object) standardGeneric("miRNASeqGene"))
-
-#' @describeIn FirehoseData Extract miRNASeqGene microRNA
-setMethod("miRNASeqGene", "FirehoseData", function(object) {
-    getElement(object, "miRNASeqGene")
-})
-
-#' @rdname FirehoseData-extractors
-#' @export
-setGeneric("CNASNP", function(object) standardGeneric("CNASNP"))
-
-#' @describeIn FirehoseData Extract Copy Number Alterations
-setMethod("CNASNP", "FirehoseData", function(object) {
-    getElement(object, "CNASNP")
-})
-
-#' @rdname FirehoseData-extractors
-#' @export
-setGeneric("CNVSNP", function(object) standardGeneric("CNVSNP"))
-
-#' @describeIn FirehoseData Extract Copy Number Variations
-setMethod("CNVSNP", "FirehoseData", function(object) {
-    getElement(object, "CNVSNP")
-})
-
-#' @rdname FirehoseData-extractors
-#' @export
-setGeneric("CNASeq", function(object) standardGeneric("CNASeq"))
-
-#' @describeIn FirehoseData Copy Number Alterations Sequencing
-setMethod("CNASeq", "FirehoseData", function(object) {
-    getElement(object, "CNASeq")
-})
-
-#' @rdname FirehoseData-extractors
-#' @export
-setGeneric("CNACGH", function(object) standardGeneric("CNACGH"))
-
-#' @describeIn FirehoseData Copy Number Alterations Comparative Genomic
-#' Hybridization
-setMethod("CNACGH", "FirehoseData", function(object) {
-    getElement(object, "CNACGH")
-})
-
-#' @rdname FirehoseData-extractors
-#' @export
-setGeneric("Methylation", function(object) standardGeneric("Methylation"))
-
-#' @describeIn FirehoseData Methylation
-setMethod("Methylation", "FirehoseData", function(object) {
-    getElement(object, "Methylation")
-})
-
-#' @rdname FirehoseData-extractors
-#' @export
-setGeneric("mRNAArray", function(object) standardGeneric("mRNAArray"))
-
-#' @describeIn FirehoseData Methylation
-setMethod("mRNAArray", "FirehoseData", function(object) {
-    getElement(object, "mRNAArray")
-})
-
-#' @rdname FirehoseData-extractors
-#' @export
-setGeneric("miRNAArray", function(object) standardGeneric("miRNAArray"))
-
-#' @describeIn FirehoseData microRNA array
-setMethod("miRNAArray", "FirehoseData", function(object) {
-    getElement(object, "miRNAArray")
-})
-
-#' @rdname FirehoseData-extractors
-#' @export
-setGeneric("RPPAArray", function(object) standardGeneric("RPPAArray"))
-
-#' @describeIn FirehoseData Reverse Phase Protein Array
-setMethod("RPPAArray", "FirehoseData", function(object) {
-    getElement(object, "RPPAArray")
-})
-
-#' @rdname FirehoseData-extractors
-#' @export
-setGeneric("Mutation", function(object) standardGeneric("Mutation"))
-
-#' @describeIn FirehoseData Mutation
-setMethod("Mutation", "FirehoseData", function(object) {
-    getElement(object, "Mutation")
-})
-
-#' @rdname FirehoseData-extractors 
-#' @export
-setGeneric("GISTIC", function(object) standardGeneric("GISTIC"))
-
-#' @describeIn FirehoseData GISTIC v2 thresholded by gene
-setMethod("GISTIC", "FirehoseData", function(object) {
-    getElement(object, "GISTIC")
+#' @describeIn FirehoseData Extract data type
+#' @aliases NULL
+#' @exportMethod selectType
+setMethod("selectType", "FirehoseData", function(object, dataType) {
+    getElement(object, dataType)
 })
