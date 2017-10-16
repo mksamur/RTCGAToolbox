@@ -2,13 +2,13 @@
 % Please edit documentation in R/biocExtract.R
 \name{biocExtract}
 \alias{biocExtract}
-\title{Extract data from \code{FirehoseData} object into \code{ExpressionSet} or
-\code{GRangesList} object}
+\title{Extract and convert data from a \code{FirehoseData} object to a
+\code{Bioconductor} object}
 \usage{
 biocExtract(object, type = c("Clinical", "RNASeqGene", "miRNASeqGene",
   "RNASeq2GeneNorm", "CNASNP", "CNVSNP", "CNASeq", "CNACGH", "Methylation",
   "Mutation", "mRNAArray", "miRNAArray", "RPPAArray", "GISTIC", "GISTICA",
-  "GISTICT"), ...)
+  "GISTICT"))
 }
 \arguments{
 \item{object}{A \code{FirehoseData} object from which to extract data.}
@@ -21,7 +21,7 @@ Either an \linkS4class{SummarizedExperiment} object or a
 \linkS4class{RaggedExperiment} object.
 }
 \description{
-This function processes data from a \code{\link{FirehoseData}} object.
+This function processes data from a \code{\linkS4class{FirehoseData}} object.
 Raw data is converted to a conventional Bioconductor object. The function
 returns either a \linkS4class{SummarizedExperiment} or a
 \linkS4class{RaggedExperiment} class object. In cases where there are
@@ -33,22 +33,31 @@ functionality is provided with more control as part of the
 }
 \section{type}{
 
-Choices include: "RNAseqGene", "clinical", "miRNASeqGene",
-"RNASeq2GeneNorm", "CNASNP", "CNVSNP", "CNASeq", "CNACGH", "Methylation",
-"Mutation", "mRNAArray", "miRNAArray", "RPPAArray", "GISTIC", "GISTICA",
-"GISTICT".
-The "GISTICA" type of dataset represents GISTIC data by all
-genes. "GISTICT" represents data thresholded by genes. To get both types
-in a list, use "GISTIC".
+Choices include:
+\itemize{
+    \item{clinical} - Get the clinical data slot
+    \item{RNASeqGene} - RNASeqGene
+    \item{RNASeq2GeneNorm} - Normalized
+    \item{miRNASeqGene} - micro RNA SeqGene
+    \item{CNASNP} - Copy Number Alteration
+    \item{CNVSNP} - Copy Number Variation
+    \item{CNASeq} - Copy Number Alteration
+    \item{CNACGH} - Copy Number Alteration
+    \item{Methylation} - Methylation
+    \item{mRNAArray} - Messenger RNA
+    \item{miRNAArray} - micro RNA
+    \item{RPPAArray} - Reverse Phase Protein Array
+    \item{Mutation} - Mutations
+    \item{GISTICA} - GISTIC v2 ('AllByGene' only)
+    \item{GISTICT} - GISTIC v2 ('ThresholdedByGene' only)
+    \item{GISTIC} - GISTIC v2 scores and probabilities (both)
+}
 }
 
 \examples{
 \dontrun{
-library(RTCGAToolbox)
-dataFolder <- normalizePath("~/Documents/data")
-coadmut <- getFirehoseData("COAD", runDate = "20151101", Mutation = TRUE,
-                         destdir = dataFolder)
-cm <- biocExtract(coadmut, "Mutation")
+coadmut <- getFirehoseData("COAD", runDate = "20151101", Mutation = TRUE)
+biocExtract(coadmut, "Mutation")
 }
 }
 \author{

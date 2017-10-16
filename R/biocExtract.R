@@ -1,10 +1,10 @@
 #' @include utils.R
 NULL
 
-#' Extract data from \code{FirehoseData} object into \code{ExpressionSet} or
-#' \code{GRangesList} object
+#' Extract and convert data from a \code{FirehoseData} object to a
+#' \code{Bioconductor} object
 #'
-#' This function processes data from a \code{\link{FirehoseData}} object.
+#' This function processes data from a \code{\linkS4class{FirehoseData}} object.
 #' Raw data is converted to a conventional Bioconductor object. The function
 #' returns either a \linkS4class{SummarizedExperiment} or a
 #' \linkS4class{RaggedExperiment} class object. In cases where there are
@@ -15,13 +15,25 @@ NULL
 #' \code{\link[RaggedExperiment]{RaggedExperiment}} for more details.
 #'
 #' @section type:
-#' Choices include: "RNAseqGene", "clinical", "miRNASeqGene",
-#' "RNASeq2GeneNorm", "CNASNP", "CNVSNP", "CNASeq", "CNACGH", "Methylation",
-#' "Mutation", "mRNAArray", "miRNAArray", "RPPAArray", "GISTIC", "GISTICA",
-#' "GISTICT".
-#' The "GISTICA" type of dataset represents GISTIC data by all
-#' genes. "GISTICT" represents data thresholded by genes. To get both types
-#' in a list, use "GISTIC".
+#' Choices include:
+#' \itemize{
+#'     \item{clinical} - Get the clinical data slot
+#'     \item{RNASeqGene} - RNASeqGene
+#'     \item{RNASeq2GeneNorm} - Normalized
+#'     \item{miRNASeqGene} - micro RNA SeqGene
+#'     \item{CNASNP} - Copy Number Alteration
+#'     \item{CNVSNP} - Copy Number Variation
+#'     \item{CNASeq} - Copy Number Alteration
+#'     \item{CNACGH} - Copy Number Alteration
+#'     \item{Methylation} - Methylation
+#'     \item{mRNAArray} - Messenger RNA
+#'     \item{miRNAArray} - micro RNA
+#'     \item{RPPAArray} - Reverse Phase Protein Array
+#'     \item{Mutation} - Mutations
+#'     \item{GISTICA} - GISTIC v2 ('AllByGene' only)
+#'     \item{GISTICT} - GISTIC v2 ('ThresholdedByGene' only)
+#'     \item{GISTIC} - GISTIC v2 scores and probabilities (both)
+#' }
 #'
 #' @param object A \code{FirehoseData} object from which to extract data.
 #' @param type The type of data to extract from the "FirehoseData" object,
@@ -32,17 +44,14 @@ NULL
 #' @author Marcel Ramos \email{marcel.ramos@roswellpark.org}
 #'
 #' @examples \dontrun{
-#' library(RTCGAToolbox)
-#' dataFolder <- normalizePath("~/Documents/data")
-#' coadmut <- getFirehoseData("COAD", runDate = "20151101", Mutation = TRUE,
-#'                          destdir = dataFolder)
-#' cm <- biocExtract(coadmut, "Mutation")
+#' coadmut <- getFirehoseData("COAD", runDate = "20151101", Mutation = TRUE)
+#' biocExtract(coadmut, "Mutation")
 #' }
 #' @export biocExtract
 biocExtract <- function(object, type = c("Clinical", "RNASeqGene",
     "miRNASeqGene", "RNASeq2GeneNorm", "CNASNP", "CNVSNP", "CNASeq",
     "CNACGH", "Methylation", "Mutation", "mRNAArray", "miRNAArray",
-    "RPPAArray", "GISTIC", "GISTICA", "GISTICT"), ...) {
+    "RPPAArray", "GISTIC", "GISTICA", "GISTICT")) {
     if (length(type) != 1L)
         stop("Please specify a single data type")
     message("working on: ", type)
@@ -58,7 +67,7 @@ biocExtract <- function(object, type = c("Clinical", "RNASeqGene",
     }
     if (is(object, "list") && !is(object, "DataFrame") &&
         type != "Methylation") {
-        return(.extractList(object, type = type, ...))
+        return(.extractList(object, type = type))
     }
     if (is(object, "SummarizedExperiment")) { return(object) }
 
