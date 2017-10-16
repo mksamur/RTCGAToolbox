@@ -12,6 +12,14 @@
     getElement(object, "Filename")
 }
 
+## Standardize barcode format
+.stdIDs <- function(sampleBarcode) {
+    bcodeTest <- grepl("\\.", sample(sampleBarcode, 10L, replace = TRUE))
+    if (all(bcodeTest))
+        sampleBarcode <- gsub("\\.", "-", sampleBarcode)
+    toupper(sampleBarcode)
+}
+
 .standardizeBC <- function(x) {
     colnames(x) <- .stdIDs(colnames(x))
     return(x)
@@ -53,6 +61,21 @@
     type <- gsub("A$|T$", "", type)
     x <- getElement(x, type)
     return(x)
+}
+
+.getHGBuild <- function(hgbuild) {
+    buildDF <- DataFrame(Date = c("July 2004", "May 2004", "March 2006",
+                                  "February 2009"),
+                         NCBI = c("34", "35", "36", "37"),
+                         UCSC = c("hg16", "hg17", "hg18", "hg19"))
+    buildIndex <- match(hgbuild, buildDF[["NCBI"]])
+    if (is.na(buildIndex)) {
+        warning("build could not be matched")
+        return(NA_character_)
+    } else {
+        ucscBuild <- buildDF$UCSC[buildIndex]
+        return(ucscBuild)
+    }
 }
 
 .searchBuild <- function(x) {
