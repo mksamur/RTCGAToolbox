@@ -1,3 +1,8 @@
+#' @importFrom GenomicRanges makeGRangesListFromDataFrame
+#' @importFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom S4Vectors SimpleList metadata metadata<- DataFrame
+#' @importFrom utils type.convert
+#' @importFrom methods .hasSlot
 ## Helper functions for data extraction
 .getDataMatrix <- function(object) {
     getElement(object, "DataMatrix")
