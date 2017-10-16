@@ -321,11 +321,9 @@
 ## Genome build from FILENAME
 ## RSE helper function from genome symbols to build (RNASeq, ExpSets)
 
-.extractList <- function(object, ...) {
-    args <- list(...)
-    type <- args[["type"]]
+.extractList <- function(object, type) {
     for (i in seq_along(object))
-        object[[i]] <- TCGAextract(object[[i]], type)
+        object[[i]] <- biocExtract(object[[i]], type)
     return(object)
 }
 
