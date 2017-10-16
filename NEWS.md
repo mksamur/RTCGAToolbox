@@ -1,5 +1,19 @@
 # RTCGAToolbox
 
+## CHANGES IN VERSION 2.7.44
+
+### New features
+
+* `selectType` function replaces all previous data type extractor functions
+* `getData` improved, removed `CN` argument
+* Cleaner documentation for `biocExtract`
+
+### Bug fixes and minor improvements
+
+* Included helper functions for enabling full functionality of `biocExtract`
+* Added appropriate import directives
+* Re-organized documentation for readability
+
 ## CHANGES IN VERSION 2.7.21
 
 ### New features
