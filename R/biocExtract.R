@@ -48,7 +48,7 @@ NULL
 #' biocExtract(coadmut, "Mutation")
 #' }
 #' @export biocExtract
-biocExtract <- function(object, type = c("Clinical", "RNASeqGene",
+biocExtract <- function(object, type = c("clinical", "RNASeqGene",
     "miRNASeqGene", "RNASeq2GeneNorm", "CNASNP", "CNVSNP", "CNASeq",
     "CNACGH", "Methylation", "Mutation", "mRNAArray", "miRNAArray",
     "RPPAArray", "GISTIC", "GISTICA", "GISTICT")) {
@@ -61,7 +61,7 @@ biocExtract <- function(object, type = c("Clinical", "RNASeqGene",
     if (is.list(object) && !is.data.frame(object)) {
         object <- .unNestList(object)
     }
-    if (type == "Clinical") { return(object) }
+    if (type == "clinical") { return(object) }
     if (is(object, "matrix")) {
         return(SummarizedExperiment(assays = SimpleList(object)))
     }

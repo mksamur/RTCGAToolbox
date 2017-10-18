@@ -54,9 +54,9 @@
 }
 
 .removeShell <- function(x, type) {
-    dataTypes <- c("Clinical", "RNASeqGene", "miRNASeqGene", "RNASeq2GeneNorm",
-                   "CNASNP", "CNVSNP", "CNASeq", "CNACGH", "Methylation", "Mutation",
-                   "mRNAArray", "miRNAArray", "RPPAArray", "GISTIC", "GISTICA", "GISTICT")
+    dataTypes <- c("clinical", "RNASeqGene", "miRNASeqGene", "RNASeq2GeneNorm",
+        "CNASNP", "CNVSNP", "CNASeq", "CNACGH", "Methylation", "Mutation",
+        "mRNAArray", "miRNAArray", "RPPAArray", "GISTIC", "GISTICA", "GISTICT")
     type <- match.arg(type, dataTypes)
     type <- gsub("A$|T$", "", type)
     x <- getElement(x, type)
