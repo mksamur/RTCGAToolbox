@@ -379,7 +379,7 @@ RTCGASample
 ```{r message=FALSE}
 RTCGASampleClinical <- getData(RTCGASample, "clinical")
 RTCGASampleRNAseqCounts <- getData(RTCGASample, "RNASeqGene")
-RTCGASampleCN <- getData(RTCGASample, "GISTIC")
+RTCGASampleCN <- getData(RTCGASample, "GISTIC", "AllByGene")
 ```
 # Reproducing BRCA results from original manuscript
 Following code block is provided to reproduce case study in the RTCGAToolbox paper[@ref6].
