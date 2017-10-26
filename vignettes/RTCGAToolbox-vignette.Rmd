@@ -427,10 +427,10 @@ getSurvival(dataObject=brcaData, geneSymbols=c("PIK3CA"),
 ```
 
 Differentially expressed genes.</br>
-<img src="Figure2.png" height="150px" width="300px" />
+<img src="Figure2.png" height="300px" width="600px" />
 <br/>
 KM plot for PIK3CA on BRCA dataset.<br/>
-<img src="Figure3.png" height="200px" width="200px" />
+<img src="Figure3.png" height="400px" width="400px" />
 
 ## Report figure
 This function provides an overall circle figure for the dataset by using the
@@ -460,7 +460,7 @@ getReport(dataObject=brcaData, DGEResult1=diffGeneExprs[[1]],
     DGEResult2=diffGeneExprs[[2]], geneLocations=locations)
 ```
 Running code above will provide following circle plot.
-<img src="Figure4.png" height="300px" width="300px" />
+<img src="Figure4.png" height="600px" width="600px" />
 
 # Data Objects
 
