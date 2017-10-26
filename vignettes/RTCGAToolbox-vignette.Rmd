@@ -128,20 +128,20 @@ getFirehoseDatasets()
 ```
 ```{r}
 # Valid stddata runs
-stddata = getFirehoseRunningDates()
+stddata <- getFirehoseRunningDates()
 stddata
 ```
 ```{r}
 # Valid analysis running dates (will return 3 recent date)
-gisticDate = getFirehoseAnalyzeDates(last=3)
+gisticDate <- getFirehoseAnalyzeDates(last=3)
 gisticDate
 ```
 When the dates and datasets are determined users can call data client function ("getFirehoseData") to access data. Current version can download multiple data types except ISOFORM and exon level data due to their huge data size. Below code chunk will download READ dataset with clinical and mutation data.
 
 ```{r eval=TRUE,message=FALSE}
 # READ mutation data and clinical data 
-brcaData = getFirehoseData (dataset="READ", runDate="20150402",forceDownload = TRUE,
-               clinic=TRUE, Mutation=TRUE)
+brcaData <- getFirehoseData(dataset="READ", runDate="20150402",
+    forceDownload=TRUE, clinical=TRUE, Mutation=TRUE)
 ```
 Users has to set several parameters to get data they need. Below "getFirehoseData" options has been explained:
 
@@ -191,13 +191,13 @@ This function filters the results as a deafult behaviour using raw p value, adju
 
 ```{r}
 # Differential gene expression analysis for gene level RNA data.
-diffGeneExprs = getDiffExpressedGenes(dataObject=RTCGASample,DrawPlots=TRUE,
-                                   adj.method="BH",adj.pval=0.05,raw.pval=0.05,
-                                   logFC=2,hmTopUpN=10,hmTopDownN=10)
+diffGeneExprs <- getDiffExpressedGenes(dataObject=RTCGASample, DrawPlots=TRUE,
+    adj.method="BH", adj.pval=0.05, raw.pval=0.05, logFC=2, hmTopUpN=10,
+    hmTopDownN=10)
 # Show head for expression outputs
 diffGeneExprs
 showResults(diffGeneExprs[[1]])
-toptableOut = showResults(diffGeneExprs[[1]])
+toptableOut <- showResults(diffGeneExprs[[1]])
 ```
 If "DrawPlots" set as FALSE, running code above won't provide any output figure.
 
@@ -211,11 +211,11 @@ Voom + limma: To voom (variance modeling at the observational level) is to estim
 "getCNGECorrelation" function provides correlation coefficient and adjusted p value between copy number and gene expression data for each dataset. This function takes main dataobject as an input (uses gene copy number estimates from GISTIC2 [@ref2] algorithm and gen expression values from every platform (RNAseq and arrays) to prepare return lists. List object stores "CorResult" object that contains results for each comparison.)
 ```{r}
 #Correlation between gene expression values and copy number
-corrGECN = getCNGECorrelation(dataObject=RTCGASample,adj.method="BH",
-                              adj.pval=0.9,raw.pval=0.05)
+corrGECN <- getCNGECorrelation(dataObject=RTCGASample, adj.method="BH",
+    adj.pval=0.9, raw.pval=0.05)
 corrGECN
 showResults(corrGECN[[1]])
-corRes = showResults(corrGECN[[1]])
+corRes <- showResults(corrGECN[[1]])
 ```
 
 If the dataset has RNASeq data, data will be normalized for correlation analysis. Correlation function uses Benjamini & Hochberg adjustment for p values. For more details about adjment users can check base adjustment methods by calling "?p.adjust". In addition, to filter results adjusted and raw p values are used. Users can change "adj.pval" and "raw.pval" parameters to refine results.
@@ -227,8 +227,8 @@ The RTCGAToolbox uses one of Pearson's product moment correlation coefficient to
 
 ```{r}
 # Mutation frequencies
-mutFrq = getMutationRate(dataObject=RTCGASample)
-head(mutFrq[order(mutFrq[,2],decreasing=TRUE),])
+mutFrq <- getMutationRate(dataObject=RTCGASample)
+head(mutFrq[order(mutFrq[, 2], decreasing=TRUE), ])
 ```
 
 ## Univariate survival analysis
@@ -242,12 +242,11 @@ This function also needs a survival data, which can be obtained using clinical d
 # Running following code will provide following KM plot.
 clinicData <- getData(RTCGASample,"clinical")
 head(clinicData)
-clinicData = clinicData[,3:5]
-clinicData[is.na(clinicData[,3]),3] = clinicData[is.na(clinicData[,3]),2]
+clinicData <- clinicData[, 3:5]
+clinicData[is.na(clinicData[, 3]), 3] <- clinicData[is.na(clinicData[, 3]), 2]
 survData <- data.frame(Samples=rownames(clinicData),
-                        Time=as.numeric(clinicData[,3]),
-                        Censor=as.numeric(clinicData[,1]))
-getSurvival(dataObject=RTCGASample,geneSymbols=c("FCGBP"),sampleTimeCensor=survData)
+    Time=as.numeric(clinicData[, 3]), Censor=as.numeric(clinicData[, 1]))
+getSurvival(dataObject=RTCGASample, geneSymbols=c("FCGBP"), sampleTimeCensor=survData)
 ```
 
 # Data Export
@@ -257,9 +256,9 @@ You can export downloaded data from FirehoseData object by using 'getData()' fun
 RTCGASample
 ```
 ```{r message=FALSE}
-RTCGASampleClinical = getData(RTCGASample,"clinical")
-RTCGASampleRNAseqCounts = getData(RTCGASample,"RNASeqGene")
-RTCGASampleCN = getData(RTCGASample,"GISTIC")
+RTCGASampleClinical <- getData(RTCGASample, "clinical")
+RTCGASampleRNAseqCounts <- getData(RTCGASample, "RNASeqGene")
+RTCGASampleCN <- getData(RTCGASample, "GISTIC")
 ```
 # Reproducing BRCA results from original manuscript
 Following code block is provided to reproduce case study in the RTCGAToolbox paper[@ref6].
@@ -268,41 +267,42 @@ Following code block is provided to reproduce case study in the RTCGAToolbox pap
 # BRCA data with mRNA (Both array and RNASeq), GISTIC processed copy number data
 # mutation data and clinical data 
 # (Depends on bandwidth this process may take long time)
-brcaData = getFirehoseData (dataset="BRCA", runDate="20140416", gistic2_Date="20140115",
-               clinic=TRUE, RNAseq_Gene=TRUE, mRNA_Array=TRUE, Mutation=TRUE)
+brcaData <- getFirehoseData (dataset="BRCA", runDate="20140416",
+    gistic2Date="20140115", clinic=TRUE, RNAseqGene=TRUE, mRNAArray=TRUE,
+    Mutation=TRUE)
 
 # Differential gene expression analysis for gene level RNA data.
 # Heatmaps are given below.
-diffGeneExprs = getDiffExpressedGenes(dataObject=brcaData,DrawPlots=TRUE,
-                                   adj.method="BH",adj.pval=0.05,raw.pval=0.05,
-                                   logFC=2,hmTopUpN=100,hmTopDownN=100)
+diffGeneExprs <- getDiffExpressedGenes(dataObject=brcaData,DrawPlots=TRUE,
+    adj.method="BH", adj.pval=0.05, raw.pval=0.05, logFC=2, hmTopUpN=100,
+    hmTopDownN=100)
 # Show head for expression outputs
 diffGeneExprs
 showResults(diffGeneExprs[[1]])
-toptableOut = showResults(diffGeneExprs[[1]])
+toptableOut <- showResults(diffGeneExprs[[1]])
 
 # Correlation between expresiion profiles and copy number data
-corrGECN = getCNGECorrelation(dataObject=brcaData,adj.method="BH",
-                              adj.pval=0.05,raw.pval=0.05)
+corrGECN <- getCNGECorrelation(dataObject=brcaData, adj.method="BH",
+    adj.pval=0.05, raw.pval=0.05)
 
 corrGECN
 showResults(corrGECN[[1]])
-corRes = showResults(corrGECN[[1]])
+corRes <- showResults(corrGECN[[1]])
 
 # Gene mutation frequincies in BRCA dataset
-mutFrq = getMutationRate(dataObject=brcaData)
+mutFrq <- getMutationRate(dataObject=brcaData)
 head(mutFrq[order(mutFrq[,2],decreasing=TRUE),])
 
 # PIK3CA which is one of the most frequently mutated gene in BRCA dataset
 # KM plot is given below.
 clinicData <- getData(brcaData,"clinical")
 head(clinicData)
-clinicData = clinicData[,3:5]
-clinicData[is.na(clinicData[,3]),3] = clinicData[is.na(clinicData[,3]),2]
+clinicData <- clinicData[, 3:5]
+clinicData[is.na(clinicData[, 3]), 3] <- clinicData[is.na(clinicData[, 3]), 2]
 survData <- data.frame(Samples=rownames(clinicData),
-                        Time=as.numeric(clinicData[,3]),
-                        Censor=as.numeric(clinicData[,1]))
-getSurvival(dataObject=brcaData,geneSymbols=c("PIK3CA"),sampleTimeCensor=survData)
+    Time=as.numeric(clinicData[, 3]), Censor=as.numeric(clinicData[, 1]))
+getSurvival(dataObject=brcaData, geneSymbols=c("PIK3CA"),
+    sampleTimeCensor=survData)
 ```
 
 Differentially expressed genes.</br>
@@ -322,24 +322,26 @@ This function needs a genes location data frame, which can be obtained from "hg1
 # Creating dataset analysis summary figure with getReport. 
 # Figure will be saved as PDF file.
 library("Homo.sapiens")
-locations = genes(Homo.sapiens,columns="SYMBOL")
-locations = as.data.frame(locations)
+locations <- genes(Homo.sapiens, columns="SYMBOL")
+locations <- as.data.frame(locations)
 locations <- locations[,c(6,1,5,2:3)]
-locations <- locations[!is.na(locations[,1]),]
-locations <- locations[!duplicated(locations[,1]),]
+locations <- locations[!is.na(locations[,1]), ]
+locations <- locations[!duplicated(locations[,1]), ]
 rownames(locations) <- locations[,1]
-getReport(dataObject=brcaData,DGEResult1=diffGeneExprs[[1]],
-DGEResult2=diffGeneExprs[[2]],geneLocations=locations)
+getReport(dataObject=brcaData, DGEResult1=diffGeneExprs[[1]],
+    DGEResult2=diffGeneExprs[[2]], geneLocations=locations)
 ```
 Running code above will provide following circle plot.
 <img src="Figure4.png" height="600px" width="600px" />
 
 # Data Objects
+
 RTCGAToolbox provides toy data object for testing functions.
 * "RTCGASample" data is a FirehoseData object that stores RNAseq, copy number, muatation, clinical data for artificially created dataset.
 ```{r}
 data(RTCGASample)
 ```
+
 ******
 ```{r}
 sessionInfo()
