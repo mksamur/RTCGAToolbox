@@ -219,6 +219,7 @@
 #' @param RPPAArray Logical (default FALSE) RPPA data
 #' @param RNAseqNorm RNAseq data normalization method. (Default raw_counts)
 #' @param RNAseq2Norm RNAseq v2 data normalization method. (Default normalized_count)
+#' @param GISTIC logical (default FALSE) processed copy number data
 #' @param forceDownload A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.
 #' @param destdir Directory in which to store the resulting downloaded file. Defaults to current working directory.
 #' @param fileSizeLimit Files that are larger than set value (megabyte) won't be downloaded (Default: 500)
@@ -238,7 +239,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     RNASeqGene=FALSE, clinical=TRUE, miRNASeqGene=FALSE, RNASeq2GeneNorm=FALSE,
     CNASNP=FALSE, CNVSNP=FALSE, CNASeq=FALSE, CNACGH=FALSE, Methylation=FALSE,
     Mutation=FALSE, mRNAArray=FALSE, miRNAArray=FALSE, RPPAArray=FALSE,
-    RNAseqNorm="raw_counts", RNAseq2Norm="normalized_count",
+    GISTIC=FALSE, RNAseqNorm="raw_counts", RNAseq2Norm="normalized_count",
     forceDownload=FALSE, destdir=".", fileSizeLimit=500, getUUIDs=FALSE) {
   #check input parameters
   if (!class(dataset)=="character" || is.null(dataset) || !length(dataset) == 1 || nchar(dataset) < 2) {
@@ -258,31 +259,24 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
         }
   }
 
-  if (!is.null(gistic2Date)) {
-    if (!class(gistic2Date)=="character" || !length(gistic2Date) == 1 || !nchar(gistic2Date) == 8) {
-        stop('Please set "gistic2Date" parameter! You should specify one Firehose run date. Ex: gistic2Date="20140115"...')
-        }
-    runGisticDate <- getFirehoseAnalyzeDates()
-    if (!any(runGisticDate==gistic2Date)) {
-        stop('Please use valid analyze date for GISTIC! "getFirehoseAnalyzeDates" function gives you the vector of valid dates!')}
-  }
-  if (is.null(gistic2Date) & is.null(runDate)) {
-      stop("Please specify run date or/and gistic date!")
-      }
+    if (GISTIC) {
+      if (!S4Vectors::isSingleString(gistic2date) &&
+          !gistic2Date %in% getFirehoseAnalyzeDates())
+          stop('Please set a valid "gistic2Date" parameter.')
+    }
+    trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 
-  trim <- function (x) gsub("^\\s+|\\s+$", "", x)
-
-  resultClass <- new("FirehoseData", Dataset = dataset)
-  if (!is.null(runDate)) {
-    resultClass@runDate <- runDate
-  } else {
-    resultClass@runDate <- "N/A"
-  }
-  if (!is.null(gistic2Date)) {
-    resultClass@gistic2Date <- gistic2Date
-  } else {
-    resultClass@gistic2Date <- "N/A"
-  }
+    resultClass <- new("FirehoseData", Dataset = dataset)
+    if (!is.null(runDate)) {
+      resultClass@runDate <- runDate
+    } else {
+      resultClass@runDate <- "N/A"
+    }
+    if (GISTIC) {
+      resultClass@gistic2Date <- gistic2Date
+    } else {
+      resultClass@gistic2Date <- "N/A"
+    }
 
   if (!is.null(runDate))
   {
@@ -653,7 +647,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
       }
     }
   }
-  if (!is.null(gistic2Date)) {
+  if (GISTIC) {
     ##build URL for getting file links
     fh_url <- "http://gdac.broadinstitute.org/runs/analyses__"
     fh_url <- paste(fh_url,substr(gistic2Date,1,4),"_",substr(gistic2Date,5,6),"_",substr(gistic2Date,7,8),"/data/",sep="")

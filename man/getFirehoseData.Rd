@@ -9,9 +9,9 @@ getFirehoseData(dataset, runDate = "20160128", gistic2Date = "20160128",
   RNASeq2GeneNorm = FALSE, CNASNP = FALSE, CNVSNP = FALSE,
   CNASeq = FALSE, CNACGH = FALSE, Methylation = FALSE, Mutation = FALSE,
   mRNAArray = FALSE, miRNAArray = FALSE, RPPAArray = FALSE,
-  RNAseqNorm = "raw_counts", RNAseq2Norm = "normalized_count",
-  forceDownload = FALSE, destdir = ".", fileSizeLimit = 500,
-  getUUIDs = FALSE)
+  GISTIC = FALSE, RNAseqNorm = "raw_counts",
+  RNAseq2Norm = "normalized_count", forceDownload = FALSE, destdir = ".",
+  fileSizeLimit = 500, getUUIDs = FALSE)
 }
 \arguments{
 \item{dataset}{A cohort name. TCGA cancer code obtained via \code{\link{getFirehoseDatasets}}}
@@ -45,6 +45,8 @@ getFirehoseData(dataset, runDate = "20160128", gistic2Date = "20160128",
 \item{miRNAArray}{Logical (default FALSE) miRNA expression data from microarray.}
 
 \item{RPPAArray}{Logical (default FALSE) RPPA data}
+
+\item{GISTIC}{logical (default FALSE) processed copy number data}
 
 \item{RNAseqNorm}{RNAseq data normalization method. (Default raw_counts)}
 
