@@ -14,37 +14,37 @@ getFirehoseData(dataset, runDate = "20160128", gistic2Date = "20160128",
   getUUIDs = FALSE)
 }
 \arguments{
-\item{dataset}{A cohort name. All dataset names can be accessible via \code{\link{getFirehoseDatasets}}}
+\item{dataset}{A cohort name. TCGA cancer code obtained via \code{\link{getFirehoseDatasets}}}
 
 \item{runDate}{Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}}
 
-\item{gistic2Date}{Analyze running dates for GISTIC processed copy number data. Date list can be accessible via \code{\link{getFirehoseAnalyzeDates}}}
+\item{gistic2Date}{Analysis run date for GISTIC obtained via \code{\link{getFirehoseAnalyzeDates}}}
 
-\item{RNASeqGene}{Logical (default FALSE) parameter for RNAseq data.}
+\item{RNASeqGene}{Logical (default FALSE) RNAseq data.}
 
-\item{clinical}{Logical (default TRUE) parameter for clinical data.}
+\item{clinical}{Logical (default TRUE) clinical data.}
 
-\item{miRNASeqGene}{Logical (default FALSE) parameter for smallRNAseq data.}
+\item{miRNASeqGene}{Logical (default FALSE) smallRNAseq data.}
 
-\item{RNASeq2GeneNorm}{Logical (default FALSE) parameter for RNAseq v2 (RSEM processed) data.}
+\item{RNASeq2GeneNorm}{Logical (default FALSE) RNAseq v2 (RSEM processed) data.}
 
-\item{CNASNP}{Logical (default FALSE) parameter for somatic copy number alterations data from SNP array.}
+\item{CNASNP}{Logical (default FALSE) somatic copy number alterations data from SNP array.}
 
-\item{CNVSNP}{Logical (default FALSE) parameter for germline copy number variants data from SNP array.}
+\item{CNVSNP}{Logical (default FALSE) germline copy number variants data from SNP array.}
 
-\item{CNASeq}{Logical (default FALSE) parameter for somatic copy number alterations data from sequencing.}
+\item{CNASeq}{Logical (default FALSE) somatic copy number alterations data from sequencing.}
 
-\item{CNACGH}{Logical (default FALSE) parameter for somatic copy number alterations data from CGH.}
+\item{CNACGH}{Logical (default FALSE) somatic copy number alterations data from CGH.}
 
-\item{Methylation}{Logical (default FALSE) parameter for methylation data.}
+\item{Methylation}{Logical (default FALSE) methylation data.}
 
-\item{Mutation}{Logical (default FALSE) parameter for mutation data from sequencing.}
+\item{Mutation}{Logical (default FALSE) mutation data from sequencing.}
 
-\item{mRNAArray}{Logical (default FALSE) parameter for mRNA expression data from microarray.}
+\item{mRNAArray}{Logical (default FALSE) mRNA expression data from microarray.}
 
-\item{miRNAArray}{Logical (default FALSE) parameter for miRNA expression data from microarray.}
+\item{miRNAArray}{Logical (default FALSE) miRNA expression data from microarray.}
 
-\item{RPPAArray}{Logical (default FALSE) parameter for RPPA data}
+\item{RPPAArray}{Logical (default FALSE) RPPA data}
 
 \item{RNAseqNorm}{RNAseq data normalization method. (Default raw_counts)}
 

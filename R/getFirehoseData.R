@@ -201,22 +201,22 @@
 #'
 #' This is a main client function to download data from Firehose TCGA portal.
 #'
-#' @param dataset A cohort name. All dataset names can be accessible via \code{\link{getFirehoseDatasets}}
+#' @param dataset A cohort name. TCGA cancer code obtained via \code{\link{getFirehoseDatasets}}
 #' @param runDate Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}
-#' @param gistic2Date Analyze running dates for GISTIC processed copy number data. Date list can be accessible via \code{\link{getFirehoseAnalyzeDates}}
-#' @param RNASeqGene Logical (default FALSE) parameter for RNAseq data.
-#' @param clinical Logical (default TRUE) parameter for clinical data.
-#' @param RNASeq2GeneNorm Logical (default FALSE) parameter for RNAseq v2 (RSEM processed) data.
-#' @param miRNASeqGene Logical (default FALSE) parameter for smallRNAseq data.
-#' @param CNASNP Logical (default FALSE) parameter for somatic copy number alterations data from SNP array.
-#' @param CNVSNP Logical (default FALSE) parameter for germline copy number variants data from SNP array.
-#' @param CNASeq Logical (default FALSE) parameter for somatic copy number alterations data from sequencing.
-#' @param CNACGH Logical (default FALSE) parameter for somatic copy number alterations data from CGH.
-#' @param Methylation Logical (default FALSE) parameter for methylation data.
-#' @param Mutation Logical (default FALSE) parameter for mutation data from sequencing.
-#' @param mRNAArray Logical (default FALSE) parameter for mRNA expression data from microarray.
-#' @param miRNAArray Logical (default FALSE) parameter for miRNA expression data from microarray.
-#' @param RPPAArray Logical (default FALSE) parameter for RPPA data
+#' @param gistic2Date Analysis run date for GISTIC obtained via \code{\link{getFirehoseAnalyzeDates}}
+#' @param RNASeqGene Logical (default FALSE) RNAseq data.
+#' @param clinical Logical (default TRUE) clinical data.
+#' @param RNASeq2GeneNorm Logical (default FALSE) RNAseq v2 (RSEM processed) data.
+#' @param miRNASeqGene Logical (default FALSE) smallRNAseq data.
+#' @param CNASNP Logical (default FALSE) somatic copy number alterations data from SNP array.
+#' @param CNVSNP Logical (default FALSE) germline copy number variants data from SNP array.
+#' @param CNASeq Logical (default FALSE) somatic copy number alterations data from sequencing.
+#' @param CNACGH Logical (default FALSE) somatic copy number alterations data from CGH.
+#' @param Methylation Logical (default FALSE) methylation data.
+#' @param Mutation Logical (default FALSE) mutation data from sequencing.
+#' @param mRNAArray Logical (default FALSE) mRNA expression data from microarray.
+#' @param miRNAArray Logical (default FALSE) miRNA expression data from microarray.
+#' @param RPPAArray Logical (default FALSE) RPPA data
 #' @param RNAseqNorm RNAseq data normalization method. (Default raw_counts)
 #' @param RNAseq2Norm RNAseq v2 data normalization method. (Default normalized_count)
 #' @param forceDownload A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.
