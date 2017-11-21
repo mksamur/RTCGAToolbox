@@ -11,7 +11,7 @@ getFirehoseData(dataset, runDate = "20160128", gistic2Date = "20160128",
   mRNAArray = FALSE, miRNAArray = FALSE, RPPAArray = FALSE,
   GISTIC = FALSE, RNAseqNorm = "raw_counts",
   RNAseq2Norm = "normalized_count", forceDownload = FALSE, destdir = ".",
-  fileSizeLimit = 500, getUUIDs = FALSE)
+  fileSizeLimit = 500, getUUIDs = FALSE, ...)
 }
 \arguments{
 \item{dataset}{A cohort name. TCGA cancer code obtained via \code{\link{getFirehoseDatasets}}}
@@ -59,6 +59,8 @@ getFirehoseData(dataset, runDate = "20160128", gistic2Date = "20160128",
 \item{fileSizeLimit}{Files that are larger than set value (megabyte) won't be downloaded (Default: 500)}
 
 \item{getUUIDs}{Logical key to get UUIDs from barcode (Default: FALSE)}
+
+\item{...}{Additional arguments to pass down. See details.}
 }
 \value{
 A \code{FirehoseData} data object that stores data for selected data types.
@@ -68,6 +70,9 @@ A \code{FirehoseData} data object that stores data for selected data types.
 }
 \details{
 This is a main client function to download data from Firehose TCGA portal.
+
+The \code{\ldots} argument allows for selection of GISTIC peaks
+when calling \code{getGISTICPeaks}.
 }
 \examples{
 # Sample Dataset

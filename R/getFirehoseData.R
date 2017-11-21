@@ -200,6 +200,8 @@
 #' \code{getFirehoseData} returns \code{FirehoseData} object that stores TCGA data.
 #'
 #' This is a main client function to download data from Firehose TCGA portal.
+#' @details The \code{\ldots} argument allows for selection of GISTIC peaks
+#' when calling \code{getGISTICPeaks}.
 #'
 #' @param dataset A cohort name. TCGA cancer code obtained via \code{\link{getFirehoseDatasets}}
 #' @param runDate Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}
@@ -224,6 +226,7 @@
 #' @param destdir Directory in which to store the resulting downloaded file. Defaults to current working directory.
 #' @param fileSizeLimit Files that are larger than set value (megabyte) won't be downloaded (Default: 500)
 #' @param getUUIDs Logical key to get UUIDs from barcode (Default: FALSE)
+#' @param ... Additional arguments to pass down. See details.
 #' @return A \code{FirehoseData} data object that stores data for selected data types.
 #' @examples
 #' # Sample Dataset
@@ -240,7 +243,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     CNASNP=FALSE, CNVSNP=FALSE, CNASeq=FALSE, CNACGH=FALSE, Methylation=FALSE,
     Mutation=FALSE, mRNAArray=FALSE, miRNAArray=FALSE, RPPAArray=FALSE,
     GISTIC=FALSE, RNAseqNorm="raw_counts", RNAseq2Norm="normalized_count",
-    forceDownload=FALSE, destdir=".", fileSizeLimit=500, getUUIDs=FALSE) {
+    forceDownload=FALSE, destdir=".", fileSizeLimit=500, getUUIDs=FALSE, ...) {
   #check input parameters
   if (!class(dataset)=="character" || is.null(dataset) || !length(dataset) == 1 || nchar(dataset) < 2) {
       stop('Please set "dataset" parameter! You should specify one dataset name. Ex: dataset="BRCA"...')
@@ -260,7 +263,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
   }
 
     if (GISTIC) {
-      if (!S4Vectors::isSingleString(gistic2date) &&
+      if (!S4Vectors::isSingleString(gistic2Date) &&
           !gistic2Date %in% getFirehoseAnalyzeDates())
           stop('Please set a valid "gistic2Date" parameter.')
     }
@@ -655,7 +658,13 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     doc = htmlTreeParse(fh_url, useInternalNodes = TRUE)
     #Search for links
     plinks <- .getLinks("CopyNumber_Gistic2.Level_4","-TP[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$",dataset,doc)
-
+    args <- list(...)
+    peakType <- args[["peak"]]
+    rmCHRx <- args[["rm.chrX"]]
+    peak <- if (is.null(peakType)) { "wide" } else { peakType }
+    rmCHRx <- if (is.null(rmCHRx)) {TRUE} else {FALSE}
+    peaks <- getGISTICPeaks(dataset = dataset, peak = peak, rm.chrX = rmCHRx)
+    resultClass@GISTIC@Peaks <- peaks
     for(ii in trim(plinks))
     {
       if (.checkFileSize(paste0(fh_url,ii),fileSizeLimit)) {

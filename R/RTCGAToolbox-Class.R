@@ -65,7 +65,8 @@ setMethod("show", "FirehosemRNAArray",function(object){
 #' @slot ThresholdedByGene A data frame for discrete copy number data
 #' @exportClass FirehoseGISTIC
 setClass("FirehoseGISTIC", representation(Dataset = "character",
-    AllByGene = "data.frame", ThresholdedByGene="data.frame"))
+    AllByGene = "data.frame", ThresholdedByGene="data.frame",
+    Peaks = "data.frame"))
 
 setMethod("show", "FirehoseGISTIC", function(object){
     if (.hasOldGISTIC(object)) {
