@@ -1,17 +1,17 @@
 #' Download peak-level data from the Firehose pipeline
-#' 
+#'
 #' @description Access copy number GISTIC2 level 4 data through
 #' \code{gdac.broadinstitute.org}
-#' 
+#'
 #' @param dataset A TCGA cancer code
 #' @param peak The peak type, select from "wide", "narrow", "full".
 #' @param rm.chrX (logical default TRUE) Whether to remove observations in the
 #' X chromosome
 #' @param gistic2Date (character default "20160128") Data of the analysis
 #' pipeline run
-#' 
+#'
 #' @author Ludwig Geistlinger
-#' 
+#'
 #' @export
 getGISTICPeaks <- function(dataset,  peak = c("wide", "narrow", "full"),
     rm.chrX = TRUE, gistic2Date = "20160128") {
@@ -38,7 +38,7 @@ getGISTICPeaks <- function(dataset,  peak = c("wide", "narrow", "full"),
     untar(tempFile, files = basef, exdir = dirname(tempFile))
 
     # read the lesion file
-    gistic <- read.delim(file.path(tempFile, basef), as.is=TRUE)
+    gistic <- read.delim(file.path(dirname(tempFile), basef), as.is=TRUE)
     unlink(dirname(tempFile), recursive=TRUE, force=TRUE)
 
     validCols <- vapply(gistic, function(x) !all(is.na(x)), logical(1L))

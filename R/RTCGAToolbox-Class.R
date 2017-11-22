@@ -198,9 +198,10 @@ setMethod("getData", "FirehoseData",
         if (type %in% withPlat) {
             res <- .getListData(getElement(object, type), platform)
         } else if (identical(type, "GISTIC")) {
-            if (!platform %in% c("ThresholdedByGene", "AllByGene") ||
+            if (!platform %in% c("ThresholdedByGene", "AllByGene", "Peaks") ||
                 !S4Vectors::isSingleString(platform))
-        stop("GISTIC platforms available: 'AllByGene' or 'ThresholdedByGene'")
+        stop("GISTIC platforms available:\n",
+             "\t'AllByGene', 'ThresholdedByGene', & 'Peaks'")
             res <-  getElement(selectType(object, "GISTIC"), platform)
         } else {
             res <- selectType(object, type)
