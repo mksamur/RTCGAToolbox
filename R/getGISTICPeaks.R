@@ -9,6 +9,9 @@
 #' X chromosome
 #' @param gistic2Date (character default "20160128") Data of the analysis
 #' pipeline run
+#'
+#' @return A \code{data.frame} of peak values
+#'
 #' @importFrom GenomicRanges seqnames order
 #' @importFrom GenomeInfoDb orderSeqlevels seqlevels seqlevels<-
 #'

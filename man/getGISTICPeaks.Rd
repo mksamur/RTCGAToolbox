@@ -18,6 +18,9 @@ X chromosome}
 \item{gistic2Date}{(character default "20160128") Data of the analysis
 pipeline run}
 }
+\value{
+A \code{data.frame} of peak values
+}
 \description{
 Access copy number GISTIC2 level 4 data through
 \code{gdac.broadinstitute.org}
