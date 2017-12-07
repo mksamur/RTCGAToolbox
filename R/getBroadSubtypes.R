@@ -38,8 +38,6 @@ getBroadSubtypes <- function(dataset, clust.alg = c("CNMF", "Consensus_Plus"))
     }
 
     subtys <- read.delim(url, skip=1, as.is=TRUE)
-    subtys[,1] <- TCGAutils::TCGAbarcode(subtys[, 1], sample=TRUE)
-    subtys[,1] <- sub("A$", "", subtys[,1])
     rownames(subtys) <- subtys[,1]
     subtys[,-1]
 }

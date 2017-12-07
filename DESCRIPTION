@@ -1,9 +1,13 @@
 Package: RTCGAToolbox
 Type: Package
 Title: A new tool for exporting TCGA Firehose data
-Version: 2.9.6
-Author: Mehmet Kemal Samur
-Maintainer: Marcel Ramos <marcel.ramos@roswellpark.org>
+Version: 2.9.7
+Authors@R: c(
+    person("Mehmet", "Samur", email = "rtcgatoolbox@gmail.com",
+    role = "aut"),
+    person("Marcel", "Ramos", email = "marcel.ramos@roswellpark.org",
+    role = c("aut", "cre")),
+    person("Ludwig", "Geistlinger", role = "ctb"))
 Description: Managing data from large scale projects such as The Cancer Genome
     Atlas (TCGA) for further analysis is an important and time consuming step
     for research projects. Several efforts, such as Firehose project, make TCGA
