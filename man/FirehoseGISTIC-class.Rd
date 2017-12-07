@@ -32,5 +32,8 @@ the most recent API
 \item{\code{AllByGene}}{A data frame that stores continuous copy number}
 
 \item{\code{ThresholdedByGene}}{A data frame for discrete copy number data}
+
+\item{\code{Peaks}}{A data frame storing GISTIC peak data.
+See \link{getGISTICPeaks}.}
 }}
 

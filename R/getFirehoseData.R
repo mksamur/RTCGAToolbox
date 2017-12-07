@@ -662,9 +662,8 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     peakType <- args[["peak"]]
     rmCHRx <- args[["rm.chrX"]]
     peak <- if (is.null(peakType)) { "wide" } else { peakType }
-    rmCHRx <- if (is.null(rmCHRx)) {TRUE} else {FALSE}
+    rmCHRx <- if (is.null(rmCHRx)) { TRUE } else { rmCHRx }
     peaks <- getGISTICPeaks(dataset = dataset, peak = peak, rm.chrX = rmCHRx)
-    resultClass@GISTIC@Peaks <- peaks
     for(ii in trim(plinks))
     {
       if (.checkFileSize(paste0(fh_url,ii),fileSizeLimit)) {
@@ -695,6 +694,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
         resultClass@GISTIC <- tmpReturn
       }
     }
+    resultClass@GISTIC@Peaks <- peaks
   }
 
   if (getUUIDs) {

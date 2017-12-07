@@ -22,6 +22,13 @@ pipeline run}
 Access copy number GISTIC2 level 4 data through
 \code{gdac.broadinstitute.org}
 }
+\examples{
+
+co <- getGISTICPeaks("COAD", "wide")
+class(co)
+head(co)[1:6]
+
+}
 \author{
 Ludwig Geistlinger
 }

@@ -9,8 +9,16 @@
 #' X chromosome
 #' @param gistic2Date (character default "20160128") Data of the analysis
 #' pipeline run
+#' @importFrom GenomicRanges seqnames order
+#' @importFrom GenomeInfoDb orderSeqlevels seqlevels seqlevels<-
 #'
 #' @author Ludwig Geistlinger
+#'
+#' @examples
+#'
+#' co <- getGISTICPeaks("COAD", "wide")
+#' class(co)
+#' head(co)[1:6]
 #'
 #' @export
 getGISTICPeaks <- function(dataset,  peak = c("wide", "narrow", "full"),

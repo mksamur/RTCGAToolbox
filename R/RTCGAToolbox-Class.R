@@ -63,6 +63,8 @@ setMethod("show", "FirehosemRNAArray",function(object){
 #' @slot Dataset Cohort name
 #' @slot AllByGene A data frame that stores continuous copy number
 #' @slot ThresholdedByGene A data frame for discrete copy number data
+#' @slot Peaks A data frame storing GISTIC peak data.
+#' See \link{getGISTICPeaks}.
 #' @exportClass FirehoseGISTIC
 setClass("FirehoseGISTIC", representation(Dataset = "character",
     AllByGene = "data.frame", ThresholdedByGene="data.frame",
