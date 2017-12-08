@@ -2,7 +2,7 @@
 % Please edit documentation in R/getGISTICPeaks.R
 \name{getGISTICPeaks}
 \alias{getGISTICPeaks}
-\title{Download peak-level data from the Firehose pipeline}
+\title{Download GISTIC2 peak-level data from the Firehose pipeline}
 \usage{
 getGISTICPeaks(dataset, peak = c("wide", "narrow", "full"), rm.chrX = TRUE,
   gistic2Date = "20160128")
@@ -22,7 +22,7 @@ pipeline run}
 A \code{data.frame} of peak values
 }
 \description{
-Access copy number GISTIC2 level 4 data through
+Access GISTIC2 level 4 copy number data through
 \code{gdac.broadinstitute.org}
 }
 \examples{

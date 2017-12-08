@@ -5,7 +5,7 @@
 #'
 #' @param dataset A TCGA cancer code, e.g. "OV" for ovarian cancer
 #' @param clust.alg The selected cluster algorithm, either "CNMF" or
-#' "ConsensusPlus"
+#' "ConsensusPlus" (default "CNMF")
 #'
 #' @return A \code{data.frame} of cluster and silhouette values
 #'
@@ -41,7 +41,7 @@ getBroadSubtypes <- function(dataset, clust.alg = c("CNMF", "ConsensusPlus"))
         url <- sub("mRNA", "mRNAseq", url)
     }
 
-    subtys <- read.delim(url, skip=1, as.is=TRUE)
-    rownames(subtys) <- subtys[,1]
-    subtys[,-1]
+    subtys <- read.delim(url, skip = 1, as.is = TRUE)
+    rownames(subtys) <- subtys[, 1]
+    subtys[, -1]
 }

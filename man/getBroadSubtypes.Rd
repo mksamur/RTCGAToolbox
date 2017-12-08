@@ -2,22 +2,22 @@
 % Please edit documentation in R/getBroadSubtypes.R
 \name{getBroadSubtypes}
 \alias{getBroadSubtypes}
-\title{Download Broad Institute Subtype Clustering Results}
+\title{Download expression-based cancer subtypes from the Broad Institute}
 \usage{
 getBroadSubtypes(dataset, clust.alg = c("CNMF", "ConsensusPlus"))
 }
 \arguments{
-\item{dataset}{A TCGA cancer code}
+\item{dataset}{A TCGA cancer code, e.g. "OV" for ovarian cancer}
 
 \item{clust.alg}{The selected cluster algorithm, either "CNMF" or
-"ConsensuPlus"}
+"ConsensusPlus" (default "CNMF")}
 }
 \value{
 A \code{data.frame} of cluster and silhouette values
 }
 \description{
-Obtain the subtype clustering results from the Broad for
-a specific cancer code (see \link{getFirehoseDatasets}).
+Obtain the mRNA expression clustering results from the
+Broad Institute for a specific cancer code (see \link{getFirehoseDatasets}).
 }
 \examples{
 co <- getBroadSubtypes("COAD", "CNMF")
