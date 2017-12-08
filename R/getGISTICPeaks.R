@@ -14,6 +14,7 @@
 #'
 #' @importFrom GenomicRanges seqnames order
 #' @importFrom GenomeInfoDb orderSeqlevels seqlevels seqlevels<-
+#' @importFrom methods as
 #'
 #' @author Ludwig Geistlinger
 #'
