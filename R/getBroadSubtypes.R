@@ -5,11 +5,12 @@
 #'
 #' @param dataset A TCGA cancer code, e.g. "OV" for ovarian cancer
 #' @param clust.alg The selected cluster algorithm, either "CNMF" or
-#' "Consensus_Plus"
+#' "ConsensusPlus"
 #'
 #' @return A \code{data.frame} of cluster and silhouette values
 #'
 #' @importFrom RCurl url.exists
+#' @importFrom S4Vectors isSingleString
 #'
 #' @author Ludwig Geistlinger
 #'
@@ -18,9 +19,12 @@
 #' head(co)
 #'
 #' @export
-getBroadSubtypes <- function(dataset, clust.alg = c("CNMF", "Consensus_Plus"))
+getBroadSubtypes <- function(dataset, clust.alg = c("CNMF", "ConsensusPlus"))
 {
-    stopifnot(S4Vectors::isSingleString(clust.alg), S4Vectors::isSingleString(dataset))
+    if (!isSingleString(clust.alg))
+        stop("Select a valid clustering algorithm")
+    if (!isSingleString(dataset))
+        stop("Enter a valid cancer code. See '?getFirehoseDatasets'")
 
     url <- file.path("http://gdac.broadinstitute.org/runs/analyses__latest",
         "reports/cancer", paste0(dataset, "-TP"),

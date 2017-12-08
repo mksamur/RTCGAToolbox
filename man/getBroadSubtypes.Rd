@@ -4,13 +4,13 @@
 \alias{getBroadSubtypes}
 \title{Download Broad Institute Subtype Clustering Results}
 \usage{
-getBroadSubtypes(dataset, clust.alg = c("CNMF", "Consensus_Plus"))
+getBroadSubtypes(dataset, clust.alg = c("CNMF", "ConsensusPlus"))
 }
 \arguments{
 \item{dataset}{A TCGA cancer code}
 
 \item{clust.alg}{The selected cluster algorithm, either "CNMF" or
-"Consensu_Plus"}
+"ConsensuPlus"}
 }
 \value{
 A \code{data.frame} of cluster and silhouette values
