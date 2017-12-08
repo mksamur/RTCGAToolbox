@@ -3,9 +3,9 @@ title: "RTCGAToolbox"
 author: "Mehmet Kemal Samur"
 date: "`r Sys.Date()`"
 output:
-  rmarkdown::html_vignette:
+  BiocStyle::html_document:
+    number_sections: yes
     toc: true
-    number_sections: true
 
 references:
 - id: ref1
