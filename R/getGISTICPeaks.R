@@ -1,6 +1,6 @@
-#' Download peak-level data from the Firehose pipeline
+#' Download GISTIC2 peak-level data from the Firehose pipeline
 #'
-#' @description Access copy number GISTIC2 level 4 data through
+#' @description Access GISTIC2 level 4 copy number data through
 #' \code{gdac.broadinstitute.org}
 #'
 #' @param dataset A TCGA cancer code
