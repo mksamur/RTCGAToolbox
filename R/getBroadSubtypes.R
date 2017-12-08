@@ -1,6 +1,6 @@
 #' Download expression-based cancer subtypes from the Broad Institute
 #'
-#' @description Obtain the mRNA expression clustering results from the  
+#' @description Obtain the mRNA expression clustering results from the
 #' Broad Institute for a specific cancer code (see \link{getFirehoseDatasets}).
 #'
 #' @param dataset A TCGA cancer code, e.g. "OV" for ovarian cancer
@@ -15,7 +15,7 @@
 #' @author Ludwig Geistlinger
 #'
 #' @examples
-#' co <- getBroadSubtypes("COAD")
+#' co <- getBroadSubtypes("COAD", "CNMF")
 #' head(co)
 #'
 #' @export
