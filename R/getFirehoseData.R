@@ -161,11 +161,12 @@
 
 }
 
-.exportFiles <- function(fileLink,dataset,fileExt,searchName,subSearch=FALSE,
-                         exportName,manifest=FALSE,destdir=".",forceDownload=FALSE,runDate)
+.exportFiles <- function(fileLink, dataset, fileExt, searchName,subSearch=FALSE,
+    exportName, manifest=FALSE, destdir=destdir, forceDownload=FALSE, runDate)
 {
 
-  if (destdir != ".") dir.create(destdir, recursive = TRUE, showWarnings = FALSE)
+  if (!dir.exists(destdir))
+      stop("Directory does not exist")
   tcgafile <- paste0(dataset,fileExt,sep="")
   destfile <- file.path(destdir, paste0(runDate,"-",dataset,exportName))
 
@@ -183,7 +184,7 @@
       }
     }
 
-    untar(tcgafile,files=fileList)
+    untar(tcgafile, files = fileList, exdir = destdir)
     file.rename(from=fileList,to=destfile)
     file.remove(tcgafile)
 
@@ -629,15 +630,16 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
           if (forceDownload || !file.exists(paste0(destdir,"/",runDate,"-",dataset,"-Mutations-AllSamples.txt"))) {
             download_link = paste(fh_url,ii,sep="")
             download.file(url=download_link,destfile=paste(dataset,"-Mutation.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "wb")
-            fileList <- untar(paste0(dataset,"-Mutation.tar.gz"),list=TRUE)
+            fileLoc <- file.path(destdir, paste0(dataset,"-Mutation.tar.gz"))
+            fileList <- untar(fileLoc, list = TRUE)
             grepSearch = "MANIFEST.txt"
             fileList = fileList[!grepl(grepSearch,fileList)]
             ###
-            untar(paste(dataset,"-Mutation.tar.gz",sep=""),files=fileList)
+            untar(fileLoc, files = fileList, exdir = destdir)
             retMutations <- do.call("rbind",lapply(fileList,FUN=function(files) {
               read.delim(files,header=TRUE,colClasses="character")
             }))
-            delFodler <- paste(getwd(),"/",strsplit(fileList[1],"/")[[1]][1],sep="")
+            delFodler <- paste(destdir,"/",strsplit(fileList[1],"/")[[1]][1],sep="")
             unlink(delFodler, recursive = TRUE)
             file.remove(paste(dataset,"-Mutation.tar.gz",sep=""))
             write.table(retMutations,file=paste0(destdir,"/",runDate,"-",dataset,"-Mutations-AllSamples.txt"),sep="\t",row.names=FALSE,quote=FALSE)
@@ -663,28 +665,39 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     rmCHRx <- args[["rm.chrX"]]
     peak <- if (is.null(peakType)) { "wide" } else { peakType }
     rmCHRx <- if (is.null(rmCHRx)) { TRUE } else { rmCHRx }
-    peaks <- getGISTICPeaks(dataset = dataset, peak = peak, rm.chrX = rmCHRx)
+    peaks <- getGISTICPeaks(dataset = dataset, peak = peak,
+        rm.chrX = rmCHRx, destdir = destdir)
     for(ii in trim(plinks))
     {
       if (.checkFileSize(paste0(fh_url,ii),fileSizeLimit)) {
         if (forceDownload || !file.exists(paste0(destdir,"/",gistic2Date,"-",dataset,"-all_thresholded.by_genes.txt"))) {
-          download_link = paste(fh_url,ii,sep="")
-          download.file(url=download_link,destfile=paste0(dataset,"-Gistic2.tar.gz"),method="auto",quiet = FALSE, mode = "wb")
-          fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
+          download_link <- paste(fh_url, ii, sep = "")
+          fileLoc <- file.path(destdir, paste0(dataset,"-Gistic2.tar.gz"))
+          download.file(url = download_link, destfile = fileLoc,
+            method = "auto", quiet = FALSE, mode = "wb")
+          fileList <- untar(fileLoc, list = TRUE)
           grepSearch = "all_data_by_genes.txt"
           fileList = fileList[grepl(grepSearch,fileList)]
-          untar(paste(dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
-          tmpCNAll = fread(fileList,header=TRUE,colClasses="character", data.table = FALSE)
-          file.rename(from=fileList,to=paste0(destdir,"/",gistic2Date,"-",dataset,"-all_data_by_genes.txt"))
-          fileList <- untar(paste(dataset,"-Gistic2.tar.gz",sep=""),list=TRUE)
+          untar(fileLoc, files = fileList, exdir = destdir)
+          filepaths <- file.path(destdir, fileList)
+          tmpCNAll = fread(filepaths, header = TRUE, colClasses = "character",
+              data.table = FALSE)
+          file.rename(from = filepaths,
+            to = paste0(destdir, "/", gistic2Date, "-",
+                dataset, "-all_data_by_genes.txt"))
+          fileList <- untar(fileLoc, list = TRUE)
           grepSearch = "all_thresholded.by_genes.txt"
           fileList = fileList[grepl(grepSearch,fileList)]
-          untar(paste(dataset,"-Gistic2.tar.gz",sep=""),files=fileList)
-          tmpCNThreshhold = fread(fileList,header=TRUE,colClasses = "character", data.table = FALSE)
-          file.rename(from=fileList,to=paste0(destdir,"/",gistic2Date,"-",dataset,"-all_thresholded.by_genes.txt"))
-          delFodler <- paste(getwd(),"/",strsplit(fileList,"/")[[1]][1],sep="")
+          untar(fileLoc, files = fileList, exdir = destdir)
+          filepaths <- file.path(destdir, fileList)
+          tmpCNThreshhold = fread(filepaths, header = TRUE,
+              colClasses = "character", data.table = FALSE)
+          file.rename(from = filepaths,
+            to = paste0(destdir, "/", gistic2Date, "-",
+                dataset, "-all_thresholded.by_genes.txt"))
+          delFodler <- paste(destdir,"/",strsplit(fileList,"/")[[1]][1],sep="")
           unlink(delFodler, recursive = TRUE)
-          file.remove(paste0(dataset,"-Gistic2.tar.gz"))
+          file.remove(fileLoc)
         } else {
           tmpCNThreshhold = fread(paste0(destdir,"/",gistic2Date,"-",dataset,"-all_thresholded.by_genes.txt"),header=TRUE,colClasses = "character", data.table = FALSE)
           tmpCNAll = fread(paste0(destdir,"/",gistic2Date,"-",dataset,"-all_data_by_genes.txt"),header=TRUE,colClasses="character", data.table = FALSE)
