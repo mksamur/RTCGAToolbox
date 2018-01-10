@@ -1,4 +1,4 @@
-.makeExprMat <- function(file,normMethod,dataType,mergeSize=1000,arrayData=FALSE)
+.makeExprMat <- function(file, normMethod, dataType, mergeSize = 1000, arrayData = FALSE)
 {
   #Get selected type only
   tmpCols = read.delim(file,nrows=1,colClasses="character")
@@ -171,7 +171,7 @@
 
   if (forceDownload || !file.exists(destfile)) {
     download.file(url=fileLink,destfile=tcgafile,method="auto",quiet = FALSE, mode = "wb")
-    fileList <- untar(tcgafile,list=TRUE)
+    fileList <- untar(tcgafile, list = TRUE)
     if (!subSearch) {
       fileList = fileList[grepl(searchName,fileList)]
     } else {
@@ -690,7 +690,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
           tmpCNAll = fread(paste0(destdir,"/",gistic2Date,"-",dataset,"-all_data_by_genes.txt"),header=TRUE,colClasses="character", data.table = FALSE)
         }
         tmpReturn <- new("FirehoseGISTIC",Dataset=dataset,AllByGene=data.frame(tmpCNAll),
-                         ThresholdedByGene=data.frame(tmpCNThreshhold))
+            ThresholdedByGene=data.frame(tmpCNThreshhold))
         resultClass@GISTIC <- tmpReturn
       }
     }
@@ -702,4 +702,3 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
   }
   return(resultClass)
 }
-
