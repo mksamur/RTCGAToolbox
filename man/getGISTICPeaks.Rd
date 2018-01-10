@@ -5,7 +5,7 @@
 \title{Download GISTIC2 peak-level data from the Firehose pipeline}
 \usage{
 getGISTICPeaks(dataset, peak = c("wide", "narrow", "full"), rm.chrX = TRUE,
-  gistic2Date = "20160128")
+  gistic2Date = "20160128", destdir = tempdir())
 }
 \arguments{
 \item{dataset}{A TCGA cancer code}
@@ -17,6 +17,9 @@ X chromosome}
 
 \item{gistic2Date}{(character default "20160128") Data of the analysis
 pipeline run}
+
+\item{destdir}{Directory location to save the downloaded file
+(default tempdir())}
 }
 \value{
 A \code{data.frame} of peak values

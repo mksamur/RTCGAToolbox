@@ -9,6 +9,8 @@
 #' X chromosome
 #' @param gistic2Date (character default "20160128") Data of the analysis
 #' pipeline run
+#' @param destdir Directory location to save the downloaded file
+#' (default tempdir())
 #'
 #' @return A \code{data.frame} of peak values
 #'
@@ -26,7 +28,7 @@
 #'
 #' @export
 getGISTICPeaks <- function(dataset,  peak = c("wide", "narrow", "full"),
-    rm.chrX = TRUE, gistic2Date = "20160128") {
+    rm.chrX = TRUE, gistic2Date = "20160128", destdir = tempdir()) {
 
     BROAD.URL <- file.path("https://gdac.broadinstitute.org",
         paste("runs/analyses_", substr(gistic2Date, 1, 4),
@@ -41,17 +43,16 @@ getGISTICPeaks <- function(dataset,  peak = c("wide", "narrow", "full"),
     tumorType <- switch(dataset, LAML = "TB", SKCM = "TM", "TP")
     url <- gsub("TP", tumorType, url, fixed = TRUE)
 
-    tempFile <- tempfile(fileext = ".tar.gz")
+    tempFile <- tempfile(tmpdir = destdir, fileext = ".tar.gz")
     download.file(url, destfile = tempFile)
     files <- untar(tempFile, list=TRUE)
 
     # extract the lesions file
     basef <- files[grepl("all_lesions.conf_99.txt", files, fixed = TRUE)]
-    untar(tempFile, files = basef, exdir = dirname(tempFile))
+    untar(tempFile, files = basef, exdir = destdir)
 
     # read the lesion file
-    gistic <- read.delim(file.path(dirname(tempFile), basef), as.is=TRUE)
-    unlink(dirname(tempFile), recursive=TRUE, force=TRUE)
+    gistic <- read.delim(file.path(destdir, basef), as.is=TRUE)
 
     validCols <- vapply(gistic, function(x) !all(is.na(x)), logical(1L))
     rel.rows <- grepl("Peak +[0-9]+$", gistic[["Unique.Name"]])
