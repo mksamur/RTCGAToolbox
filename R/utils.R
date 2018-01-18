@@ -242,8 +242,9 @@
     if (!any(is.data.frame(x), is(x, "DataFrame"), is.matrix(x)))
         stop("(internal) 'x' must be rectangular")
     !all(is.na(findGRangesCols(names(x), seqnames.field = "Chromosome",
-                               start.field = c("Start", "Start_position"),
-                               end.field = c("End", "End_position"))))
+        start.field = c("Start", "Start_position"),
+        end.field = c("End", "End_position")))
+    )
 }
 
 ## Safe to assume equal number of ranges == equal ranges (?)
@@ -332,7 +333,17 @@
                             start.field, end.field, xfixType = "pre") {
     fixint <- intersect(xfix1, xfix2)
     fixint <- fixint[fixint != ""]
-    if (!S4Vectors::isSingleString(fixint))
+    if (length(fixint) > 1L) {
+        kword <- "region"
+        warning(" Multiple ", xfixType, "fixes found, using keyword '", kword,
+                "' or taking first one")
+        ## keywords to keep, else take first one
+        gfix <- grep(kword, fixint, value = TRUE)
+        if (length(gfix) && isSingleString(gfix))
+            fixint <- gfix
+        fixint <- fixint[[1L]]
+    }
+    if (!isSingleString(fixint))
         stop("'start.field' and 'end.field' ", xfixType, "fixes do not match")
     names(fixint) <- xfixType
 
