@@ -1,4 +1,4 @@
-#' @importFrom GenomicRanges makeGRangesListFromDataFrame
+#' @importFrom GenomicRanges makeGRangesListFromDataFrame makeGRangesFromDataFrame
 #' @importFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom S4Vectors SimpleList metadata metadata<- DataFrame
 #' @importFrom utils type.convert
@@ -41,10 +41,10 @@
     headers <- names(x)
     annote <- x[, !grepl("TCGA", headers)]
     isNumRow <- all(grepl("^[0-9]*$",
-                          sample(rownames(x), size = 100L, replace = TRUE)))
+        sample(rownames(x), size = 100L, replace = TRUE)))
     if (isNumRow) {
         geneSymbols <- annote[, grep("symbol", names(annote),
-                                     ignore.case = TRUE, value = TRUE)]
+            ignore.case = TRUE, value = TRUE)]
         rNames <- geneSymbols
     } else { rNames <- rownames(x) }
     dm <- data.matrix(x[, grepl("TCGA", names(x))])
@@ -205,30 +205,29 @@
 
 .ansRangeNames <- function(x) {
     if (is(x, "list")) { return(list()) }
-    granges_cols <- findGRangesCols(names(x), seqnames.field = "Chromosome",
-                                    start.field = c("Start", "Start_position"),
-                                    end.field = c("End", "End_position"))
+    granges_cols <- TCGAutils::findGRangesCols(names(x))
     fielders <- list(seqnames.field = "seqnames", start.field = "start",
-                     end.field = "end", strand.field = "strand")
+        end.field = "end", strand.field = "strand")
     Fargs <- lapply(fielders, function(name) { names(x)[granges_cols[[name]]] })
     Fargs[["ignore.strand"]] <- is.na(Fargs[["strand.field"]])
     Filter(function(g) {!is.na(g)}, Fargs)
 }
 
 .findSampleCol <- function(x) {
-    tsb <- match("tumor_sample_barcode", tolower(names(x)))
-    if (length(tsb) == 1L && !is.na(tsb)) {
-        primary <- names(x)[tsb]
-    } else if (is.na(tsb)) {
-        primary <- names(x)[tolower(names(x)) == "sample"]
+    tsb <- na.omit(match(c("tumor_sample_barcode", "sample"),
+        tolower(names(x))))
+    if (length(tsb)) {
+        names(x)[tsb[[1L]]]
     } else {
-        stop("'split.field' could not be found")
+        NA_character_
     }
-    return(primary)
 }
 
 .hasConsistentRanges <- function(object) {
     primary <- .findSampleCol(object)
+    if (is.na(primary)) {
+        return(FALSE)
+    }
     if (is(object, "DataFrame"))
         asListData <- IRanges::splitAsList(object, object[[primary]])
     else
@@ -241,7 +240,7 @@
     if (all(grepl("^TCGA", names(x)))) { return(FALSE) }
     if (!any(is.data.frame(x), is(x, "DataFrame"), is.matrix(x)))
         stop("(internal) 'x' must be rectangular")
-    !all(is.na(findGRangesCols(names(x), seqnames.field = "Chromosome",
+    !all(is.na(TCGAutils::findGRangesCols(names(x), seqnames.field = "Chromosome",
         start.field = c("Start", "Start_position"),
         end.field = c("End", "End_position")))
     )
@@ -301,12 +300,34 @@
             rownames(df) <- df[, .findCol(df, "Hugo_Symbol")]
     }
     newGRL <- do.call(makeGRangesListFromDataFrame,
-                      args = c(list(df = df, keep.extra.columns = TRUE), rangeInfo))
+        args = c(list(df = df, keep.extra.columns = TRUE), rangeInfo))
     if (exists("GBuild"))
         GenomeInfoDb::genome(newGRL) <- GBuild
     newRE <- RaggedExperiment::RaggedExperiment(newGRL)
     metadata(newRE) <- metadat
     return(newRE)
+}
+
+.makeGRangesFromDataFrame <- function(df, ...) {
+    args <- list(...)
+    if (!is.null(args[["build"]]))
+        GBuild <- args[["build"]]
+    metadat <- if (is(df, "DataFrame")) { metadata(df) } else { list() }
+    ansRanges <- .ansRangeNames(df)
+    dropIdx <- .omitAdditionalIdx(df, ansRanges)
+    if (length(dropIdx))
+        df <- df[, -dropIdx]
+    if (.hasHugoInfo(df)) {
+        hugos <- df[, .findCol(df, "Hugo_Symbol")]
+        if (identical(length(hugos), length(unique(hugos))))
+            rownames(df) <- df[, .findCol(df, "Hugo_Symbol")]
+    }
+    newgr <- do.call(GenomicRanges::makeGRangesFromDataFrame,
+        args = c(list(df = df, keep.extra.columns = TRUE), ansRanges))
+    if (exists("GBuild"))
+        GenomeInfoDb::genome(newgr) <- GBuild
+    metadata(newgr) <- metadat
+    return(newgr)
 }
 
 .omitAdditionalIdx <- function(object, rangeNames) {
