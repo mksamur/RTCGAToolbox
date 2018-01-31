@@ -221,9 +221,8 @@
         BCOL <- .findCol(x, "NCBI_Build")
         build <- unique(x[[BCOL]])
         if (length(build) > 1L)
-            stop("Inconsistent genome build column")
-        build <- as.character(build)
-        return(.getHGBuild(build))
+           build <- .validateNCBI(x[[BCOL]])
+        return(as.character(build))
     } else {
         stop("Build not available")
     }
@@ -336,14 +335,12 @@
     split.field <- .findSampleCol(df)
     ansRanges <- .ansRangeNames(df)
     rangeInfo <- c(ansRanges, list(split.field = split.field))
+    df <- .standardizeStrand(df, ansRanges[["strand.field"]])
     dropIdx <- .omitAdditionalIdx(df, ansRanges)
     if (length(dropIdx))
         df <- df[, -dropIdx]
-    if (.hasHugoInfo(df)) {
-        hugos <- df[, .findCol(df, "Hugo_Symbol")]
-        if (identical(length(hugos), length(unique(hugos))))
-            rownames(df) <- df[, .findCol(df, "Hugo_Symbol")]
-    }
+    if (.hasHugoInfo(df))
+        df <- .setHugoRows(df)
     newGRL <- do.call(makeGRangesListFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), rangeInfo))
     if (exists("GBuild"))
@@ -362,11 +359,8 @@
     dropIdx <- .omitAdditionalIdx(df, ansRanges)
     if (length(dropIdx))
         df <- df[, -dropIdx]
-    if (.hasHugoInfo(df)) {
-        hugos <- df[, .findCol(df, "Hugo_Symbol")]
-        if (identical(length(hugos), length(unique(hugos))))
-            rownames(df) <- df[, .findCol(df, "Hugo_Symbol")]
-    }
+    if (.hasHugoInfo(df))
+        df <- .setHugoRows(df)
     newgr <- do.call(GenomicRanges::makeGRangesFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), ansRanges))
     if (exists("GBuild"))
