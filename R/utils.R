@@ -189,6 +189,32 @@
     as.logical(length(hugoInfo))
 }
 
+.setHugoRows <- function(df) {
+    hugos <- df[, .findCol(df, "Hugo_Symbol")]
+    if (identical(length(hugos), length(unique(hugos))))
+        rownames(df) <- df[, .findCol(df, "Hugo_Symbol")]
+    df
+}
+
+.validateNCBI <- function(bvec) {
+    builds <- stringr::str_extract(bvec, "\\d+")
+    bnum <- unique(builds)
+    if (length(bnum) > 1L)
+        stop("Inconsistent build numbers found")
+    bnum
+}
+
+.standardstrand <- function(x) {
+    x <- gsub("null", "*", x, ignore.case = TRUE)
+    x[is.null(x) || is.na(x)] <- "*"
+    x
+}
+
+.standardizeStrand <- function(x, strandcol) {
+    x[[strandcol]] <- .standardstrand(x[[strandcol]])
+    x
+}
+
 .getBuild <- function(x) {
     binf <- .hasBuildInfo(x)
     if (binf) {
@@ -247,6 +273,25 @@
 }
 
 ## Safe to assume equal number of ranges == equal ranges (?)
+.makeSummarizedExperimentFromDataFrame <- function(df, ...) {
+    bcodecols <- startsWith(names(df), "TCGA")
+    if (any(bcodecols)) {
+        rowData <- df[, !bcodecols]
+    }
+    df <- df[, bcodecols]
+    df <- RTCGAToolbox:::.standardizeBC(df)
+    metadat <- metadata(df)
+    if (.hasHugoInfo(df))
+        df <- .setHugoRows(df)
+    if (length(rowData))
+    object <- SummarizedExperiment(assays = SimpleList(df),
+        rowData = rowData)
+    else
+    object <- makeSummarizedExperimentFromDataFrame(df)
+    if (length(metadata))
+        metadata(object) <- list(metadata)
+    return(object)
+}
 
 .makeRangedSummarizedExperimentFromDataFrame <- function(df, ...,
     seqinfo = NULL, starts.in.df.are.0based = FALSE) {
