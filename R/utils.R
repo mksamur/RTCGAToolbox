@@ -238,7 +238,7 @@
     Filter(function(g) {!is.na(g)}, Fargs)
 }
 
-.findSampleCol <- function(x, sampcols = c("tumor_sample_barcode", "sample") {
+.findSampleCol <- function(x, sampcols = c("tumor_sample_barcode", "sample")) {
     tsb <- na.omit(match(sampcols, tolower(names(x))))
     if (length(tsb)) {
         names(x)[tsb[[1L]]]
