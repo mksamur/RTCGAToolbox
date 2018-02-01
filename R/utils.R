@@ -198,7 +198,7 @@
 }
 
 .validateNCBI <- function(bvec) {
-    builds <- stringr::str_extract(bvec, "\\d+")
+    builds <- str_extract(bvec, "\\d+")
     bnum <- unique(builds)
     if (length(bnum) > 1L)
         stop("Inconsistent build numbers found")
@@ -231,7 +231,7 @@
 
 .ansRangeNames <- function(x) {
     if (is(x, "list")) { return(list()) }
-    granges_cols <- TCGAutils::findGRangesCols(names(x))
+    granges_cols <- findGRangesCols(names(x))
     fielders <- list(seqnames.field = "seqnames", start.field = "start",
         end.field = "end", strand.field = "strand")
     Fargs <- lapply(fielders, function(name) { names(x)[granges_cols[[name]]] })
@@ -268,7 +268,7 @@
     if (all(grepl("^TCGA", names(x)))) { return(FALSE) }
     if (!any(is.data.frame(x), is(x, "DataFrame"), is.matrix(x)))
         stop("(internal) 'x' must be rectangular")
-    !all(is.na(TCGAutils::findGRangesCols(names(x), seqnames.field = "Chromosome",
+    !all(is.na(findGRangesCols(names(x), seqnames.field = "Chromosome",
         start.field = c("Start", "Start_position"),
         end.field = c("End", "End_position")))
     )
@@ -281,7 +281,7 @@
         rowData <- df[, !bcodecols]
     }
     df <- df[, bcodecols]
-    df <- RTCGAToolbox:::.standardizeBC(df)
+    df <- .standardizeBC(df)
     metadat <- metadata(df)
     if (.hasHugoInfo(df))
         df <- .setHugoRows(df)
@@ -394,7 +394,7 @@
 
 ## Helper functions from TCGAutils (to be released) see findGRangesCols
 .find_with_xfix <- function(df_colnames, xfix1, xfix2,
-                            start.field, end.field, xfixType = "pre") {
+        start.field, end.field, xfixType = "pre") {
     fixint <- intersect(xfix1, xfix2)
     fixint <- fixint[fixint != ""]
     if (length(fixint) > 1L) {
@@ -421,9 +421,10 @@
     if (!length(start.field) && !length(end.field))
         list(c(start.field = "", end.field = ""), "")
     else
-        list(c(start.field = start.field, end.field = end.field), fixint)
+    list(c(start.field = start.field, end.field = end.field), fixint)
 }
 
+## Helper functions
 .find_start_end_cols <- function (df_colnames, start.field, end.field) {
     idx1 <- which(df_colnames %in% start.field)
     idx2 <- which(df_colnames %in% end.field)
@@ -432,25 +433,26 @@
     suffixes1 <- .collect_suffixes(df_colnames, start.field)
     suffixes2 <- .collect_suffixes(df_colnames, end.field)
     if (length(idx1) == 1L && length(idx2) == 1L) {
-        return(list(c(start = idx1, end = idx2), ""))
+        return(list(c(start = idx1, end = idx2), list(c(none = ""))))
     }
     if (length(idx1) != 1L && length(prefixes1) ||
         length(idx2) != 1L && length(prefixes2)) {
-        startend.fields <- .find_with_xfix(df_colnames, prefixes1, prefixes2,
-            start.field, end.field, "pre")
-        idx1 <- which(df_colnames %in% startend.fields[[1L]][["start.field"]])
-        idx2 <- which(df_colnames %in% startend.fields[[1L]][["end.field"]])
+    startend.fields <- .find_with_xfix(df_colnames, prefixes1, prefixes2,
+        start.field, end.field, "pre")
+    idx1 <- which(df_colnames %in% startend.fields[[1L]][["start.field"]])
+    idx2 <- which(df_colnames %in% startend.fields[[1L]][["end.field"]])
     }
-    if (!length(idx1) && !length(idx2)) {
-        startend.fields <- .find_with_xfix(df_colnames, suffixes1, suffixes2,
-            start.field, end.field, "suf")
-        idx1 <- which(df_colnames %in% startend.fields[[1L]][["start.field"]])
-        idx2 <- which(df_colnames %in% startend.fields[[1L]][["end.field"]])
+    if (length(idx1) != 1L && length(suffixes1) ||
+        length(idx2) != 1L && length(suffixes2)) {
+    startend.fields <- .find_with_xfix(df_colnames, suffixes1, suffixes2,
+        start.field, end.field, "suf")
+    idx1 <- which(df_colnames %in% startend.fields[[1L]][["start.field"]])
+    idx2 <- which(df_colnames %in% startend.fields[[1L]][["end.field"]])
     }
     if (length(idx1) == 1L && length(idx2) == 1L) {
         list(c(start = idx1, end = idx2), startend.fields[2L])
     } else {
-        list(c(start = NA_integer_, end = NA_integer_), "")
+        list(c(start = NA_integer_, end = NA_integer_), list(c(none = "")))
     }
 }
 
@@ -468,13 +470,13 @@
     suffixes <- lapply(field, function(pre) {
         idx <- which(startsWith(df_colnames, pre))
         substr(df_colnames[idx], nchar(field) + 1L,
-               nchar(df_colnames[idx]))
+            nchar(df_colnames[idx]))
     })
     unique(unlist(suffixes))
 }
 
 .find_strands_col <- function(df_colnames, strand.field, xfix) {
-    fixFUN <- switch(names(xfix[[1]]), pre = I, suf = rev)
+    fixFUN <- switch(names(xfix[[1]]), pre = I, suf = rev, none = I)
     idx <- which(df_colnames %in%
         paste(fixFUN(c(xfix, strand.field)), collapse = ""))
     if (length(idx) == 0L)
@@ -489,21 +491,21 @@
 }
 
 .find_seqnames_col <- function (df_colnames, seqnames.field, xfix) {
-    fixFUN <- switch(names(xfix[[1]]), pre = I, suf = rev)
+    fixFUN <- switch(names(xfix[[1]]), pre = I, suf = rev, none = I)
     idx <- which(df_colnames %in%
-                     paste(fixFUN(c(xfix, seqnames.field)), collapse = ""))
+        paste(fixFUN(c(xfix, seqnames.field)), collapse = ""))
     if (length(idx) == 0L)
         idx <- which(df_colnames %in% seqnames.field)
     if (length(idx) == 0L)
         return(NA_integer_)
     if (length(idx) >= 2L)
         warning("cannnot determine seqnames column unambiguously")
-    return(idx[[1L]])
+        return(idx[[1L]])
     idx
 }
 
 .find_width_col <- function (df_colnames, width.field, xfix) {
-    fixFUN <- switch(names(xfix[[1]]), pre = I, suf = rev)
+    fixFUN <- switch(names(xfix[[1]]), pre = I, suf = rev, none = I)
     idx <- which(df_colnames %in%
         paste(fixFUN(c(xfix, width.field)), collapse = ""))
     if (length(idx) == 0L)
@@ -526,11 +528,12 @@ findGRangesCols <- function (df_colnames,
     ignore.strand = FALSE) {
 
     df_colnames0 <- tolower(df_colnames)
-    seqnames.field0 <- GenomicRanges:::.normarg_field(seqnames.field, "seqnames")
+    seqnames.field0 <-
+        GenomicRanges:::.normarg_field(seqnames.field, "seqnames")
     start.field0 <- GenomicRanges:::.normarg_field(start.field, "start")
     end.field0 <- GenomicRanges:::.normarg_field(end.field, "end")
     start_end_cols <- .find_start_end_cols(df_colnames0, start.field0,
-                                           end.field0)
+        end.field0)
     xfix <- start_end_cols[[2L]]
     width_col <- .find_width_col(df_colnames0, "width", xfix)
     seqnames_col <- .find_seqnames_col(df_colnames0, seqnames.field0, xfix)
@@ -541,5 +544,5 @@ findGRangesCols <- function (df_colnames,
         strand_col <- .find_strands_col(df_colnames0, strand.field0, xfix)
     }
     c(seqnames = seqnames_col, start_end_cols[[1L]], width = width_col,
-      strand = strand_col)
+        strand = strand_col)
 }
