@@ -1,5 +1,7 @@
 #' @importFrom GenomicRanges makeGRangesListFromDataFrame makeGRangesFromDataFrame
 #' @importFrom SummarizedExperiment SummarizedExperiment
+#' makeSummarizedExperimentFromDataFrame
+#' @importFrom RaggedExperiment RaggedExperiment
 #' @importFrom S4Vectors SimpleList metadata metadata<- DataFrame
 #' @importFrom utils type.convert
 #' @importFrom methods .hasSlot

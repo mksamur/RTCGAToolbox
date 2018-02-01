@@ -1,7 +1,7 @@
 Package: RTCGAToolbox
 Type: Package
 Title: A new tool for exporting TCGA Firehose data
-Version: 2.9.26
+Version: 2.9.27
 Authors@R: c(
     person("Mehmet", "Samur", email = "rtcgatoolbox@gmail.com",
     role = "aut"),
@@ -39,6 +39,7 @@ Imports:
     RCurl,
     RJSONIO,
     S4Vectors,
+    stringr,
     SummarizedExperiment,
     survival,
     XML
@@ -46,7 +47,6 @@ Suggests:
     BiocStyle,
     Homo.sapiens,
     knitr,
-    MultiAssayExperiment,
     readr,
     rmarkdown
 biocViews: DifferentialExpression, GeneExpression, Sequencing
