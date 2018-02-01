@@ -241,6 +241,7 @@
 .findSampleCol <-
     function(x, sampcols = c("tumor_sample_barcode", "sample", "id"))
 {
+    sampcols <- tolower(sampcols)
     tsb <- na.omit(match(sampcols, tolower(names(x))))
     if (length(tsb)) {
         names(x)[tsb[[1L]]]
@@ -336,7 +337,8 @@
     split.field <- .findSampleCol(df)
     ansRanges <- .ansRangeNames(df)
     rangeInfo <- c(ansRanges, list(split.field = split.field))
-    df <- .standardizeStrand(df, ansRanges[["strand.field"]])
+    if (!is.null(ansRanges[["strand.field"]]))
+        df <- .standardizeStrand(df, ansRanges[["strand.field"]])
     dropIdx <- .omitAdditionalIdx(df, ansRanges)
     if (length(dropIdx))
         df <- df[, -dropIdx]
