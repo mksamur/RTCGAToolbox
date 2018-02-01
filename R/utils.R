@@ -3,6 +3,7 @@
 #' @importFrom S4Vectors SimpleList metadata metadata<- DataFrame
 #' @importFrom utils type.convert
 #' @importFrom methods .hasSlot
+#' @importFrom stringr str_extract
 ## Helper functions for data extraction
 .getDataMatrix <- function(object) {
     getElement(object, "DataMatrix")

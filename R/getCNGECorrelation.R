@@ -12,7 +12,7 @@
 #' RCircos.Heatmap.Plot RCircos.Gene.Connector.Plot RCircos.Gene.Name.Plot
 #' RCircos.Chromosome.Ideogram.Plot
 #' @importFrom RJSONIO fromJSON
-#' @importFrom stats cor.test heatmap model.matrix p.adjust pchisq
+#' @importFrom stats cor.test heatmap model.matrix p.adjust pchisq na.omit
 #' @importFrom survival survfit survdiff Surv
 #' @importFrom utils data download.file head read.csv read.delim read.table
 #' setTxtProgressBar txtProgressBar untar write.table
