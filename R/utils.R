@@ -193,7 +193,7 @@
 }
 
 .setHugoRows <- function(df) {
-    hugos <- df[, .findCol(df, "Hugo_Symbol")]
+    hugos <- df[, .findCol(df, "Hugo_Symbol"), drop = TRUE]
     if (identical(length(hugos), length(unique(hugos))))
         rownames(df) <- df[, .findCol(df, "Hugo_Symbol")]
     df
@@ -210,6 +210,8 @@
 .standardstrand <- function(x) {
     x <- gsub("null", "*", x, ignore.case = TRUE)
     x[is.null(x) || is.na(x)] <- "*"
+    x[x == 1] <- "+"
+    x[x == -1] <- "-"
     x
 }
 
@@ -274,6 +276,12 @@
         start.field = c("Start", "Start_position"),
         end.field = c("End", "End_position")))
     )
+}
+
+.hasExperimentData <- function(x) {
+    bcodecols <- any(startsWith(names(x), "TCGA"))
+    sampcols <- na.omit(.findSampleCol(x))
+    .hasRangeNames(x) || length(sampcols) || bcodecols
 }
 
 ## Safe to assume equal number of ranges == equal ranges (?)
