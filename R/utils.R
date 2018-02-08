@@ -80,8 +80,12 @@
     }
 }
 
-.searchBuild <- function(x) {
-    gsub("(^.+)_(hg[0-9]{2})_(.+$)", "\\2", x = x, ignore.case = TRUE)
+.findBuild <- function(fname) {
+    bno <- stringr::str_extract(fname, "hg[0-9]{2}")
+    if (!length(bno))
+        NA_character_
+    else
+        bno
 }
 
 .nameClean <- function(x) {
@@ -140,8 +144,7 @@
         x <- lapply(x, function(y) {
             fname <- .getFilenames(y)
             platform <- .searchPlatform(fname)
-            if (!.hasBuildInfo(y))
-                build <- .searchBuild(fname)
+            build <- .findBuild(fname)
             y <- .getDataMatrix(y)
             y <- DataFrame(y)
             metadata(y) <- list(filename = fname, build = build,
