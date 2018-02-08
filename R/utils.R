@@ -187,7 +187,7 @@
     names(x)[foundInData]
 }
 
-.hasInfo <- fuction(x, info = "NCBI_Build") {
+.hasInfo <- function(x, info = "NCBI_Build") {
     ## check "Hugo_Symbol" also possible
     buildInfo <- .findCol(x, info)
     as.logical(length(buildInfo))
