@@ -231,7 +231,7 @@
            build <- .validateNCBI(x[[BCOL]])
         return(as.character(build))
     } else {
-        stop("Build not available")
+        NA_character_
     }
 }
 
@@ -316,8 +316,8 @@
 .makeRangedSummarizedExperimentFromDataFrame <-
     function(df, ..., seqinfo = NULL, starts.in.df.are.0based = FALSE) {
     args <- list(...)
-    if (!is.null(args[["build"]]))
-        GBuild <- args[["build"]]
+    build <- args[["build"]]
+    names.field <- args[["names.field"]]
     metadat <- metadata(df)
     if (!.hasConsistentRanges(df))
         stop("All ranges must be equal in number by 'split.field'")
@@ -339,9 +339,8 @@
     }
     names(countList) <- nameAssays
     rowRanges <- makeGRangesListFromDataFrame(df[, unlist(RangeInfo)],
-                                              split.field = split.field)
-    if (exists("GBuild"))
-        GenomeInfoDb::genome(rowRanges) <- GBuild
+        split.field = split.field, names.field = names.field)
+    GenomeInfoDb::genome(rowRanges) <- build
     newSE <- SummarizedExperiment(assays = SimpleList(countList),
         rowRanges = rowRanges)
     metadata(newSE) <- metadat
@@ -350,12 +349,13 @@
 
 .makeRaggedExperimentFromDataFrame <- function(df, ...) {
     args <- list(...)
-    if (!is.null(args[["build"]]))
-        GBuild <- args[["build"]]
+    build <- args[["build"]]
+    names.field <- args[["names.field"]]
     metadat <- if (is(df, "DataFrame")) { metadata(df) } else { list() }
     split.field <- .findSampleCol(df)
     ansRanges <- .ansRangeNames(df)
-    rangeInfo <- c(ansRanges, list(split.field = split.field))
+    rangeInfo <- c(ansRanges, list(split.field = split.field,
+        names.field = names.field))
     if (!is.null(ansRanges[["strand.field"]]))
         df <- .standardizeStrand(df, ansRanges[["strand.field"]])
     dropIdx <- .omitAdditionalIdx(df, ansRanges)
@@ -365,8 +365,7 @@
         df <- .setHugoRows(df)
     newGRL <- do.call(makeGRangesListFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), rangeInfo))
-    if (exists("GBuild"))
-        GenomeInfoDb::genome(newGRL) <- GBuild
+    GenomeInfoDb::genome(newGRL) <- build
     newRE <- RaggedExperiment::RaggedExperiment(newGRL)
     metadata(newRE) <- metadat
     return(newRE)
@@ -374,8 +373,7 @@
 
 .makeGRangesFromDataFrame <- function(df, ...) {
     args <- list(...)
-    if (!is.null(args[["build"]]))
-        GBuild <- args[["build"]]
+    build <- args[["build"]]
     metadat <- if (is(df, "DataFrame")) { metadata(df) } else { list() }
     ansRanges <- .ansRangeNames(df)
     dropIdx <- .omitAdditionalIdx(df, ansRanges)
@@ -385,8 +383,7 @@
         df <- .setHugoRows(df)
     newgr <- do.call(GenomicRanges::makeGRangesFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), ansRanges))
-    if (exists("GBuild"))
-        GenomeInfoDb::genome(newgr) <- GBuild
+    GenomeInfoDb::genome(newgr) <- build
     metadata(newgr) <- metadat
     return(newgr)
 }
