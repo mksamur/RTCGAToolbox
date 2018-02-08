@@ -187,14 +187,10 @@
     names(x)[foundInData]
 }
 
-.hasBuildInfo <- function(x) {
-    buildInfo <- .findCol(x, "NCBI_Build")
+.hasInfo <- fuction(x, info = "NCBI_Build") {
+    ## check "Hugo_Symbol" also possible
+    buildInfo <- .findCol(x, info)
     as.logical(length(buildInfo))
-}
-
-.hasHugoInfo <- function(x) {
-    hugoInfo <- .findCol(x, "Hugo_Symbol")
-    as.logical(length(hugoInfo))
 }
 
 .setHugoRows <- function(df) {
@@ -226,7 +222,7 @@
 }
 
 .getBuild <- function(x) {
-    binf <- .hasBuildInfo(x)
+    binf <- .hasInfo(x, "NCBI_Build")
     if (binf) {
         BCOL <- .findCol(x, "NCBI_Build")
         build <- unique(x[[BCOL]])
@@ -297,9 +293,15 @@
     }
     df <- df[, bcodecols]
     df <- .standardizeBC(df)
+    args <- list(...)
+    names.field <- args[["names.field"]]
+    if (is.null(names.field)) {
+        if (.hasInfo(df, "Hugo_Symbol"))
+            df <- .setHugoRows(df)
+    } else {
+        rownames(df) <- rowData[[names.field]]
+    }
     metadat <- metadata(df)
-    if (.hasHugoInfo(df))
-        df <- .setHugoRows(df)
     if (length(rowData))
     object <- SummarizedExperiment(assays = SimpleList(df),
         rowData = rowData)
@@ -358,7 +360,7 @@
     dropIdx <- .omitAdditionalIdx(df, ansRanges)
     if (length(dropIdx))
         df <- df[, -dropIdx]
-    if (.hasHugoInfo(df))
+    if (.hasInfo(df, "Hugo_Symbol"))
         df <- .setHugoRows(df)
     newGRL <- do.call(makeGRangesListFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), rangeInfo))
@@ -378,7 +380,7 @@
     dropIdx <- .omitAdditionalIdx(df, ansRanges)
     if (length(dropIdx))
         df <- df[, -dropIdx]
-    if (.hasHugoInfo(df))
+    if (.hasInfo(df, "Hugo_Symbol"))
         df <- .setHugoRows(df)
     newgr <- do.call(GenomicRanges::makeGRangesFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), ansRanges))
