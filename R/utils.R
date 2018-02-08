@@ -68,9 +68,8 @@
 
 .getHGBuild <- function(hgbuild) {
     buildDF <- DataFrame(Date = c("July 2004", "May 2004", "March 2006",
-                                  "February 2009"),
-                         NCBI = c("34", "35", "36", "37"),
-                         UCSC = c("hg16", "hg17", "hg18", "hg19"))
+        "February 2009"), NCBI = c("34", "35", "36", "37"),
+        UCSC = c("hg16", "hg17", "hg18", "hg19"))
     buildIndex <- match(hgbuild, buildDF[["NCBI"]])
     if (is.na(buildIndex)) {
         warning("build could not be matched")
@@ -124,7 +123,7 @@
     brokenUP <- Filter(function(y) nchar(y) != 0L, brokenUP)
     platNumExp <- "[0-9]k$|[0-9]a$|450$|27$|ht|hg"
     namePlat <- unique(grep("cgh|mirna|meth|huex|^trans", brokenUP,
-                            ignore.case = TRUE, value = TRUE))
+        ignore.case = TRUE, value = TRUE))
     namePlat <- .nameClean(namePlat)
     vers <- grep(platNumExp, brokenUP, ignore.case = TRUE, value = TRUE)
     vers <- .nameClean(vers)
@@ -146,7 +145,7 @@
             y <- .getDataMatrix(y)
             y <- DataFrame(y)
             metadata(y) <- list(filename = fname, build = build,
-                                platform = platform)
+                platform = platform)
             return(y)
         })
         if (length(x) > 1L) {
@@ -305,8 +304,8 @@
     return(object)
 }
 
-.makeRangedSummarizedExperimentFromDataFrame <- function(df, ...,
-    seqinfo = NULL, starts.in.df.are.0based = FALSE) {
+.makeRangedSummarizedExperimentFromDataFrame <-
+    function(df, ..., seqinfo = NULL, starts.in.df.are.0based = FALSE) {
     args <- list(...)
     if (!is.null(args[["build"]]))
         GBuild <- args[["build"]]
@@ -327,7 +326,7 @@
     countList <- vector(mode = "list", length = numAssays)
     for (i in seq_len(numAssays)) {
         countList[[i]] <- do.call(cbind, lapply(numInfo,
-                                                function(smalldf) { smalldf[[i]] }))
+            function(smalldf) { smalldf[[i]] }))
     }
     names(countList) <- nameAssays
     rowRanges <- makeGRangesListFromDataFrame(df[, unlist(RangeInfo)],
@@ -335,7 +334,7 @@
     if (exists("GBuild"))
         GenomeInfoDb::genome(rowRanges) <- GBuild
     newSE <- SummarizedExperiment(assays = SimpleList(countList),
-                                  rowRanges = rowRanges)
+        rowRanges = rowRanges)
     metadata(newSE) <- metadat
     return(newSE)
 }
