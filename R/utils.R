@@ -175,12 +175,15 @@
 }
 
 .findCol <- function(x, colname) {
-    stopifnot(is.character(colname))
-    dataNames <- tolower(gsub("\\.|_", "", names(x)))
-    colname <- tolower(gsub("\\.|_", "", colname))
+    if (!is.character(colname))
+        stop("<internal> colname is not character")
+    dataNames <- tolower(gsub("[^A-Za-z0-9]", "", names(x)))
+    colname <- tolower(gsub("[^A-Za-z0-9]", "", colname))
     foundInData <- dataNames %in% colname
     if (sum(foundInData) > 1L)
-        stop("Multiple matched columns detected")
+        foundInData <- which.max(foundInData)
+    if (!sum(foundInData))
+        return(character(0L))
     names(x)[foundInData]
 }
 
