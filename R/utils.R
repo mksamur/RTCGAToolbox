@@ -194,9 +194,10 @@
 }
 
 .setHugoRows <- function(df) {
-    hugos <- df[, .findCol(df, "Hugo_Symbol"), drop = TRUE]
+    hugoname <- .findCol(df, "Hugo_Symbol")
+    hugos <- df[[hugoname]]
     if (identical(length(hugos), length(unique(hugos))))
-        rownames(df) <- df[, .findCol(df, "Hugo_Symbol")]
+        rownames(df) <- hugos
     df
 }
 
