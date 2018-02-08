@@ -237,7 +237,7 @@
 
 .ansRangeNames <- function(x) {
     if (is(x, "list")) { return(list()) }
-    granges_cols <- findGRangesCols(names(x))
+    granges_cols <- .findGRangesCols(names(x))
     fielders <- list(seqnames.field = "seqnames", start.field = "start",
         end.field = "end", strand.field = "strand")
     Fargs <- lapply(fielders, function(name) { names(x)[granges_cols[[name]]] })
@@ -274,7 +274,8 @@
     if (all(grepl("^TCGA", names(x)))) { return(FALSE) }
     if (!any(is.data.frame(x), is(x, "DataFrame"), is.matrix(x)))
         stop("(internal) 'x' must be rectangular")
-    !all(is.na(findGRangesCols(names(x), seqnames.field = "Chromosome",
+    !all(is.na(.findGRangesCols(names(x),
+        seqnames.field = "Chromosome",
         start.field = c("Start", "Start_position"),
         end.field = c("End", "End_position")))
     )
@@ -407,7 +408,7 @@
     return(object)
 }
 
-## Helper functions from TCGAutils (to be released) see findGRangesCols
+## Helper functions from TCGAutils (to be released) see .findGRangesCols
 .find_with_xfix <- function(df_colnames, xfix1, xfix2,
         start.field, end.field, xfixType = "pre") {
     fixint <- intersect(xfix1, xfix2)
@@ -534,7 +535,7 @@
     idx
 }
 
-findGRangesCols <- function (df_colnames,
+.findGRangesCols <- function (df_colnames,
     seqnames.field = c("seqnames", "seqname", "chromosome",
         "chrom", "chr", "chromosome_name", "seqid"),
     start.field = "start",
