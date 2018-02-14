@@ -68,8 +68,8 @@
 
 .getHGBuild <- function(hgbuild) {
     buildDF <- DataFrame(Date = c("July 2004", "May 2004", "March 2006",
-        "February 2009"), NCBI = c("34", "35", "36", "37"),
-        UCSC = c("hg16", "hg17", "hg18", "hg19"))
+        "February 2009"), NCBI = c("34", "35", "36", "37", "38"),
+        UCSC = c("hg16", "hg17", "hg18", "hg19", "hg38"))
     buildIndex <- match(hgbuild, buildDF[["NCBI"]])
     if (is.na(buildIndex)) {
         warning("build could not be matched")
@@ -80,8 +80,10 @@
     }
 }
 
-.findBuild <- function(fname) {
-    bno <- stringr::str_extract(fname, "hg[0-9]{2}")
+.findBuild <- function(fname, type = "UCSC") {
+    pattrn <- switch(type, UCSC = "[Hh][Gg][0-9]{2}",
+        NCBI = "[Gg][Rr][Cc][Hh][0-9]{2}")
+    bno <- stringr::str_extract(fname, pattrn)
     if (!length(bno))
         NA_character_
     else
