@@ -1,5 +1,12 @@
 # RTCGAToolbox
 
+## CHANGES IN VERSION 2.9.41
+
+## Bug fixes and minor improvements
+
+* Fixed bug where file rename was not working due to incorrect path location
+in `getFirehoseData`
+
 ## CHANGES IN VERSION 2.9.40
 
 ### New features

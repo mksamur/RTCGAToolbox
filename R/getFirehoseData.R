@@ -167,11 +167,12 @@
 
   if (!dir.exists(destdir))
       stop("Directory does not exist")
-  tcgafile <- paste0(dataset,fileExt,sep="")
+  tcgafile <- file.path(destdir, paste0(dataset, fileExt, sep=""))
   destfile <- file.path(destdir, paste0(runDate,"-",dataset,exportName))
 
   if (forceDownload || !file.exists(destfile)) {
-    download.file(url=fileLink,destfile=tcgafile,method="auto",quiet = FALSE, mode = "wb")
+    download.file(url=fileLink, destfile=tcgafile, method="auto",
+        quiet = FALSE, mode = "wb")
     fileList <- untar(tcgafile, list = TRUE)
     if (!subSearch) {
       fileList = fileList[grepl(searchName,fileList)]
@@ -185,11 +186,11 @@
     }
 
     untar(tcgafile, files = fileList, exdir = destdir)
-    file.rename(from=fileList,to=destfile)
+    file.rename(from=file.path(destdir, fileList), to=destfile)
     file.remove(tcgafile)
 
     message(dirname(fileList))
-    unlink(dirname(fileList), recursive = TRUE)
+    unlink(file.path(destdir, dirname(fileList)), recursive = TRUE)
   } else {
     message(sprintf('Using locally cached version of %s',destfile))
   }

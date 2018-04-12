@@ -1,7 +1,7 @@
 Package: RTCGAToolbox
 Type: Package
 Title: A new tool for exporting TCGA Firehose data
-Version: 2.9.40
+Version: 2.9.41
 Authors@R: c(
     person("Mehmet", "Samur", email = "rtcgatoolbox@gmail.com",
     role = "aut"),
@@ -20,7 +20,6 @@ Description: Managing data from large scale projects such as The Cancer Genome
     integrated with other analysis pipelines for following data analysis.
 License: file LICENSE
 LazyData: true
-LazyLoad: yes
 Depends:
     R (>= 3.4.0)
 Imports:
