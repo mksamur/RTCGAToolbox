@@ -1,5 +1,16 @@
 # RTCGAToolbox
 
+## CHANGES IN VERSION 2.9.40
+
+### New features
+
+* `getBroadSubtypes` and `getGISTICPeaks` now included in the package.
+Thanks to @lgeistlinger!
+* Updated import directives
+* Added peaks data slot to the `FirehoseGISTIC` class
+* Numerous improvements to internal helpers
+* Added a `GISTIC` argument to `getFirehoseData`
+
 ## CHANGES IN VERSION 2.7.44
 
 ### New features

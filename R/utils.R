@@ -195,6 +195,12 @@
     as.logical(length(buildInfo))
 }
 
+.TCGAcols <- function(df) {
+    apply(df, 2L, function(col) {
+        all(startsWith(col, "TCGA"))
+    })
+}
+
 .setHugoRows <- function(df) {
     hugoname <- .findCol(df, "Hugo_Symbol")
     hugos <- df[[hugoname]]
@@ -243,7 +249,8 @@
     fielders <- list(seqnames.field = "seqnames", start.field = "start",
         end.field = "end", strand.field = "strand")
     Fargs <- lapply(fielders, function(name) { names(x)[granges_cols[[name]]] })
-    Fargs[["ignore.strand"]] <- is.na(Fargs[["strand.field"]])
+    allStrandNA <- all(is.na(x[[Fargs[["strand.field"]]]]))
+    Fargs[["ignore.strand"]] <- is.na(Fargs[["strand.field"]]) || allStrandNA
     Filter(function(g) {!is.na(g)}, Fargs)
 }
 
@@ -283,19 +290,24 @@
     )
 }
 
+.samplesAsCols <- function(x, char = "TCGA") {
+    startsWith(names(x), char)
+}
+
 .hasExperimentData <- function(x) {
-    bcodecols <- any(startsWith(names(x), "TCGA"))
+    anySamplesAsCols <- any(.SamplesAsCols(x))
     sampcols <- na.omit(.findSampleCol(x))
-    .hasRangeNames(x) || length(sampcols) || bcodecols
+    .hasRangeNames(x) || length(sampcols) || anySamplesAsCols
 }
 
 ## Safe to assume equal number of ranges == equal ranges (?)
 .makeSummarizedExperimentFromDataFrame <- function(df, ...) {
-    bcodecols <- startsWith(names(df), "TCGA")
-    if (any(bcodecols)) {
-        rowData <- df[, !bcodecols]
+    samplesAsCols <- .samplesAsCols(df)
+    if (any(samplesAsCols)) {
+        rowData <- df[, !samplesAsCols]
     }
-    df <- df[, bcodecols]
+    df <- data.matrix(df[, samplesAsCols])
+
     df <- .standardizeBC(df)
     args <- list(...)
     names.field <- args[["names.field"]]
@@ -386,7 +398,7 @@
         df <- .setHugoRows(df)
     newgr <- do.call(GenomicRanges::makeGRangesFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), ansRanges))
-    GenomeInfoDb::genome(newgr) <- build
+    GenomeInfoDb::genome(newgr) <- if (is.null(build)) NA else build
     metadata(newgr) <- metadat
     return(newgr)
 }
@@ -409,4 +421,3 @@
         object[[i]] <- biocExtract(object[[i]], type)
     return(object)
 }
-
