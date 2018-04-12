@@ -95,7 +95,7 @@ biocExtract <- function(object, type = c("clinical", "RNASeqGene",
 
     hasRanged <- .hasRangeNames(object)
     if (hasRanged) {
-        if (.hasBuildInfo(object)) {
+        if (.hasInfo(object, "NCBI_Build")) {
             GBuild <- .getBuild(object)
         }
         if (.hasConsistentRanges(object)) {

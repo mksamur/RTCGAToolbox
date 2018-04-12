@@ -295,7 +295,7 @@
 }
 
 .hasExperimentData <- function(x) {
-    anySamplesAsCols <- any(.SamplesAsCols(x))
+    anySamplesAsCols <- any(.samplesAsCols(x))
     sampcols <- na.omit(.findSampleCol(x))
     .hasRangeNames(x) || length(sampcols) || anySamplesAsCols
 }
