@@ -303,6 +303,8 @@
 ## Safe to assume equal number of ranges == equal ranges (?)
 .makeSummarizedExperimentFromDataFrame <- function(df, ...) {
     samplesAsCols <- .samplesAsCols(df)
+    if (is(df, "DataFrame"))
+        metadat <- metadata(df)
     if (any(samplesAsCols)) {
         rowData <- df[, !samplesAsCols]
     }
@@ -317,14 +319,13 @@
     } else {
         rownames(df) <- rowData[[names.field]]
     }
-    metadat <- metadata(df)
     if (length(rowData))
     object <- SummarizedExperiment(assays = SimpleList(df),
         rowData = rowData)
     else
     object <- makeSummarizedExperimentFromDataFrame(df)
-    if (length(metadata))
-        metadata(object) <- list(metadata)
+    if (length(metadat))
+        metadata(object) <- metadat
     return(object)
 }
 
