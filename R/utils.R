@@ -243,9 +243,34 @@
     }
 }
 
+.validStartEnd <- function(x, ansranges) {
+    startf <- names(x)[ansranges["start"]]
+    endf <- names(x)[ansranges["end"]]
+    if (any(is.na(x[[startf]])) || any(is.na(x[[endf]])))
+        FALSE
+    else
+        TRUE
+}
+
+.removeStartEnds <- function(x, ansranges) {
+    startf <- names(x)[ansranges["start"]]
+    endf <- names(x)[ansranges["end"]]
+    rangeIndx <- which(names(x) %in% c(startf, endf))
+    x[, -rangeIndx]
+}
+
+.validGRangesCols <- function(x) {
+    granges_cols <- .findGRangesCols(names(x))
+    while (!.validStartEnd(x, granges_cols)) {
+        x <- .removeStartEnds(x, granges_cols)
+        granges_cols <- .findGRangesCols(names(x))
+    }
+    granges_cols
+}
+
 .ansRangeNames <- function(x) {
     if (is(x, "list")) { return(list()) }
-    granges_cols <- .findGRangesCols(names(x))
+    granges_cols <- .validGRangesCols(x)
     fielders <- list(seqnames.field = "seqnames", start.field = "start",
         end.field = "end", strand.field = "strand")
     Fargs <- lapply(fielders, function(name) { names(x)[granges_cols[[name]]] })
