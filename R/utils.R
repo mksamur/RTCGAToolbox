@@ -290,7 +290,7 @@
     )
 }
 
-.samplesAsCols <- function(x, char = "TCGA") {
+.samplesAsCols <- function(x, char = c("TCGA-", "TCGA.")) {
     startsWith(names(x), char)
 }
 
@@ -306,7 +306,7 @@
     if (is(df, "DataFrame"))
         metadat <- metadata(df)
     if (any(samplesAsCols)) {
-        rowData <- df[, !samplesAsCols]
+        rowData <- df[, !samplesAsCols, drop = FALSE]
     }
     df <- data.matrix(df[, samplesAsCols])
 
