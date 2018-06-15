@@ -41,6 +41,7 @@ Imports:
     stringr,
     SummarizedExperiment,
     survival,
+    TCGAutils,
     XML
 Suggests:
     BiocStyle,

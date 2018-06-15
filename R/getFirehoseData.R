@@ -275,12 +275,12 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     if (!is.null(runDate)) {
       resultClass@runDate <- runDate
     } else {
-      resultClass@runDate <- "N/A"
+      resultClass@runDate <- NA_character_
     }
     if (GISTIC) {
       resultClass@gistic2Date <- gistic2Date
     } else {
-      resultClass@gistic2Date <- "N/A"
+      resultClass@gistic2Date <- NA_character_
     }
 
   if (!is.null(runDate))
