@@ -234,7 +234,7 @@
     binf <- .hasInfo(x, "NCBI_Build")
     if (binf) {
         BCOL <- .findCol(x, "NCBI_Build")
-        build <- unique(x[[BCOL]])
+        build <- TCGAutils::uniformBuilds(x[[BCOL]])
         if (length(build) > 1L)
            build <- .validateNCBI(x[[BCOL]])
         return(as.character(build))

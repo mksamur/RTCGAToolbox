@@ -1,7 +1,7 @@
 Package: RTCGAToolbox
 Type: Package
 Title: A new tool for exporting TCGA Firehose data
-Version: 2.11.0
+Version: 2.11.1
 Authors@R: c(
     person("Mehmet", "Samur", email = "rtcgatoolbox@gmail.com",
     role = "aut"),
@@ -59,7 +59,6 @@ Collate:
     'RTCGAToolbox.R'
     'utils.R'
     'biocExtract.R'
-    'findGRcols.R'
     'getBroadSubtypes.R'
     'getCNGECorrelation.R'
     'getDiffExpressedGenes.R'
