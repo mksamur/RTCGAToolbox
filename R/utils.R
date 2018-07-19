@@ -66,20 +66,6 @@
     return(x)
 }
 
-.getHGBuild <- function(hgbuild) {
-    buildDF <- DataFrame(Date = c("July 2004", "May 2004", "March 2006",
-        "February 2009"), NCBI = c("34", "35", "36", "37", "38"),
-        UCSC = c("hg16", "hg17", "hg18", "hg19", "hg38"))
-    buildIndex <- match(hgbuild, buildDF[["NCBI"]])
-    if (is.na(buildIndex)) {
-        warning("build could not be matched")
-        return(NA_character_)
-    } else {
-        ucscBuild <- buildDF$UCSC[buildIndex]
-        return(ucscBuild)
-    }
-}
-
 .findBuild <- function(fname, type = "UCSC") {
     pattrn <- switch(type, UCSC = "[Hh][Gg][0-9]{2}",
         NCBI = "[Gg][Rr][Cc][Hh][0-9]{2}")
@@ -308,11 +294,7 @@
     if (all(grepl("^TCGA", names(x)))) { return(FALSE) }
     if (!any(is.data.frame(x), is(x, "DataFrame"), is.matrix(x)))
         stop("(internal) 'x' must be rectangular")
-    !all(is.na(TCGAutils::findGRangesCols(names(x),
-        seqnames.field = "Chromosome",
-        start.field = c("Start", "Start_position"),
-        end.field = c("End", "End_position")))
-    )
+    !all(is.na(TCGAutils::findGRangesCols(names(x))))
 }
 
 .samplesAsCols <- function(x, char = c("TCGA-", "TCGA.")) {
