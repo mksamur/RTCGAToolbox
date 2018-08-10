@@ -144,8 +144,9 @@ available on GitHub. First time users use the following code snippet to
 install the package
 
 ```{r eval=FALSE}
-source("http://bioconductor.org/biocLite.R")
-biocLite("RTCGAToolbox")
+if (!requireNamespace("BiocManager"))
+    install.packages("BiocManager")
+BiocManager::install("RTCGAToolbox")
 ```
 
 # Data Client
