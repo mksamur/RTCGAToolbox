@@ -1,7 +1,7 @@
 Package: RTCGAToolbox
 Type: Package
 Title: A new tool for exporting TCGA Firehose data
-Version: 2.11.4
+Version: 2.11.5
 Authors@R: c(
     person("Mehmet", "Samur", email = "rtcgatoolbox@gmail.com",
     role = "aut"),
@@ -23,17 +23,14 @@ LazyData: true
 Depends:
     R (>= 3.4.0)
 Imports:
-    Biobase,
     BiocGenerics,
     data.table (>= 1.9.4),
     DelayedArray,
     GenomicRanges,
     GenomeInfoDb,
-    httr,
     IRanges,
     limma (>= 3.18),
     methods,
-    plyr,
     RaggedExperiment,
     RCircos,
     RCurl,
