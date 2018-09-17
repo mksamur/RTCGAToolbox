@@ -1,6 +1,7 @@
 #' @importFrom GenomicRanges makeGRangesListFromDataFrame makeGRangesFromDataFrame
 #' @importFrom SummarizedExperiment SummarizedExperiment
 #' makeSummarizedExperimentFromDataFrame
+#' @importFrom DelayedArray DelayedArray
 #' @importFrom RaggedExperiment RaggedExperiment
 #' @importFrom S4Vectors SimpleList metadata metadata<- DataFrame
 #' @importFrom utils type.convert
@@ -51,9 +52,11 @@
         rNames <- geneSymbols
     } else { rNames <- rownames(x) }
     dm <- data.matrix(x[, grepl("TCGA", names(x))])
+    mode(dm) <- "numeric"
     rownames(dm) <- rNames
     dm <- .standardizeBC(dm)
-    SummarizedExperiment::SummarizedExperiment(SimpleList(dm), rowData = annote)
+    dm <- DelayedArray::DelayedArray(dm)
+    SummarizedExperiment::SummarizedExperiment(dm, rowData = annote)
 }
 
 .removeShell <- function(x, type) {
