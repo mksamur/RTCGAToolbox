@@ -100,10 +100,10 @@ biocExtract <- function(object, type = c("clinical", "RNASeqGene",
         }
         if (.hasConsistentRanges(object)) {
             object <- .makeRangedSummarizedExperimentFromDataFrame(object,
-                build = if (exists("GBuild")) { GBuild } else { NULL })
+                build = if (exists("GBuild")) { GBuild } else { NA })
         } else {
             object <- .makeRaggedExperimentFromDataFrame(object,
-                build = if (exists("GBuild")) { GBuild } else { NULL })
+                build = if (exists("GBuild")) { GBuild } else { NA })
         }
     } else {
         object <- .standardizeBC(object)
