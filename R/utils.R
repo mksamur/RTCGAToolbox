@@ -31,14 +31,25 @@
 
 .getGISTIC <- function(x, type) {
     x <- getElement(x, type)
-    annoteCols <- !grepl("TCGA", names(x))
-    annoteRowDF <- x[, annoteCols]
-    rownames(annoteRowDF) <-
-        annoteRowDF[, grepl("gene", names(annoteRowDF), ignore.case = TRUE)]
-    x <- x[, !annoteCols]
-    x <- vapply(x, type.convert, numeric(nrow(x)))
-    x <- .standardizeBC(x)
-    SummarizedExperiment(SimpleList(x), rowData = annoteRowDF)
+    if (length(x)) {
+        annoteCols <- !grepl("TCGA", names(x))
+        annoteRowDF <- x[, annoteCols]
+        rows <- annoteRowDF[,
+            grepl("gene|ranges", names(annoteRowDF), ignore.case = TRUE)]
+        if (length(rows))
+            rownames(annoteRowDF) <- rows
+        x <- x[, !annoteCols]
+        x <- vapply(x, type.convert, numeric(nrow(x)))
+        x <- .standardizeBC(x)
+        if (type == "Peaks" && length(rows)) {
+            gist <- SummarizedExperiment(SimpleList(x),
+                rowRanges = as(rownames(annoteRowDF), "GRanges"))
+            mcols(gist) <- annoteRowDF
+        } else gist <- SummarizedExperiment(SimpleList(x), rowData = annoteRowDF)
+            return(gist)
+    } else {
+        return(list())
+    }
 }
 
 .getMethyl <- function(x) {

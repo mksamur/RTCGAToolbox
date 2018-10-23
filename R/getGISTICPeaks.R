@@ -62,6 +62,7 @@ getGISTICPeaks <- function(dataset,  peak = c("wide", "narrow", "full"),
     names(gistic)[isBCodes] <- .stdIDs(names(gistic)[isBCodes])
 
     # (a) get the ranges from chosen peaks
+    peak <- match.arg(peak, c("wide", "narrow", "full"))
     peak.col <- switch (peak,
         wide = "Wide.Peak.Limits",
         narrow = "Peak.Limits",

@@ -32,6 +32,7 @@ NULL
 #'     \item{Mutation} - Mutations
 #'     \item{GISTICA} - GISTIC v2 ('AllByGene' only)
 #'     \item{GISTICT} - GISTIC v2 ('ThresholdedByGene' only)
+#'     \item{GISTICP} - GISTIC v2 ('Peaks' only)
 #'     \item{GISTIC} - GISTIC v2 scores and probabilities (both)
 #' }
 #'
@@ -41,17 +42,17 @@ NULL
 #' @return Either an \linkS4class{SummarizedExperiment} object or a
 #' \linkS4class{RaggedExperiment} object.
 #'
-#' @author Marcel Ramos \email{marcel.ramos@roswellpark.org}
+#' @author Marcel Ramos \email{marcel.ramos@@roswellpark.org}
 #'
 #' @examples \dontrun{
-#' coadmut <- getFirehoseData("COAD", runDate = "20151101", Mutation = TRUE)
-#' biocExtract(coadmut, "Mutation")
+#'     coadmut <- getFirehoseData("COAD", Mutation = TRUE)
+#'     biocExtract(coadmut, "Mutation")
 #' }
 #' @export biocExtract
 biocExtract <- function(object, type = c("clinical", "RNASeqGene",
     "miRNASeqGene", "RNASeq2GeneNorm", "CNASNP", "CNVSNP", "CNASeq",
     "CNACGH", "Methylation", "Mutation", "mRNAArray", "miRNAArray",
-    "RPPAArray", "GISTIC", "GISTICA", "GISTICT")) {
+    "RPPAArray", "GISTIC", "GISTICA", "GISTICT", "GISTICP")) {
     if (length(type) != 1L)
         stop("Please specify a single data type")
     message("working on: ", type)
@@ -73,14 +74,18 @@ biocExtract <- function(object, type = c("clinical", "RNASeqGene",
 
     gisticType <- grepl("^GISTIC", type, ignore.case = TRUE)
     if (gisticType) {
-        slotreq <- switch(type, GISTICA = "AllByGene",
-                          GISTICT = "ThresholdedByGene",
-                          GISTIC = c("AllByGene", "ThresholdedByGene"))
-        if (type == "GISTIC") {
+        slotreq <- switch(type,
+            GISTICA = "AllByGene", GISTICT = "ThresholdedByGene",
+            GISTICP = "Peaks",
+            GISTIC = c("AllByGene", "ThresholdedByGene", "Peaks")
+        )
+        result <- if (type == "GISTIC") {
             names(slotreq) <- slotreq
-            result <- lapply(slotreq, function (x) { .getGISTIC(object, x) })
-        } else
-            result <- .getGISTIC(object, slotreq)
+            Filter(length,
+                lapply(slotreq, function (x) { .getGISTIC(object, x) }))
+        } else { .getGISTIC(object, slotreq) }
+        if (length(result) == 1L)
+            result <- result[[1L]]
         return(result)
     }
 
