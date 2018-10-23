@@ -3,12 +3,17 @@
 \docType{class}
 \name{FirehoseGISTIC-class}
 \alias{FirehoseGISTIC-class}
+\alias{isEmpty,FirehoseGISTIC-method}
 \alias{updateObject,FirehoseGISTIC-method}
 \title{An S4 class to store processed copy number data. (Data processed by using GISTIC2 algorithm)}
 \usage{
+\S4method{isEmpty}{FirehoseGISTIC}(x)
+
 \S4method{updateObject}{FirehoseGISTIC}(object, ..., verbose = FALSE)
 }
 \arguments{
+\item{x}{A FirehoseGISTIC class object}
+
 \item{object}{A \code{FirehoseGISTIC} object}
 
 \item{...}{additional arguments for updateObject}
@@ -20,6 +25,9 @@ An S4 class to store processed copy number data. (Data processed by using GISTIC
 }
 \section{Methods (by generic)}{
 \itemize{
+\item \code{isEmpty}: check whether the FirehoseGISTIC object has
+data in it or not
+
 \item \code{updateObject}: Update an old FirehoseGISTIC object to
 the most recent API
 }}

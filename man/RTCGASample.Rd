@@ -3,7 +3,6 @@
 \docType{data}
 \name{RTCGASample}
 \alias{RTCGASample}
-\alias{RTCGASample}
 \title{A sample data object for sample codes.}
 \format{A \code{FirehoseData} data object}
 \usage{

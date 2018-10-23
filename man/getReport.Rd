@@ -4,7 +4,8 @@
 \alias{getReport}
 \title{Draws a circle plot into working directory}
 \usage{
-getReport(dataObject, DGEResult1 = NULL, DGEResult2 = NULL, geneLocations)
+getReport(dataObject, DGEResult1 = NULL, DGEResult2 = NULL,
+  geneLocations)
 }
 \arguments{
 \item{dataObject}{This must be \code{FirehoseData} object.}

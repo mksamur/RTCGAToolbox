@@ -1,24 +1,23 @@
-.getListData <- function(object,platform){
-  if(is.null(platform)){stop("Please set platform")}
-  switch(class(platform),
-         "numeric"={
-           if(platform > length(object)){
-             message("Accessible platforms:")
-             for(i in 1:length(object)){
-               message(paste0("#",i," :",object[[i]]@Filename))
-             }
-             stop("Invalid list member")
-           }
-           invisible(object[[platform]]@DataMatrix)
-         },
-        {
-          message("Accessible platforms:")
-          for(i in 1:length(object)){
-            message(paste0("#",i," :",object[[i]]@Filename))
-          }
-          stop("Set a valid platfrom")
+.getListData <- function(object, platform) {
+    if (is.null(platform)) { stop("Please set platform") }
+    switch(class(platform),
+        "numeric" = {
+            if (platform > length(object)) {
+                message("Accessible platforms:")
+                for (i in seq_along(object)) {
+                    message(paste0("#",i," :",object[[i]]@Filename))
+                }
+                stop("Invalid list member")
+            }
+            invisible(object[[platform]]@DataMatrix)
+        }, {
+            message("Accessible platforms:")
+            for (i in seq_along(object)) {
+                message(paste0("#",i," :",object[[i]]@Filename))
+            }
+            stop("Set a valid platfrom")
         }
-  )
+    )
 }
 
 #' An S4 class to store data from CGA platforms
@@ -28,11 +27,12 @@
 #' @exportClass FirehoseCGHArray
 setClass("FirehoseCGHArray", representation(Filename = "character",
     DataMatrix = "data.frame"))
-setMethod("show", "FirehoseCGHArray",function(object){
+setMethod("show", "FirehoseCGHArray",function(object) {
     message(paste0("Platform:", object@Filename))
     if (dim(object@DataMatrix)[1] > 0 ) {
         message("FirehoseCGHArray object, dim: ", paste(dim(object@DataMatrix),
-        collapse = "\t"))}
+        collapse = "\t"))
+    }
 })
 
 #' An S4 class to store data from methylation platforms
@@ -79,6 +79,23 @@ setMethod("show", "FirehoseGISTIC", function(object){
         message("FirehoseGISTIC object, dim: ", paste(dim(object@AllByGene),
             collapse = "\t"))
     }
+})
+
+#' @importFrom S4Vectors isEmpty
+#' @importFrom methods slotNames
+#' @param x A FirehoseGISTIC class object
+#' @exportMethod isEmpty
+#' @describeIn FirehoseGISTIC check whether the FirehoseGISTIC object has
+#' data in it or not
+setMethod("isEmpty", "FirehoseGISTIC", function(x) {
+    allSlots <- slotNames(x)
+    all(vapply(allSlots, function(g) {
+        obj <- getElement(x, g)
+        if (is.data.frame(obj) || is.character(obj))
+            !length(obj)
+        else
+            isEmpty(obj)
+    }, logical(1L)))
 })
 
 #' An S4 class to store main data object from clinent function.

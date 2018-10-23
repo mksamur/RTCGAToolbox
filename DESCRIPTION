@@ -1,7 +1,7 @@
 Package: RTCGAToolbox
 Type: Package
 Title: A new tool for exporting TCGA Firehose data
-Version: 2.11.6
+Version: 2.11.7
 Authors@R: c(
     person("Mehmet", "Samur", email = "rtcgatoolbox@gmail.com",
     role = "aut"),
@@ -21,15 +21,15 @@ Description: Managing data from large scale projects such as The Cancer Genome
 License: file LICENSE
 LazyData: true
 Depends:
-    R (>= 3.4.0)
+    R (>= 3.5.0)
 Imports:
     BiocGenerics,
-    data.table (>= 1.9.4),
+    data.table,
     DelayedArray,
     GenomicRanges,
     GenomeInfoDb,
     IRanges,
-    limma (>= 3.18),
+    limma,
     methods,
     RaggedExperiment,
     RCircos,
@@ -51,7 +51,7 @@ biocViews: DifferentialExpression, GeneExpression, Sequencing
 URL: http://mksamur.github.io/RTCGAToolbox/
 BugReports: https://github.com/mksamur/RTCGAToolbox/issues
 VignetteBuilder: knitr
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Collate: 
     'RTCGAToolbox-Class.R'
     'RTCGAToolbox.R'

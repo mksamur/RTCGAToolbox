@@ -4,14 +4,15 @@
 \alias{getFirehoseData}
 \title{Get data from Firehose portal.}
 \usage{
-getFirehoseData(dataset, runDate = "20160128", gistic2Date = "20160128",
-  RNASeqGene = FALSE, clinical = TRUE, miRNASeqGene = FALSE,
-  RNASeq2GeneNorm = FALSE, CNASNP = FALSE, CNVSNP = FALSE,
-  CNASeq = FALSE, CNACGH = FALSE, Methylation = FALSE, Mutation = FALSE,
-  mRNAArray = FALSE, miRNAArray = FALSE, RPPAArray = FALSE,
-  GISTIC = FALSE, RNAseqNorm = "raw_counts",
-  RNAseq2Norm = "normalized_count", forceDownload = FALSE, destdir = ".",
-  fileSizeLimit = 500, getUUIDs = FALSE, ...)
+getFirehoseData(dataset, runDate = "20160128",
+  gistic2Date = "20160128", RNASeqGene = FALSE, clinical = TRUE,
+  miRNASeqGene = FALSE, RNASeq2GeneNorm = FALSE, CNASNP = FALSE,
+  CNVSNP = FALSE, CNASeq = FALSE, CNACGH = FALSE,
+  Methylation = FALSE, Mutation = FALSE, mRNAArray = FALSE,
+  miRNAArray = FALSE, RPPAArray = FALSE, GISTIC = FALSE,
+  RNAseqNorm = "raw_counts", RNAseq2Norm = "normalized_count",
+  forceDownload = FALSE, destdir = ".", fileSizeLimit = 500,
+  getUUIDs = FALSE, ...)
 }
 \arguments{
 \item{dataset}{A cohort name. TCGA cancer code obtained via \code{\link{getFirehoseDatasets}}}
