@@ -1,5 +1,21 @@
 # RTCGAToolbox
 
+## CHANGES IN VERSION 2.11.9
+
+### New features
+
+* `biocExtract` can now return GISTIC peak data as well with the 'GISTICP'
+option
+* Methylation data is now converted to `DelayedArray` and contained in
+`SummarizedExperiment` objects via `biocExtract`
+* Added an `isEmpty` method to the `FirehoseGISTIC` data class
+
+## Bug fixes and minor improvements
+
+* Set default 'peak' argument to 'wide'
+* Functionality from the `TCGAutils` package is now employed such as
+`findGRangesCols` and `uniformBuilds` 
+
 ## CHANGES IN VERSION 2.9.41
 
 ## Bug fixes and minor improvements
