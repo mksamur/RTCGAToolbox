@@ -36,20 +36,22 @@ getGISTICPeaks <- function(dataset,  peak = c("wide", "narrow", "full"),
         "data", dataset, gistic2Date)
 
     GISTIC.FILE <- paste0("gdac.broadinstitute.org_", dataset, "-TP.",
-        "CopyNumber_Gistic2.Level_4.", gistic2Date, "00.0.0.tar.gz")
-
+        "CopyNumber_Gistic2.Level_4.", gistic2Date, "00.0.0")
     # download the tar
-    url <- file.path(BROAD.URL, GISTIC.FILE)
+    url <- file.path(BROAD.URL, paste0(GISTIC.FILE, ".tar.gz"))
     tumorType <- switch(dataset, LAML = "TB", SKCM = "TM", "TP")
     url <- gsub("TP", tumorType, url, fixed = TRUE)
+    basef <- file.path(GISTIC.FILE, "all_lesions.conf_99.txt")
 
-    tempFile <- tempfile(tmpdir = destdir, fileext = ".tar.gz")
-    download.file(url, destfile = tempFile)
-    files <- untar(tempFile, list=TRUE)
-
-    # extract the lesions file
-    basef <- files[grepl("all_lesions.conf_99.txt", files, fixed = TRUE)]
-    untar(tempFile, files = basef, exdir = destdir)
+    if (!file.exists(file.path(destdir, basef))) {
+        tempFile <- tempfile(tmpdir = destdir, fileext = ".tar.gz")
+        download.file(url, destfile = tempFile)
+        files <- untar(tempFile, list=TRUE)
+        # extract the lesions file
+        basef <- files[grepl("all_lesions.conf_99.txt", files, fixed = TRUE)]
+        untar(tempFile, files = basef, exdir = destdir)
+        file.remove(tempFile)
+    }
 
     # read the lesion file
     gistic <- read.delim(file.path(destdir, basef), as.is=TRUE)
