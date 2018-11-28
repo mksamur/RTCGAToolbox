@@ -3,7 +3,7 @@
 #' makeSummarizedExperimentFromDataFrame
 #' @importFrom DelayedArray DelayedArray
 #' @importFrom RaggedExperiment RaggedExperiment
-#' @importFrom S4Vectors SimpleList metadata metadata<- DataFrame
+#' @importFrom S4Vectors SimpleList metadata metadata<- DataFrame mcols mcols<-
 #' @importFrom utils type.convert
 #' @importFrom methods .hasSlot
 #' @importFrom stringr str_extract

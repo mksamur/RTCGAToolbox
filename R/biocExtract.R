@@ -33,7 +33,7 @@ NULL
 #'     \item{GISTICA} - GISTIC v2 ('AllByGene' only)
 #'     \item{GISTICT} - GISTIC v2 ('ThresholdedByGene' only)
 #'     \item{GISTICP} - GISTIC v2 ('Peaks' only)
-#'     \item{GISTIC} - GISTIC v2 scores and probabilities (both)
+#'     \item{GISTIC} - GISTIC v2 scores, probabilities, and peaks
 #' }
 #'
 #' @param object A \code{FirehoseData} object from which to extract data.
