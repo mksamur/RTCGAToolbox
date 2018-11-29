@@ -32,11 +32,11 @@
 .getGISTIC <- function(x, type) {
     x <- getElement(x, type)
     if (length(x)) {
-        annoteCols <- !grepl("TCGA", names(x))
-        annoteRowDF <- x[, annoteCols]
+        annoteCols <- !grepl("TCGA", names(x), ignore.case = TRUE)
+        annoteRowDF <- x[, annoteCols, drop = FALSE]
         rows <- annoteRowDF[,
             grepl("gene|ranges", names(annoteRowDF), ignore.case = TRUE)]
-        if (length(rows))
+        if (length(rows) && !anyDuplicated(rows))
             rownames(annoteRowDF) <- rows
         x <- x[, !annoteCols]
         x <- vapply(x, type.convert, numeric(nrow(x)))
