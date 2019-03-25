@@ -71,13 +71,9 @@
 }
 
 .removeShell <- function(x, type) {
-    dataTypes <- c("clinical", "RNASeqGene", "miRNASeqGene", "RNASeq2GeneNorm",
-        "CNASNP", "CNVSNP", "CNASeq", "CNACGH", "Methylation", "Mutation",
-        "mRNAArray", "miRNAArray", "RPPAArray", "GISTIC", "GISTICA", "GISTICT")
-    type <- match.arg(type, dataTypes)
-    type <- gsub("A$|T$", "", type)
-    x <- getElement(x, type)
-    return(x)
+    if (startsWith(type, "GISTIC"))
+        type <- "GISTIC"
+    getElement(x, type)
 }
 
 .findBuild <- function(fname, type = "UCSC") {

@@ -53,7 +53,7 @@ biocExtract <- function(object, type = c("clinical", "RNASeqGene",
     "miRNASeqGene", "RNASeq2GeneNorm", "CNASNP", "CNVSNP", "CNASeq",
     "CNACGH", "Methylation", "Mutation", "mRNAArray", "miRNAArray",
     "RPPAArray", "GISTIC", "GISTICA", "GISTICT", "GISTICP")) {
-    if (length(type) != 1L)
+    if (!identical(length(type), 1L))
         stop("Please specify a single data type")
     message("working on: ", type)
     if (!is(object, "DataFrame") && !is.data.frame(object))
