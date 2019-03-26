@@ -654,13 +654,18 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     }
   }
   if (GISTIC) {
+    tag <- switch(dataset, SKCM = "TM", LAML = "TB", "TP")
+    dset <- paste0(dataset, "-", tag)
     ##build URL for getting file links
     fh_url <- "http://gdac.broadinstitute.org/runs/analyses__"
-    fh_url <- paste(fh_url,substr(gistic2Date,1,4),"_",substr(gistic2Date,5,6),"_",substr(gistic2Date,7,8),"/data/",sep="")
-    fh_url <- paste(fh_url,dataset,"/",gistic2Date,"/",sep="")
+    fh_url <- paste(fh_url, substr(gistic2Date, 1, 4), "_",
+        substr(gistic2Date, 5, 6), "_", substr(gistic2Date, 7, 8),
+        "/data/", sep="")
+    fh_url <- paste(fh_url, dset, "/", gistic2Date, "/", sep="")
     doc = htmlTreeParse(fh_url, useInternalNodes = TRUE)
     #Search for links
-    plinks <- .getLinks("CopyNumber_Gistic2.Level_4","-TP[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$",dataset,doc)
+    plinks <- .getLinks("CopyNumber_Gistic2.Level_4",
+        "[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$", dset, doc)
     args <- list(...)
     peakType <- args[["peak"]]
     rmCHRx <- args[["rm.chrX"]]
@@ -668,7 +673,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     rmCHRx <- if (is.null(rmCHRx)) { TRUE } else { rmCHRx }
     peaks <- getGISTICPeaks(dataset = dataset, peak = peak,
         rm.chrX = rmCHRx, destdir = destdir)
-    for(ii in trim(plinks))
+    for (ii in trim(plinks))
     {
       if (.checkFileSize(paste0(fh_url,ii),fileSizeLimit)) {
         if (forceDownload || !file.exists(paste0(destdir,"/",gistic2Date,"-",dataset,"-all_thresholded.by_genes.txt"))) {
