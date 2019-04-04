@@ -37,8 +37,12 @@
     annoteRowDF <- x[, annoteCols, drop = FALSE]
     rows <- annoteRowDF[,
         grepl("gene|ranges", names(annoteRowDF), ignore.case = TRUE)]
-    if (length(rows))
-        rownames(annoteRowDF) <- rows
+    if (length(rows) && anyDuplicated(rows)) {
+        uniq <- !duplicated(rows)
+        annoteRowDF <- annoteRowDF[uniq, ]
+        x <- x[uniq, ]
+        rownames(annoteRowDF) <- rows[uniq]
+    }
     x <- x[, !annoteCols]
     x <- vapply(x, type.convert, numeric(nrow(x)))
     x <- .standardizeBC(x)
