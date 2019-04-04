@@ -37,18 +37,19 @@
     annoteRowDF <- x[, annoteCols, drop = FALSE]
     rows <- annoteRowDF[,
         grepl("gene|ranges", names(annoteRowDF), ignore.case = TRUE)]
-    if (length(rows) && anyDuplicated(rows)) {
+    if (length(rows) && as.logical(anyDuplicated(rows))) {
         uniq <- !duplicated(rows)
+        rows <- rows[uniq]
         annoteRowDF <- annoteRowDF[uniq, ]
         x <- x[uniq, ]
-        rownames(annoteRowDF) <- rows[uniq]
+        rownames(annoteRowDF) <- rows
     }
     x <- x[, !annoteCols]
     x <- vapply(x, type.convert, numeric(nrow(x)))
     x <- .standardizeBC(x)
     if (identical(type, "Peaks") && length(rows)) {
         gist <- SummarizedExperiment(SimpleList(x),
-            rowRanges = as(rownames(annoteRowDF), "GRanges"))
+            rowRanges = as(rows, "GRanges"))
         mcols(gist) <- annoteRowDF
     } else {
         gist <- SummarizedExperiment(SimpleList(x), rowData = annoteRowDF)
