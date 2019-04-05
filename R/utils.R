@@ -50,6 +50,7 @@
     if (identical(type, "Peaks") && length(rows)) {
         gist <- SummarizedExperiment(SimpleList(x),
             rowRanges = as(rows, "GRanges"))
+        rownames(gist) <- rows
         mcols(gist) <- annoteRowDF
     } else {
         gist <- SummarizedExperiment(SimpleList(x), rowData = annoteRowDF)
