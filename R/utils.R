@@ -37,11 +37,13 @@
     annoteRowDF <- x[, annoteCols, drop = FALSE]
     rows <- annoteRowDF[,
         grepl("gene|ranges", names(annoteRowDF), ignore.case = TRUE)]
-    if (length(rows) && as.logical(anyDuplicated(rows))) {
-        uniq <- !duplicated(rows)
-        rows <- rows[uniq]
-        annoteRowDF <- annoteRowDF[uniq, ]
-        x <- x[uniq, ]
+    if (length(rows)) {
+        if (as.logical(anyDuplicated(rows))) {
+            uniq <- !duplicated(rows)
+            rows <- rows[uniq]
+            annoteRowDF <- annoteRowDF[uniq, ]
+            x <- x[uniq, ]
+        }
         rownames(annoteRowDF) <- rows
     }
     x <- x[, !annoteCols]
