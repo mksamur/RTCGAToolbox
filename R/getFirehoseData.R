@@ -339,20 +339,23 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
       #Search for links
       plinks <- .getLinks("Level_3__RSEM_genes_normalized__data.Level_3","*.Merge_rnaseqv2__.*._rnaseqv2__.*.tar[.]gz$",NULL,doc)
 
-      for(i in trim(plinks))
-      {
-        if (.checkFileSize(paste0(fh_url,i),fileSizeLimit))
-        {
-          export.file <- .exportFiles(paste0(fh_url,i),dataset,
-                      "-RNAseq2GeneNorm.tar.gz",
-                      "[.]rnaseqv2__.*.__Level_3__RSEM_genes_normalized__data.data.txt$",
-                      TRUE,
-                      "-RNAseq2GeneNorm.txt",FALSE,destdir,forceDownload,runDate)
-
-          resultClass@RNASeq2GeneNorm <- .makeExprMat(export.file,RNAseq2Norm,"RNAseq2",mergeSize=1000,arrayData=TRUE)
-          gc()
-        }
-      }
+      plinks <- setNames(
+        vapply(plinks, function(x)
+            .checkFileSize(paste0(fh_url, x), fileSizeLimit), logical(1L)
+        ),
+        plinks)
+      plinks <- plinks[plinks]
+      res <- lapply(seq_along(plinks), function(k, i) {
+        i <- plinks[k]
+        export.file <- .exportFiles(paste0(fh_url,i),dataset,
+                    "-RNAseq2GeneNorm.tar.gz",
+                    "[.]rnaseqv2__.*.__Level_3__RSEM_genes_normalized__data.data.txt$",
+                    TRUE,
+                    paste0("-RNAseq2GeneNorm-", k, ".txt"),FALSE,destdir,forceDownload,runDate)
+      .makeExprMat(export.file,RNAseq2Norm,"RNAseq2",mergeSize=1000,arrayData=TRUE)
+      })
+      res <- res[[which.max(vapply(res, ncol, integer(1L)))]]
+      resultClass@RNASeq2GeneNorm <- res
     }
 
     #Download miRNAseq gene level data
