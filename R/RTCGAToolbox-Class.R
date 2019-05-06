@@ -121,7 +121,7 @@ setMethod("isEmpty", "FirehoseGISTIC", function(x) {
 #' @exportClass FirehoseData
 setClass("FirehoseData", representation(Dataset = "character",
     runDate = "character", gistic2Date = "character", clinical = "data.frame",
-    RNASeqGene = "matrix", RNASeq2GeneNorm="matrix", miRNASeqGene="matrix",
+    RNASeqGene = "matrix", RNASeq2GeneNorm="list", miRNASeqGene="matrix",
     CNASNP="data.frame", CNVSNP="data.frame", CNASeq="data.frame", CNACGH="list",
     Methylation="list", mRNAArray="list", miRNAArray="list", RPPAArray="list",
     Mutation="data.frame", GISTIC="FirehoseGISTIC", BarcodeUUID="data.frame"))
@@ -143,37 +143,37 @@ setMethod("show", "FirehoseData",function(object) {
     if (dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0) {
         cat("  RNASeqGene: A matrix of count or normalized data, dim: ",
             paste(dim(object@RNASeqGene),collapse = " x "), "\n")}
-    if (dim(object@RNASeq2GeneNorm)[1] > 0 & dim(object@RNASeq2GeneNorm)[2] > 0) {
-        cat("  RNASeq2GeneNorm: A matrix of count or normalized data, dim: ",
-            paste(dim(object@RNASeq2GeneNorm), collapse = " x "), "\n")}
+    if (length(object@RNASeq2GeneNorm)) {
+        cat("  RNASeq2GeneNorm: A list of FirehosemRNAArray object(s), length: ",
+            length(object@RNASeq2GeneNorm), "\n")}
     if (dim(object@miRNASeqGene)[1] > 0 & dim(object@miRNASeqGene)[2] > 0) {
         cat("  miRNASeqGene: A matrix, dim: ",
             paste(dim(object@miRNASeqGene), collapse = " x "), "\n")}
-    if (dim(object@CNASNP)[1] > 0 & dim(object@CNASNP)[2] > 0) {
+    if (dim(object@CNASNP)[1] & dim(object@CNASNP)[2]) {
         cat("  CNASNP: A data.frame, dim: ", paste(dim(object@CNASNP),
             collapse = " x "), "\n")}
-    if (dim(object@CNVSNP)[1] > 0 & dim(object@CNVSNP)[2] > 0) {
+    if (dim(object@CNVSNP)[1] & dim(object@CNVSNP)[2]) {
         cat("  CNVSNP: A data.frame, dim: ", paste(dim(object@CNVSNP),collapse = " x "), "\n")}
-    if (dim(object@CNASeq)[1] > 0 & dim(object@CNASeq)[2] > 0) {
+    if (dim(object@CNASeq)[1] & dim(object@CNASeq)[2]) {
         cat("  CNASeq: A data.frame, dim: ", paste(dim(object@CNASeq),collapse = " x "), "\n")}
-    if (length(object@CNACGH) > 0 ) {
+    if (length(object@CNACGH)) {
         cat("  CNACGH: A list of FirehoseCGHArray object(s), length: ",
                 length(object@CNACGH), "\n")}
-    if (length(object@Methylation) > 0 ) {
+    if (length(object@Methylation)) {
         cat("  Methylation: A list of FirehoseMethylationArray object(s), length: ",
                 length(object@Methylation), "\n")}
-    if (length(object@mRNAArray) > 0 ) {
+    if (length(object@mRNAArray)) {
         cat("  mRNAArray: A list of FirehosemRNAArray object(s), length: ",
                 length(object@mRNAArray), "\n")}
-    if (length(object@miRNAArray) > 0 ) {
+    if (length(object@miRNAArray)) {
         cat("  miRNAArray: A list of FirehosemRNAArray object(s), length: ",
                 length(object@miRNAArray), "\n")}
-    if (length(object@RPPAArray) > 0 ) {
+    if (length(object@RPPAArray)) {
         cat("  RPPAArray: A list of FirehosemRNAArray object(s), length: ",
                 length(object@RPPAArray), "\n")}
-    if (length(object@GISTIC@Dataset) > 0) {
+    if (length(object@GISTIC@Dataset)) {
         cat("  GISTIC: A FirehoseGISTIC for copy number data", "\n")}
-    if (dim(object@Mutation)[2] > 0 & dim(object@Mutation)[2] > 0) {
+    if (dim(object@Mutation)[2] & dim(object@Mutation)[2]) {
         cat("  Mutation: A data.frame, dim: ", paste(dim(object@Mutation),
         collapse = " x "), "\n")}
     cat("To export data, use the 'getData' function.\n")

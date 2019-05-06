@@ -352,9 +352,11 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
             "[.]rnaseqv2__.*.__Level_3__RSEM_genes_normalized__data.data.txt$",
             TRUE,
             paste0("-RNAseq2GeneNorm-", k, ".txt"),FALSE,destdir,forceDownload,runDate)
-      .makeExprMat(export.file,RNAseq2Norm,"RNAseq2",mergeSize=1000,arrayData=TRUE)
+            new("FirehosemRNAArray",Filename=i,
+                DataMatrix=.makeExprMat(export.file,
+                    RNAseq2Norm,"RNAseq2",mergeSize=1000,arrayData=TRUE))
       })
-      res <- res[[which.max(vapply(res, ncol, integer(1L)))]]
+      # res <- res[[which.max(vapply(res, ncol, integer(1L)))]]
       resultClass@RNASeq2GeneNorm <- res
     }
 

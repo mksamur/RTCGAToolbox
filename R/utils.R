@@ -132,7 +132,7 @@
     brokenUP <- unlist(strsplit(x, "_"))
     brokenUP <- Filter(function(y) nchar(y) != 0L, brokenUP)
     platNumExp <- "[0-9]k$|[0-9]a$|450$|27$|ht|hg"
-    namePlat <- unique(grep("cgh|mirna|meth|huex|^trans", brokenUP,
+    namePlat <- unique(grep("cgh|mirna|meth|huex|^trans|illu", brokenUP,
         ignore.case = TRUE, value = TRUE))
     namePlat <- .nameClean(namePlat)
     vers <- grep(platNumExp, brokenUP, ignore.case = TRUE, value = TRUE)
@@ -152,6 +152,7 @@
             platform <- .searchPlatform(fname)
             build <- .findBuild(fname)
             y <- .getDataMatrix(y)
+            ## Use DataFrame for metadata
             y <- DataFrame(y)
             metadata(y) <- list(filename = fname, build = build,
                 platform = platform)
