@@ -345,13 +345,13 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
         ),
         plinks)
       plinks <- plinks[plinks]
-      res <- lapply(seq_along(plinks), function(k, i) {
-        i <- plinks[k]
+      res <- lapply(seq_along(plinks), function(k) {
+        i <- names(plinks)[k]
         export.file <- .exportFiles(paste0(fh_url,i),dataset,
-                    "-RNAseq2GeneNorm.tar.gz",
-                    "[.]rnaseqv2__.*.__Level_3__RSEM_genes_normalized__data.data.txt$",
-                    TRUE,
-                    paste0("-RNAseq2GeneNorm-", k, ".txt"),FALSE,destdir,forceDownload,runDate)
+            "-RNAseq2GeneNorm.tar.gz",
+            "[.]rnaseqv2__.*.__Level_3__RSEM_genes_normalized__data.data.txt$",
+            TRUE,
+            paste0("-RNAseq2GeneNorm-", k, ".txt"),FALSE,destdir,forceDownload,runDate)
       .makeExprMat(export.file,RNAseq2Norm,"RNAseq2",mergeSize=1000,arrayData=TRUE)
       })
       res <- res[[which.max(vapply(res, ncol, integer(1L)))]]
