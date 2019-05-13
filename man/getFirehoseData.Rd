@@ -11,7 +11,7 @@ getFirehoseData(dataset, runDate = "20160128",
   Methylation = FALSE, Mutation = FALSE, mRNAArray = FALSE,
   miRNAArray = FALSE, RPPAArray = FALSE, GISTIC = FALSE,
   RNAseqNorm = "raw_counts", RNAseq2Norm = "normalized_count",
-  forceDownload = FALSE, destdir = ".", fileSizeLimit = 500,
+  forceDownload = FALSE, destdir = tempdir(), fileSizeLimit = 500,
   getUUIDs = FALSE, ...)
 }
 \arguments{
@@ -55,7 +55,8 @@ getFirehoseData(dataset, runDate = "20160128",
 
 \item{forceDownload}{A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.}
 
-\item{destdir}{Directory in which to store the resulting downloaded file. Defaults to current working directory.}
+\item{destdir}{Directory in which to store the resulting downloaded file.
+Defaults to a temporary directory given by `tempdir()`.}
 
 \item{fileSizeLimit}{Files that are larger than set value (megabyte) won't be downloaded (Default: 500)}
 

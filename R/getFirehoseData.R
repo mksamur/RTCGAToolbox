@@ -225,7 +225,8 @@
 #' @param RNAseq2Norm RNAseq v2 data normalization method. (Default normalized_count)
 #' @param GISTIC logical (default FALSE) processed copy number data
 #' @param forceDownload A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.
-#' @param destdir Directory in which to store the resulting downloaded file. Defaults to current working directory.
+#' @param destdir Directory in which to store the resulting downloaded file.
+#'   Defaults to a temporary directory given by `tempdir()`.
 #' @param fileSizeLimit Files that are larger than set value (megabyte) won't be downloaded (Default: 500)
 #' @param getUUIDs Logical key to get UUIDs from barcode (Default: FALSE)
 #' @param ... Additional arguments to pass down. See details.
@@ -245,7 +246,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     CNASNP=FALSE, CNVSNP=FALSE, CNASeq=FALSE, CNACGH=FALSE, Methylation=FALSE,
     Mutation=FALSE, mRNAArray=FALSE, miRNAArray=FALSE, RPPAArray=FALSE,
     GISTIC=FALSE, RNAseqNorm="raw_counts", RNAseq2Norm="normalized_count",
-    forceDownload=FALSE, destdir=".", fileSizeLimit=500, getUUIDs=FALSE, ...) {
+    forceDownload=FALSE, destdir=tempdir(), fileSizeLimit=500, getUUIDs=FALSE, ...) {
   #check input parameters
   if (!class(dataset)=="character" || is.null(dataset) || !length(dataset) == 1 || nchar(dataset) < 2) {
       stop('Please set "dataset" parameter! You should specify one dataset name. Ex: dataset="BRCA"...')
