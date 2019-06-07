@@ -340,7 +340,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
       #Search for links
       plinks <- .getLinks("Level_3__RSEM_genes_normalized__data.Level_3","*.Merge_rnaseqv2__.*._rnaseqv2__.*.tar[.]gz$",NULL,doc)
 
-      plinks <- setNames(
+      plinks <- stats::setNames(
         vapply(plinks, function(x)
             .checkFileSize(paste0(fh_url, x), fileSizeLimit), logical(1L)
         ),
