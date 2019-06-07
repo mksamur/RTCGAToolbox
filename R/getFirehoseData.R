@@ -634,25 +634,25 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
       {
         if (.checkFileSize(paste0(fh_url,ii),fileSizeLimit))
         {
-          if (forceDownload || !file.exists(paste0(destdir,"/",runDate,"-",dataset,"-Mutations-AllSamples.txt"))) {
+          allsampsfile <- paste0(destdir,"/",runDate,"-",dataset,"-Mutations-AllSamples.txt")
+          if (forceDownload || !file.exists(allsampsfile)) {
             download_link = paste(fh_url,ii,sep="")
-            download.file(url=download_link,destfile=paste(dataset,"-Mutation.tar.gz",sep=""),method="auto",quiet = FALSE, mode = "wb")
-            fileLoc <- file.path(destdir, paste0(dataset,"-Mutation.tar.gz"))
-            fileList <- untar(fileLoc, list = TRUE)
+            tarfile <- file.path(destdir, paste0(dataset, "-Mutation.tar.gz"))
+            download.file(url=download_link,destfile=tarfile,method="auto",quiet = FALSE, mode = "wb")
+            fileList <- untar(tarfile, list = TRUE)
             grepSearch = "MANIFEST.txt"
             fileList = fileList[!grepl(grepSearch,fileList)]
             ###
-            untar(fileLoc, files = fileList, exdir = destdir)
-            retMutations <- do.call("rbind",lapply(fileList,FUN=function(files) {
+            untar(tarfile, files = fileList, exdir = destdir)
+            retMutations <- do.call(rbind,lapply(file.path(destdir, fileList),FUN=function(files) {
               read.delim(files,header=TRUE,colClasses="character")
             }))
-            delFodler <- paste(destdir,"/",strsplit(fileList[1],"/")[[1]][1],sep="")
-            unlink(delFodler, recursive = TRUE)
-            file.remove(paste(dataset,"-Mutation.tar.gz",sep=""))
-            write.table(retMutations,file=paste0(destdir,"/",runDate,"-",dataset,"-Mutations-AllSamples.txt"),sep="\t",row.names=FALSE,quote=FALSE)
+            delFolder <- file.path(destdir, dirname(fileList[[1L]]))
+            unlink(delFolder, recursive = TRUE)
+            file.remove(tarfile)
+            write.table(retMutations,file=allsampsfile,sep="\t",row.names=FALSE,quote=FALSE)
           } else {
-            #retMutations <- read.delim(file=paste0(runDate,"-",dataset,"-Mutations-AllSamples.txt"),header = TRUE,sep="\t")
-            retMutations <- fread(paste0(destdir,"/",runDate,"-",dataset,"-Mutations-AllSamples.txt"),header=TRUE,colClasses="character", data.table = FALSE)
+            retMutations <- fread(allsampsfile,header=TRUE,colClasses="character", data.table = FALSE)
           }
           resultClass@Mutation <- retMutations
         }
