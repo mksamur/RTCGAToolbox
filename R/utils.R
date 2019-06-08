@@ -3,7 +3,7 @@
 #' makeSummarizedExperimentFromDataFrame
 #' @importFrom DelayedArray DelayedArray
 #' @importFrom RaggedExperiment RaggedExperiment
-#' @importFrom S4Vectors SimpleList metadata metadata<- DataFrame mcols mcols<-
+#' @importFrom S4Vectors SimpleList metadata metadata<- DataFrame mcols mcols<- splitAsList
 #' @importFrom utils type.convert
 #' @importFrom methods .hasSlot
 #' @importFrom stringr str_extract
@@ -302,7 +302,7 @@
         return(FALSE)
     }
     if (is(object, "DataFrame"))
-        asListData <- IRanges::splitAsList(object, object[[primary]])
+        asListData <- S4Vectors::splitAsList(object, object[[primary]])
     else
         asListData <- base::split(object, object[[primary]])
     S4Vectors::isSingleInteger(unique( vapply(asListData, nrow, integer(1L)) ))
@@ -371,7 +371,7 @@
     numAssays <- ncol(numInfo)
     nameAssays <- names(numInfo)
     if (is(df, "DataFrame"))
-        numInfo <- IRanges::splitAsList(numInfo, df[[split.field]])
+        numInfo <- S4Vectors::splitAsList(numInfo, df[[split.field]])
     else
         numInfo <- base::split(numInfo, df[[split.field]])
     countList <- vector(mode = "list", length = numAssays)
