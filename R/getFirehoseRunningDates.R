@@ -13,14 +13,14 @@ getFirehoseRunningDates <- function(last=NULL){
     !length(grep("[^[:digit:]]", as.character(N)))
   }
   if(is.null(last)){
-    runDate <- read.table("http://www.canevolve.org/fmineRdate.txt",
+    runDate <- read.table("https://raw.githubusercontent.com/mksamur/RawDataURLs/master/fmineRdate.txt",
                           header=FALSE, sep="\t", na.strings="NA", dec=".", strip.white=TRUE)
     runDate <- as.character(runDate[,1])
     return(runDate)
   }
   else if(check.integer(last))
   {
-    runDate <- read.table("http://www.canevolve.org/fmineRdate.txt",
+    runDate <- read.table("https://raw.githubusercontent.com/mksamur/RawDataURLs/master/fmineRdate.txt",
                           header=FALSE, sep="\t", na.strings="NA", dec=".", strip.white=TRUE)
     runDate <- as.character(runDate[,1])
     if(last < length(runDate)){runDate <- runDate[1:last]}
