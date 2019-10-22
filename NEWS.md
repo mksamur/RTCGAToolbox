@@ -1,5 +1,19 @@
-# RTCGAToolbox
-----------------------------------------------------------------------
+## CHANGES IN VERSION 2.16.0
+
+### New features
+
+* `RNASeq2GeneNorm` slot in the `FirehoseData` class is a `list` now (from
+`matrix`)
+* Use `tempdir()` as the default directory for downloading data in
+`getFirehoseData`
+
+
+### Bug fixes and minor improvements
+
+* Save all `RNASeq2GeneNorm` datasets within the output object as a list.
+Previously, only the last dataset would get returned (#30)
+* Read files from the appropriate download location in `getFirehoseData`
+* Move static text file references from `canevolve` to GitHub hosted locations
 
 ## CHANGES IN VERSION 2.14.0
 
