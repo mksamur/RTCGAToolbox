@@ -1,7 +1,7 @@
 Package: RTCGAToolbox
 Type: Package
 Title: A new tool for exporting TCGA Firehose data
-Version: 2.15.5
+Version: 2.15.6
 Authors@R: c(
     person("Mehmet", "Samur", email = "rtcgatoolbox@gmail.com",
     role = "aut"),
@@ -28,6 +28,7 @@ Imports:
     DelayedArray,
     GenomicRanges,
     GenomeInfoDb,
+    httr,
     IRanges,
     limma,
     methods,

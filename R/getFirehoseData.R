@@ -147,18 +147,19 @@
   return(convertTable)
 }
 
-.checkFileSize <- function(dataURL,fileSizeLimit)
-{
-  asd = read.csv(url(paste0("http://www.canevolve.org/fmineRgetSize.php?url=",dataURL)))
-  if (as.numeric(asd[1,1])/(1024^2) > fileSizeLimit) {
-    message(dataURL)
-    message(paste("File Size: ~"),format(as.numeric(asd[1,1])/(1024^2), digits=1, decimal.mark="."),"MB")
-    message("File above won't be downloaded due to data size, RTCGAToolbox will skip this data!")
-    return(FALSE)
-  } else {
-    return(TRUE)
-  }
+.checkFileSize <- function(dataURL, fileSizeLimit) {
+  fileSize <- httr::HEAD(dataURL)
+  # this should convert file size from byte to MB
+  fileSize <- as.numeric(fileSize$headers$`content-length`)/1e6
 
+  if (fileSize > fileSizeLimit) {
+    message(dataURL)
+    message(paste("File Size: ~"), fileSize, "MB")
+    message("File above won't be downloaded due to data size, RTCGAToolbox will skip this data!")
+    FALSE
+  } else {
+    TRUE
+  }
 }
 
 .exportFiles <- function(fileLink, dataset, fileExt, searchName,subSearch=FALSE,

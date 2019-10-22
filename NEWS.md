@@ -13,7 +13,10 @@
 * Save all `RNASeq2GeneNorm` datasets within the output object as a list.
 Previously, only the last dataset would get returned (#30)
 * Read files from the appropriate download location in `getFirehoseData`
-* Move static text file references from `canevolve` to GitHub hosted locations
+* Move static text file references from 'canevolve.org' to GitHub hosted
+locations
+* Check file sizes using `httr` instead of 'canevolve.org' query
+(@mksamur, #32)
 
 ## CHANGES IN VERSION 2.14.0
 
