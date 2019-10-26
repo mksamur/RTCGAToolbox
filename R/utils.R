@@ -206,10 +206,10 @@
     })
 }
 
-.setHugoRows <- function(df) {
-    hugoname <- .findCol(df, "Hugo_Symbol")
-    hugos <- df[[hugoname]]
-    if (identical(length(hugos), length(unique(hugos))))
+.setAnnoRows <- function(df, rowAnnotation = "Hugo_Symbol") {
+    annoName <- .findCol(df, rowAnnotation)
+    annos <- df[[annoName]]
+    if (identical(length(annos), length(unique(annos))))
         rownames(df) <- hugos
     df
 }
@@ -235,10 +235,10 @@
     x
 }
 
-.getBuild <- function(x) {
-    binf <- .hasInfo(x, "NCBI_Build")
+.getBuild <- function(x, type = "NCBI_Build") {
+    binf <- .hasInfo(x, type)
     if (binf) {
-        BCOL <- .findCol(x, "NCBI_Build")
+        BCOL <- .findCol(x, type)
         build <- TCGAutils::uniformBuilds(x[[BCOL]])
         if (length(build) > 1L)
            build <- .validateNCBI(x[[BCOL]])
@@ -341,7 +341,7 @@
     names.field <- args[["names.field"]]
     if (is.null(names.field)) {
         if (.hasInfo(df, "Hugo_Symbol"))
-            df <- .setHugoRows(df)
+            df <- .setAnnoRows(df)
     } else {
         rownames(df) <- rowData[[names.field]]
     }
@@ -394,7 +394,13 @@
     build <- args[["build"]]
     names.field <- args[["names.field"]]
     metadat <- if (is(df, "DataFrame")) { metadata(df) } else { list() }
-    split.field <- .findSampleCol(df)
+    split.field <- args[["split.field"]]
+    if (is.null(split.field))
+        split.field <- .findSampleCol(df)
+    rowanno <- args[["rowanno"]]
+    if (is.null(rowanno))
+        rowanno <- "Hugo_Symbol"
+
     ansRanges <- .ansRangeNames(df)
     rangeInfo <- c(ansRanges, list(split.field = split.field,
         names.field = names.field))
@@ -403,8 +409,8 @@
     dropIdx <- .omitAdditionalIdx(df, ansRanges)
     if (length(dropIdx))
         df <- df[, -dropIdx]
-    if (.hasInfo(df, "Hugo_Symbol"))
-        df <- .setHugoRows(df)
+    if (.hasInfo(df, rowanno))
+        df <- .setAnnoRows(df)
     newGRL <- do.call(makeGRangesListFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), rangeInfo))
     GenomeInfoDb::genome(newGRL) <- build
@@ -422,7 +428,7 @@
     if (length(dropIdx))
         df <- df[, -dropIdx]
     if (.hasInfo(df, "Hugo_Symbol"))
-        df <- .setHugoRows(df)
+        df <- .setAnnoRows(df)
     newgr <- do.call(GenomicRanges::makeGRangesFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), ansRanges))
     GenomeInfoDb::genome(newgr) <- if (is.null(build)) NA else build
