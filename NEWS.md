@@ -7,7 +7,6 @@
 * Use `tempdir()` as the default directory for downloading data in
 `getFirehoseData`
 
-
 ### Bug fixes and minor improvements
 
 * Save all `RNASeq2GeneNorm` datasets within the output object as a list.

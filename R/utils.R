@@ -241,7 +241,7 @@
         BCOL <- .findCol(x, type)
         build <- TCGAutils::uniformBuilds(x[[BCOL]])
         if (length(build) > 1L)
-           build <- .validateNCBI(x[[BCOL]])
+           build <- .validateNCBI(build)
         return(as.character(build))
     } else {
         NA_character_
