@@ -316,8 +316,8 @@
     !all(is.na(TCGAutils::findGRangesCols(names(x))))
 }
 
-.samplesAsCols <- function(x, char = c("TCGA-", "TCGA.")) {
-    startsWith(names(x), char)
+.samplesAsCols <- function(x) {
+    grepl("^TCGA", names(x), ignore.case = TRUE)
 }
 
 .hasExperimentData <- function(x) {
@@ -339,7 +339,7 @@
     df <- .standardizeBC(df)
     args <- list(...)
     names.field <- args[["names.field"]]
-    if (is.null(names.field)) {
+    if (is.null(names.field) || !length(names.field)) {
         if (.hasInfo(df, "Hugo_Symbol"))
             df <- .setAnnoRows(df)
     } else {
