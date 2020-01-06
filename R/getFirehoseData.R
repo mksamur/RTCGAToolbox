@@ -168,6 +168,7 @@
 
   if (!dir.exists(destdir))
       stop("Directory does not exist")
+
   tcgafile <- file.path(destdir, paste0(dataset, fileExt, sep=""))
   destfile <- file.path(destdir, paste0(runDate,"-",dataset,exportName))
 
@@ -175,6 +176,9 @@
     download.file(url=fileLink, destfile=tcgafile, method="auto",
         quiet = FALSE, mode = "wb")
     fileList <- untar(tcgafile, list = TRUE)
+    fullList <- paste(destdir, fileList, sep = "/")
+    if (any(nchar(fullList) > 259) && identical(.Platform$OS.type, "windows"))
+        warning("File path too long, make 'destdir' shorter")
     if (!subSearch) {
       fileList = fileList[grepl(searchName,fileList)]
     } else {
