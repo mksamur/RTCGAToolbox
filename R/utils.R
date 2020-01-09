@@ -222,12 +222,13 @@
     bnum
 }
 
-.standardstrand <- function(x) {
-    x <- gsub("null", "*", x, ignore.case = TRUE)
-    x[is.null(x) || is.na(x)] <- "*"
-    x[x == 1] <- "+"
-    x[x == -1] <- "-"
-    x
+.standardstrand <- function(strandv) {
+    strandv <- gsub("null", "*", strandv, ignore.case = TRUE)
+    isnullna <- is.null(strandv) | is.na(strandv)
+    strandv[isnullna] <- "*"
+    strandv[strandv == 1] <- "+"
+    strandv[strandv == -1] <- "-"
+    strandv
 }
 
 .standardizeStrand <- function(x, strandcol) {
@@ -404,7 +405,8 @@
     ansRanges <- .ansRangeNames(df)
     rangeInfo <- c(ansRanges, list(split.field = split.field,
         names.field = names.field))
-    if (!is.null(ansRanges[["strand.field"]]))
+
+    if (!is.null(ansRanges[["strand.field"]]) || length(ansRanges[["strand.field"]]))
         df <- .standardizeStrand(df, ansRanges[["strand.field"]])
     dropIdx <- .omitAdditionalIdx(df, ansRanges)
     if (length(dropIdx))
