@@ -29,7 +29,6 @@ Imports:
     GenomicRanges,
     GenomeInfoDb,
     httr,
-    IRanges,
     limma,
     methods,
     RaggedExperiment,
@@ -53,7 +52,7 @@ biocViews: DifferentialExpression, GeneExpression, Sequencing
 URL: http://mksamur.github.io/RTCGAToolbox/
 BugReports: https://github.com/mksamur/RTCGAToolbox/issues
 VignetteBuilder: knitr
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Collate: 
     'RTCGAToolbox-Class.R'
     'RTCGAToolbox.R'

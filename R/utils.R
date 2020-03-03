@@ -210,7 +210,7 @@
     annoName <- .findCol(df, rowAnnotation)
     annos <- df[[annoName]]
     if (identical(length(annos), length(unique(annos))))
-        rownames(df) <- hugos
+        rownames(df) <- annos
     df
 }
 
