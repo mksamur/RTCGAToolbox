@@ -207,8 +207,6 @@
 #' \code{getFirehoseData} returns \code{FirehoseData} object that stores TCGA data.
 #'
 #' This is a main client function to download data from Firehose TCGA portal.
-#' @details The \code{\ldots} argument allows for selection of GISTIC peaks
-#' when calling \code{getGISTICPeaks}.
 #'
 #' @param dataset A cohort name. TCGA cancer code obtained via \code{\link{getFirehoseDatasets}}
 #' @param runDate Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}
@@ -234,7 +232,7 @@
 #'   Defaults to a temporary directory given by `tempdir()`.
 #' @param fileSizeLimit Files that are larger than set value (megabyte) won't be downloaded (Default: 500)
 #' @param getUUIDs Logical key to get UUIDs from barcode (Default: FALSE)
-#' @param ... Additional arguments to pass down. See details.
+#' @param ... Additional arguments to pass down.
 #' @return A \code{FirehoseData} data object that stores data for selected data types.
 #' @examples
 #' # Sample Dataset

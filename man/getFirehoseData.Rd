@@ -62,7 +62,7 @@ Defaults to a temporary directory given by `tempdir()`.}
 
 \item{getUUIDs}{Logical key to get UUIDs from barcode (Default: FALSE)}
 
-\item{...}{Additional arguments to pass down. See details.}
+\item{...}{Additional arguments to pass down.}
 }
 \value{
 A \code{FirehoseData} data object that stores data for selected data types.
@@ -72,9 +72,6 @@ A \code{FirehoseData} data object that stores data for selected data types.
 }
 \details{
 This is a main client function to download data from Firehose TCGA portal.
-
-The \code{\ldots} argument allows for selection of GISTIC peaks
-when calling \code{getGISTICPeaks}.
 }
 \examples{
 # Sample Dataset
