@@ -675,13 +675,6 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     #Search for links
     plinks <- .getLinks("CopyNumber_Gistic2.Level_4",
         "[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$", dset, doc)
-    args <- list(...)
-    peakType <- args[["peak"]]
-    rmCHRx <- args[["rm.chrX"]]
-    peak <- if (is.null(peakType)) { "wide" } else { peakType }
-    rmCHRx <- if (is.null(rmCHRx)) { TRUE } else { rmCHRx }
-    peaks <- getGISTICPeaks(dataset = dataset, peak = peak,
-        rm.chrX = rmCHRx, destdir = destdir)
     for (ii in trim(plinks))
     {
       if (.checkFileSize(paste0(fh_url,ii),fileSizeLimit)) {
@@ -690,6 +683,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
           fileLoc <- file.path(destdir, paste0(dataset,"-Gistic2.tar.gz"))
           download.file(url = download_link, destfile = fileLoc,
             method = "auto", quiet = FALSE, mode = "wb")
+
           fileList <- untar(fileLoc, list = TRUE)
           grepSearch = "all_data_by_genes.txt"
           fileList = fileList[grepl(grepSearch,fileList)]
@@ -700,6 +694,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
           file.rename(from = filepaths,
             to = paste0(destdir, "/", gistic2Date, "-",
                 dataset, "-all_data_by_genes.txt"))
+
           fileList <- untar(fileLoc, list = TRUE)
           grepSearch = "all_thresholded.by_genes.txt"
           fileList = fileList[grepl(grepSearch,fileList)]
@@ -710,19 +705,31 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
           file.rename(from = filepaths,
             to = paste0(destdir, "/", gistic2Date, "-",
                 dataset, "-all_thresholded.by_genes.txt"))
-          delFodler <- paste(destdir,"/",strsplit(fileList,"/")[[1]][1],sep="")
+
+          fileList <- untar(fileLoc, list = TRUE)
+          grepSearch = "all_lesions.conf_99.txt"
+          fileList = fileList[grepl(grepSearch,fileList)]
+          untar(fileLoc, files = fileList, exdir = destdir)
+          filepaths <- file.path(destdir, fileList)
+          tmpPeaks <- fread(filepaths, header = TRUE,
+              colClasses = "character", data.table = FALSE)
+          file.rename(from = filepaths,
+            to = paste0(destdir, "/", gistic2Date, "-",
+                dataset, "-all_lesions.conf_99.txt"))
+
+          delFodler <- file.path(destdir, dirname(fileList))
           unlink(delFodler, recursive = TRUE)
           file.remove(fileLoc)
         } else {
           tmpCNThreshhold = fread(paste0(destdir,"/",gistic2Date,"-",dataset,"-all_thresholded.by_genes.txt"),header=TRUE,colClasses = "character", data.table = FALSE)
           tmpCNAll = fread(paste0(destdir,"/",gistic2Date,"-",dataset,"-all_data_by_genes.txt"),header=TRUE,colClasses="character", data.table = FALSE)
+          tmpPeaks = fread(paste0(destdir, "/", gistic2Date, "-", dataset, "-all_lesions.conf_99.txt"), header = TRUE, colClasses = "character", data.table = FALSE)
         }
         tmpReturn <- new("FirehoseGISTIC",Dataset=dataset,AllByGene=data.frame(tmpCNAll),
-            ThresholdedByGene=data.frame(tmpCNThreshhold))
+            ThresholdedByGene=data.frame(tmpCNThreshhold), Peaks = data.frame(tmpPeaks))
         resultClass@GISTIC <- tmpReturn
       }
     }
-    resultClass@GISTIC@Peaks <- peaks
   }
 
   if (getUUIDs) {

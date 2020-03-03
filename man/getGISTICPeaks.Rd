@@ -4,22 +4,15 @@
 \alias{getGISTICPeaks}
 \title{Download GISTIC2 peak-level data from the Firehose pipeline}
 \usage{
-getGISTICPeaks(dataset, peak = c("wide", "narrow", "full"),
-  rm.chrX = TRUE, gistic2Date = "20160128", destdir = tempdir())
+getGISTICPeaks(object, peak = c("wide", "narrow", "full"), rm.chrX = TRUE)
 }
 \arguments{
-\item{dataset}{A TCGA cancer code}
+\item{object}{A FirehoseData GISTIC type object}
 
 \item{peak}{The peak type, select from "wide", "narrow", "full".}
 
 \item{rm.chrX}{(logical default TRUE) Whether to remove observations in the
 X chromosome}
-
-\item{gistic2Date}{(character default "20160128") Data of the analysis
-pipeline run}
-
-\item{destdir}{Directory location to save the downloaded file
-(default tempdir())}
 }
 \value{
 A \code{data.frame} of peak values
@@ -30,9 +23,10 @@ Access GISTIC2 level 4 copy number data through
 }
 \examples{
 
-co <- getGISTICPeaks("COAD", "wide")
-class(co)
-head(co)[1:6]
+co <- getFirehoseData("COAD", clinical = FALSE, GISTIC = TRUE)
+peaks <- getGISTICPeaks(co, "wide")
+class(peaks)
+head(peaks)[1:6]
 
 }
 \author{
