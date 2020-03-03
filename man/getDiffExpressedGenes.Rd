@@ -4,9 +4,17 @@
 \alias{getDiffExpressedGenes}
 \title{Perform differential gene expression analysis for mRNA expression data.}
 \usage{
-getDiffExpressedGenes(dataObject, DrawPlots = TRUE, adj.method = "BH",
-  adj.pval = 0.05, raw.pval = 0.05, logFC = 2, hmTopUpN = 100,
-  hmTopDownN = 100, meanFilter = 10)
+getDiffExpressedGenes(
+  dataObject,
+  DrawPlots = TRUE,
+  adj.method = "BH",
+  adj.pval = 0.05,
+  raw.pval = 0.05,
+  logFC = 2,
+  hmTopUpN = 100,
+  hmTopDownN = 100,
+  meanFilter = 10
+)
 }
 \arguments{
 \item{dataObject}{This must be \code{FirehoseData} object.}

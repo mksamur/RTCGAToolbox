@@ -4,8 +4,7 @@
 \alias{getSurvival}
 \title{Perform survival analysis based on gene expression data}
 \usage{
-getSurvival(dataObject, numberofGroups = 2, geneSymbols,
-  sampleTimeCensor)
+getSurvival(dataObject, numberofGroups = 2, geneSymbols, sampleTimeCensor)
 }
 \arguments{
 \item{dataObject}{This must be \code{FirehoseData} object.}

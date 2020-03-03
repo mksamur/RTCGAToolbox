@@ -4,8 +4,12 @@
 \alias{getCNGECorrelation}
 \title{Perform correlation analysis betwwen gene expression and copy number data}
 \usage{
-getCNGECorrelation(dataObject, adj.method = "BH", adj.pval = 0.05,
-  raw.pval = 0.05)
+getCNGECorrelation(
+  dataObject,
+  adj.method = "BH",
+  adj.pval = 0.05,
+  raw.pval = 0.05
+)
 }
 \arguments{
 \item{dataObject}{This must be \code{FirehoseData} object.}

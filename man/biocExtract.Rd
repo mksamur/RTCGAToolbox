@@ -5,10 +5,12 @@
 \title{Extract and convert data from a \code{FirehoseData} object to a
 \code{Bioconductor} object}
 \usage{
-biocExtract(object, type = c("clinical", "RNASeqGene", "miRNASeqGene",
-  "RNASeq2GeneNorm", "CNASNP", "CNVSNP", "CNASeq", "CNACGH", "Methylation",
-  "Mutation", "mRNAArray", "miRNAArray", "RPPAArray", "GISTIC", "GISTICA",
-  "GISTICT", "GISTICP"))
+biocExtract(
+  object,
+  type = c("clinical", "RNASeqGene", "miRNASeqGene", "RNASeq2GeneNorm", "CNASNP",
+    "CNVSNP", "CNASeq", "CNACGH", "Methylation", "Mutation", "mRNAArray", "miRNAArray",
+    "RPPAArray", "GISTIC", "GISTICA", "GISTICT", "GISTICP")
+)
 }
 \arguments{
 \item{object}{A \code{FirehoseData} object from which to extract data.}
