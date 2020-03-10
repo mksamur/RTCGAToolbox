@@ -12,7 +12,7 @@ NULL
 #' be made based on matching dimension names. For ranged data, this
 #' functionality is provided with more control as part of the
 #' \code{RaggedExperiment} features. See
-#' \code{\link[RaggedExperiment]{RaggedExperiment}} for more details.
+#' \code{\link[RaggedExperiment]{RaggedExperiment-class}} for more details.
 #'
 #' @section type:
 #' Choices include:
