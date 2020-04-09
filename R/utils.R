@@ -280,8 +280,9 @@
     fielders <- list(seqnames.field = "seqnames", start.field = "start",
         end.field = "end", strand.field = "strand")
     Fargs <- lapply(fielders, function(name) { names(x)[granges_cols[[name]]] })
-    allStrandNA <- all(is.na(x[[Fargs[["strand.field"]]]]))
-    Fargs[["ignore.strand"]] <- is.na(Fargs[["strand.field"]]) || allStrandNA
+    strd <- Fargs[["strand.field"]]
+    allStrandNA <- if (!is.na(strd)) all(is.na(x[[strd]])) else TRUE
+    Fargs[["ignore.strand"]] <- allStrandNA
     Filter(function(g) {!is.na(g)}, Fargs)
 }
 
