@@ -1,3 +1,18 @@
+## CHANGES IN VERSION 2.18.0
+
+### New features
+
+* Warning for Windows users added when file paths are too long
+* `getGISTICPeaks` now requires a `FirehoseGISTIC` data object obtained from
+`getFirehoseData`
+
+### Bug fixes and minor improvements
+
+* Consolidate GISTIC data download methods in `getFirehoseData` and
+`getGISTICPeaks`
+* Increase robustness of internal helper functions that work with strands
+* 'TCGA' sample column identification is less strict
+
 ## CHANGES IN VERSION 2.16.0
 
 ### New features
@@ -23,7 +38,7 @@ locations
 
 * GISTIC data for `SKCM` and `LAML` is correctly returned by the
 `getFirehoseData` function
-* Helpers now correctly assign row names in presence of ranged data when 
+* Helpers now correctly assign row names in presence of ranged data when
 using `biocExtract`
 
 ## CHANGES IN VERSION 2.12.0
@@ -40,7 +55,7 @@ option
 
 * Set default 'peak' argument to 'wide'
 * Functionality from the `TCGAutils` package is now employed such as
-`findGRangesCols` and `uniformBuilds` 
+`findGRangesCols` and `uniformBuilds`
 
 ## CHANGES IN VERSION 2.9.41
 
