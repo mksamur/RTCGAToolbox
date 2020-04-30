@@ -1,3 +1,10 @@
+## CHANGES IN VERSION 2.20.0
+
+### Bug fixes and minor improvements
+
+* Remove static file dependencies from GitHub and use text inside function
+(@DavisWeaver, #34)
+
 ## CHANGES IN VERSION 2.18.0
 
 ### New features

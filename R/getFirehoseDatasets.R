@@ -6,11 +6,12 @@
 #' @examples
 #' getFirehoseDatasets()
 #' @export getFirehoseDatasets
-getFirehoseDatasets <- function(){
-  runDataset <- read.table("https://raw.githubusercontent.com/mksamur/RawDataURLs/master/fmineRdataset.txt",
-                           header=FALSE, sep="\t", na.strings="NA", dec=".", strip.white=TRUE)
-  runDataset <- as.character(runDataset[,1])
-  return(runDataset)
+getFirehoseDatasets <- function() {
+    c("ACC", "BLCA", "BRCA", "CESC", "CHOL", "COADREAD", "COAD",
+    "DLBC", "ESCA", "FPPP", "GBMLGG", "GBM", "HNSC", "KICH", "KIPAN",
+    "KIRC", "KIRP", "LAML", "LGG", "LIHC", "LUAD", "LUSC", "MESO",
+    "OV", "PAAD", "PCPG", "PRAD", "READ", "SARC", "SKCM", "STAD",
+    "STES", "TGCT", "THCA", "THYM", "UCEC", "UCS", "UVM")
 }
 
 #' RTCGASample
