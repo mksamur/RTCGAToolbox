@@ -4,7 +4,11 @@
 \name{RTCGASample}
 \alias{RTCGASample}
 \title{A sample data object for sample codes.}
-\format{A \code{FirehoseData} data object}
+\format{
+A \code{FirehoseData} data object
+
+An object of class \code{FirehoseData} of length 1.
+}
 \usage{
 RTCGASample
 }

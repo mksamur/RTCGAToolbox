@@ -38,7 +38,8 @@ getFirehoseData(
 
 \item{gistic2Date}{Analysis run date for GISTIC obtained via \code{\link{getFirehoseAnalyzeDates}}}
 
-\item{RNASeqGene}{Logical (default FALSE) RNAseq data.}
+\item{RNASeqGene}{Logical (default FALSE) RNAseq TPM data:
+gdac.broadinstitute.org_*.Merge_rnaseq__illuminaga_rnaseq__unc_edu__Level_3__gene_expression__data.Level_3*}
 
 \item{clinical}{Logical (default TRUE) clinical data.}
 

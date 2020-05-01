@@ -211,7 +211,8 @@
 #' @param dataset A cohort name. TCGA cancer code obtained via \code{\link{getFirehoseDatasets}}
 #' @param runDate Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}
 #' @param gistic2Date Analysis run date for GISTIC obtained via \code{\link{getFirehoseAnalyzeDates}}
-#' @param RNASeqGene Logical (default FALSE) RNAseq data.
+#' @param RNASeqGene Logical (default FALSE) RNAseq TPM data:
+#'     gdac.broadinstitute.org_*.Merge_rnaseq__illuminaga_rnaseq__unc_edu__Level_3__gene_expression__data.Level_3*
 #' @param clinical Logical (default TRUE) clinical data.
 #' @param RNASeq2GeneNorm Logical (default FALSE) RNAseq v2 (RSEM processed) data.
 #' @param miRNASeqGene Logical (default FALSE) smallRNAseq data.

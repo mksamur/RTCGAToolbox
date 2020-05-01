@@ -3,7 +3,9 @@
 \name{hg19.ucsc.gene.locations}
 \alias{hg19.ucsc.gene.locations}
 \title{Gene coordinates for circle plot.}
-\format{A data frame with 28454 rows and 5 variables}
+\format{
+A data frame with 28454 rows and 5 variables
+}
 \description{
 A dataset containing the gene coordinates
 The variables are as follows:
