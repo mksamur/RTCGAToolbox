@@ -215,8 +215,7 @@
 }
 
 .validateNCBI <- function(bvec) {
-    builds <- str_extract(bvec, "\\d+")
-    bnum <- unique(builds)
+    bnum <- unique(bvec)
     if (length(bnum) > 1L)
         stop("Inconsistent build numbers found")
     bnum
@@ -391,6 +390,13 @@
     return(newSE)
 }
 
+.removeNASeq <- function(x, colname) {
+    nas <- is.na(x[[colname]])
+    if (any(nas))
+        message("Removing ", sum(nas), " rows where 'is.na(seqnames.field)'")
+    x[!is.na(x[[colname]]), ]
+}
+
 .makeRaggedExperimentFromDataFrame <- function(df, ...) {
     args <- list(...)
     build <- args[["build"]]
@@ -406,7 +412,8 @@
     ansRanges <- .ansRangeNames(df)
     rangeInfo <- c(ansRanges, list(split.field = split.field,
         names.field = names.field))
-
+    
+    df <- .removeNASeq(df, ansRanges[["seqnames.field"]])
     if (!is.null(ansRanges[["strand.field"]]) || length(ansRanges[["strand.field"]]))
         df <- .standardizeStrand(df, ansRanges[["strand.field"]])
     dropIdx <- .omitAdditionalIdx(df, ansRanges)
@@ -414,6 +421,7 @@
         df <- df[, -dropIdx]
     if (.hasInfo(df, rowanno))
         df <- .setAnnoRows(df)
+
     newGRL <- do.call(makeGRangesListFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), rangeInfo))
     GenomeInfoDb::genome(newGRL) <- build
