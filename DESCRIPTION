@@ -1,7 +1,7 @@
 Package: RTCGAToolbox
 Type: Package
 Title: A new tool for exporting TCGA Firehose data
-Version: 2.19.3
+Version: 2.19.4
 Authors@R: c(
     person("Mehmet", "Samur", email = "rtcgatoolbox@gmail.com",
     role = "aut"),
@@ -40,7 +40,7 @@ Imports:
     stringr,
     SummarizedExperiment,
     survival,
-    TCGAutils,
+    TCGAutils (>= 1.9.4),
     XML
 Suggests:
     BiocStyle,
