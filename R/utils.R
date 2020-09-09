@@ -248,34 +248,9 @@
     }
 }
 
-.validStartEnd <- function(x, ansranges) {
-    startf <- names(x)[ansranges["start"]]
-    endf <- names(x)[ansranges["end"]]
-    if (any(is.na(x[[startf]])) || any(is.na(x[[endf]])))
-        FALSE
-    else
-        TRUE
-}
-
-.removeStartEnds <- function(x, ansranges) {
-    startf <- names(x)[ansranges["start"]]
-    endf <- names(x)[ansranges["end"]]
-    rangeIndx <- which(names(x) %in% c(startf, endf))
-    x[, -rangeIndx]
-}
-
-.validGRangesCols <- function(x) {
-    granges_cols <- TCGAutils::findGRangesCols(names(x))
-    while (!.validStartEnd(x, granges_cols)) {
-        x <- .removeStartEnds(x, granges_cols)
-        granges_cols <- TCGAutils::findGRangesCols(names(x))
-    }
-    granges_cols
-}
-
 .ansRangeNames <- function(x) {
     if (is(x, "list")) { return(list()) }
-    granges_cols <- .validGRangesCols(x)
+    granges_cols <- TCGAutils::findGRangesCols(names(x))
     fielders <- list(seqnames.field = "seqnames", start.field = "start",
         end.field = "end", strand.field = "strand")
     Fargs <- lapply(fielders, function(name) { names(x)[granges_cols[[name]]] })
@@ -317,19 +292,23 @@
     !all(is.na(TCGAutils::findGRangesCols(names(x))))
 }
 
-.samplesAsCols <- function(x) {
-    grepl("^TCGA", names(x), ignore.case = TRUE)
+.samplesAsCols <- function(x, sampleNames = character(0L)) {
+    tcganames <- grepl("^TCGA", names(x), ignore.case = TRUE)
+    if (any(tcganames))
+        tcganames
+    else
+        grepl(paste("^", sampleNames, collapse = "|"), names(x), ignore.case = TRUE)
 }
 
-.hasExperimentData <- function(x) {
-    anySamplesAsCols <- any(.samplesAsCols(x))
+.hasExperimentData <- function(x, colnames = c("Hugo", "Entrez")) {
+    anySamplesAsCols <- any(.samplesAsCols(x, colnames))
     sampcols <- na.omit(.findSampleCol(x))
     .hasRangeNames(x) || length(sampcols) || anySamplesAsCols
 }
 
 ## Safe to assume equal number of ranges == equal ranges (?)
 .makeSummarizedExperimentFromDataFrame <- function(df, ...) {
-    samplesAsCols <- .samplesAsCols(df)
+    samplesAsCols <- .samplesAsCols(df, c("Hugo", "Entrez"))
     if (is(df, "DataFrame"))
         metadat <- metadata(df)
     if (any(samplesAsCols)) {
@@ -430,11 +409,19 @@
     return(newRE)
 }
 
+.rmNAse <- function(x, ansranges) {
+    startf <- ansranges[["start.field"]]
+    endf <- ansranges[["end.field"]]
+    naRanges <- is.na(x[[startf]]) | is.na(x[[endf]])
+    x[!naRanges, ]
+}
+
 .makeGRangesFromDataFrame <- function(df, ...) {
     args <- list(...)
     build <- args[["build"]]
     metadat <- if (is(df, "DataFrame")) { metadata(df) } else { list() }
     ansRanges <- .ansRangeNames(df)
+    df <- .rmNAse(df, ansRanges)
     dropIdx <- .omitAdditionalIdx(df, ansRanges)
     if (length(dropIdx))
         df <- df[, -dropIdx]
