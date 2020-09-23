@@ -18,10 +18,13 @@
 
 ## Standardize barcode format
 .stdIDs <- function(sampleBarcode) {
-    bcodeTest <- grepl("\\.", sample(sampleBarcode, 10L, replace = TRUE))
-    if (all(bcodeTest))
-        sampleBarcode <- gsub("\\.", "-", sampleBarcode)
-    toupper(sampleBarcode)
+    if (all(startsWith(sampleBarcode, "TCGA"))) {
+        bcodeTest <- grepl("\\.", sample(sampleBarcode, 10L, replace = TRUE))
+        if (all(bcodeTest))
+            sampleBarcode <- gsub("\\.", "-", sampleBarcode)
+        sampleBarcode <- toupper(sampleBarcode)
+    }
+    sampleBarcode
 }
 
 .standardizeBC <- function(x) {
@@ -294,10 +297,11 @@
 
 .samplesAsCols <- function(x, sampleNames = character(0L)) {
     tcganames <- grepl("^TCGA", names(x), ignore.case = TRUE)
-    if (any(tcganames))
-        tcganames
+    if (length(sampleNames))
+        vapply(names(x), function(y) any(startsWith(y, sampleNames)),
+            logical(1L)) 
     else
-        grepl(paste("^", sampleNames, collapse = "|"), names(x), ignore.case = TRUE)
+        tcganames
 }
 
 .hasExperimentData <- function(x, colnames = c("Hugo", "Entrez")) {
@@ -307,8 +311,8 @@
 }
 
 ## Safe to assume equal number of ranges == equal ranges (?)
-.makeSummarizedExperimentFromDataFrame <- function(df, ...) {
-    samplesAsCols <- .samplesAsCols(df, c("Hugo", "Entrez"))
+.makeSummarizedExperimentFromDataFrame <- function(df, ..., colnames) {
+    samplesAsCols <- .samplesAsCols(df, colnames)
     if (is(df, "DataFrame"))
         metadat <- metadata(df)
     if (any(samplesAsCols)) {
