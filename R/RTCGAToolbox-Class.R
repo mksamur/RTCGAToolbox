@@ -105,6 +105,7 @@ setMethod("isEmpty", "FirehoseGISTIC", function(x) {
 #' @slot gistic2Date Analyze running date from \code{\link{getFirehoseAnalyzeDates}}
 #' @slot clinical clinical data frame
 #' @slot RNASeqGene Gene level expression data matrix from RNAseq
+#' @slot RNASeq2Gene Gene level expression data matrix from RNAseq
 #' @slot RNASeq2GeneNorm Gene level expression data matrix from RNAseq (RSEM)
 #' @slot miRNASeqGene miRNA expression data from matrix smallRNAseq
 #' @slot CNASNP A data frame to store somatic copy number alterations from SNP array platform
@@ -121,7 +122,7 @@ setMethod("isEmpty", "FirehoseGISTIC", function(x) {
 #' @exportClass FirehoseData
 setClass("FirehoseData", representation(Dataset = "character",
     runDate = "character", gistic2Date = "character", clinical = "data.frame",
-    RNASeqGene = "matrix", RNASeq2GeneNorm="list", miRNASeqGene="matrix",
+    RNASeqGene = "matrix", RNASeq2Gene = "matrix", RNASeq2GeneNorm="list", miRNASeqGene="matrix",
     CNASNP="data.frame", CNVSNP="data.frame", CNASeq="data.frame", CNACGH="list",
     Methylation="list", mRNAArray="list", miRNAArray="list", RPPAArray="list",
     Mutation="data.frame", GISTIC="FirehoseGISTIC", BarcodeUUID="data.frame"))
@@ -143,6 +144,9 @@ setMethod("show", "FirehoseData",function(object) {
     if (dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0) {
         cat("  RNASeqGene: A matrix of count or normalized data, dim: ",
             paste(dim(object@RNASeqGene),collapse = " x "), "\n")}
+    if (dim(object@RNASeq2Gene)[1] > 0 & dim(object@RNASeq2Gene)[2] > 0) {
+      cat("  RNASeq2Gene: A matrix of count or scaled estimate data, dim: ",
+          paste(dim(object@RNASeq2Gene),collapse = " x "), "\n")}
     if (length(object@RNASeq2GeneNorm)) {
         cat("  RNASeq2GeneNorm: A list of FirehosemRNAArray object(s), length: ",
             length(object@RNASeq2GeneNorm), "\n")}
@@ -325,6 +329,7 @@ setMethod("updateObject", "FirehoseData",
         clinical = if (.hasSlot(object, "Clinical")) { object@Clinical }
         else { object@clinical },
         RNASeqGene = object@RNASeqGene,
+        RNASeq2Gene = object@RNASeq2Gene,
         RNASeq2GeneNorm = object@RNASeq2GeneNorm,
         miRNASeqGene = object@miRNASeqGene, CNASNP = object@CNASNP,
         CNVSNP = object@CNVSNP,
