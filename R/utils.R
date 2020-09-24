@@ -297,9 +297,10 @@
 
 .samplesAsCols <- function(x, sampleNames = character(0L)) {
     tcganames <- grepl("^TCGA", names(x), ignore.case = TRUE)
+    sampleNames <- as.character(sampleNames)
     if (length(sampleNames))
         vapply(names(x), function(y) any(startsWith(y, sampleNames)),
-            logical(1L)) 
+            logical(1L))
     else
         tcganames
 }
@@ -311,7 +312,9 @@
 }
 
 ## Safe to assume equal number of ranges == equal ranges (?)
-.makeSummarizedExperimentFromDataFrame <- function(df, ..., colnames) {
+.makeSummarizedExperimentFromDataFrame <-
+    function(df, ..., colnames = c("Hugo", "Entrez"))
+{
     samplesAsCols <- .samplesAsCols(df, colnames)
     if (is(df, "DataFrame"))
         metadat <- metadata(df)
@@ -395,7 +398,7 @@
     ansRanges <- .ansRangeNames(df)
     rangeInfo <- c(ansRanges, list(split.field = split.field,
         names.field = names.field))
-    
+
     df <- .removeNASeq(df, ansRanges[["seqnames.field"]])
     if (!is.null(ansRanges[["strand.field"]]) || length(ansRanges[["strand.field"]]))
         df <- .standardizeStrand(df, ansRanges[["strand.field"]])
