@@ -4,6 +4,8 @@
 
 * Remove static file dependencies from GitHub and use text inside function
 (@DavisWeaver, #34)
+* Added default values to helper for making `SummarizedExperiment` datasets
+* Coerce sample names to character when in (rare) case they're numeric
 
 ## CHANGES IN VERSION 2.18.0
 
