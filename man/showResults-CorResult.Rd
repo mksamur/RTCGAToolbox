@@ -17,8 +17,5 @@ Returns correlation results data frame
 Export toptable or correlation data frame
 }
 \examples{
-data(RTCGASample)
-corRes = getCNGECorrelation(RTCGASample,adj.pval = 1,raw.pval = 1)
-corRes
-showResults(corRes[[1]])
+data(accmini)
 }

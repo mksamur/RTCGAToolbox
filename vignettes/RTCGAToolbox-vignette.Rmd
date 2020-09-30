@@ -242,8 +242,8 @@ hard drive, I will use nonsense data set for following steps.
 
 You can use following code snippet to load toy dataset.
 ```{r}
-data(RTCGASample)
-RTCGASample
+data(accmini)
+accmini
 ```
 
 ## Differential gene expression
@@ -269,7 +269,7 @@ regulated genes. Users can also adjust these values by using "hmTopUpN" and
 
 ```{r}
 # Differential gene expression analysis for gene level RNA data.
-diffGeneExprs <- getDiffExpressedGenes(dataObject=RTCGASample, DrawPlots=TRUE,
+diffGeneExprs <- getDiffExpressedGenes(dataObject=accmini, DrawPlots=TRUE,
     adj.method="BH", adj.pval=0.05, raw.pval=0.05, logFC=2, hmTopUpN=10,
     hmTopDownN=10)
 # Show head for expression outputs
@@ -306,11 +306,9 @@ object that contains results for each comparison.)
 
 ```{r}
 #Correlation between gene expression values and copy number
-corrGECN <- getCNGECorrelation(dataObject=RTCGASample, adj.method="BH",
+corrGECN <- getCNGECorrelation(dataObject=accmini, adj.method="BH",
     adj.pval=0.9, raw.pval=0.05)
 corrGECN
-showResults(corrGECN[[1]])
-corRes <- showResults(corrGECN[[1]])
 ```
 
 If the dataset has RNASeq data, data will be normalized for correlation
@@ -336,7 +334,7 @@ that has data and calculates frequency for each gene.
 
 ```{r}
 # Mutation frequencies
-mutFrq <- getMutationRate(dataObject=RTCGASample)
+mutFrq <- getMutationRate(dataObject=accmini)
 head(mutFrq[order(mutFrq[, 2], decreasing=TRUE), ])
 ```
 
@@ -362,25 +360,25 @@ survival analysis can be done.
 # Creating survival data frame and running analysis for
 # FCGBP which is one of the most frequently mutated gene in the toy data
 # Running following code will provide following KM plot.
-clinicData <- getData(RTCGASample,"clinical")
+clinicData <- getData(accmini,"clinical")
 head(clinicData)
 clinicData <- clinicData[, 3:5]
 clinicData[is.na(clinicData[, 3]), 3] <- clinicData[is.na(clinicData[, 3]), 2]
 survData <- data.frame(Samples=rownames(clinicData),
     Time=as.numeric(clinicData[, 3]), Censor=as.numeric(clinicData[, 1]))
-getSurvival(dataObject=RTCGASample, geneSymbols=c("FCGBP"), sampleTimeCensor=survData)
+getSurvival(dataObject=accmini, geneSymbols=c("FCGBP"), sampleTimeCensor=survData)
 ```
 
 # Data Export
 You can export downloaded data from FirehoseData object by using 'getData()' function.
 ```{r}
 # Note: This function is provided for real dataset test since the toy dataset is small.
-RTCGASample
+accmini
 ```
 ```{r message=FALSE}
-RTCGASampleClinical <- getData(RTCGASample, "clinical")
-RTCGASampleRNAseqCounts <- getData(RTCGASample, "RNASeqGene")
-RTCGASampleCN <- getData(RTCGASample, "GISTIC", "AllByGene")
+accClinical <- getData(accmini, "clinical")
+accRNAseqCounts <- getData(accmini, "RNASeq2GeneNorm")
+accCN <- getData(accmini, "GISTIC", "AllByGene")
 ```
 # Reproducing BRCA results from original manuscript
 Following code block is provided to reproduce case study in the RTCGAToolbox paper[@ref6].
@@ -467,11 +465,11 @@ Running code above will provide following circle plot.
 
 RTCGAToolbox provides toy data object for testing functions.
 
-* "RTCGASample" data is a FirehoseData object that stores RNAseq, copy number,
-mutation, clinical data for artificially created dataset.
+* `accmini` data is a FirehoseData object that stores RNAseq, copy number,
+mutation, clinical data from the Adrenocortical Carcinoma (ACC) study.
 
 ```{r}
-data(RTCGASample)
+data(accmini)
 ```
 
 ******

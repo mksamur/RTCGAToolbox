@@ -9,7 +9,7 @@
 #' @return Draws a circle plot
 #' @export getReport
 #' @examples
-#' data(RTCGASample)
+#' data(accmini)
 #' require("Homo.sapiens")
 #' locations <- genes(Homo.sapiens,columns="SYMBOL")
 #' locations <- as.data.frame(locations)
@@ -17,11 +17,14 @@
 #' locations <- locations[!is.na(locations[,1]),]
 #' locations <- locations[!duplicated(locations[,1]),]
 #' rownames(locations) <- locations[,1]
-#' t1 <- getDiffExpressedGenes(RTCGASample)
+#' t1 <- getDiffExpressedGenes(accmini)
 #' \dontrun{
-#' getReport(dataObject=RTCGASample,DGEResult1=t1[[1]],geneLocations=locations)
+#' getReport(dataObject=accmini,DGEResult1=t1[[1]],geneLocations=locations)
 #' }
 getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations) {
+  .Deprecated(
+    msg = "This function is no longer maintained and will be retired."
+  )
   if (is.null(dataObject) | class(dataObject) != "FirehoseData") {
       stop("Please set a valid FirehoseData class!")
       }

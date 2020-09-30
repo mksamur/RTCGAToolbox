@@ -105,8 +105,8 @@ setMethod("isEmpty", "FirehoseGISTIC", function(x) {
 #' @slot gistic2Date Analyze running date from \code{\link{getFirehoseAnalyzeDates}}
 #' @slot clinical clinical data frame
 #' @slot RNASeqGene Gene level expression data matrix from RNAseq
-#' @slot RNASeq2Gene Gene level expression data matrix from RNAseq
-#' @slot RNASeq2GeneNorm Gene level expression data matrix from RNAseq (RSEM)
+#' @slot RNASeq2Gene Gene level expression data matrix from RNAseqV2
+#' @slot RNASeq2GeneNorm Gene level expression data matrix from RNAseqV2 (RSEM)
 #' @slot miRNASeqGene miRNA expression data from matrix smallRNAseq
 #' @slot CNASNP A data frame to store somatic copy number alterations from SNP array platform
 #' @slot CNVSNP A data frame to store germline copy number variants from SNP array platform
@@ -197,9 +197,9 @@ setMethod("show", "FirehoseData",function(object) {
 #' 'AllByGene' or 'ThresholdedByGene'
 #'
 #' @examples
-#' data(RTCGASample)
-#' getData(RTCGASample, "clinical")
-#' getData(RTCGASample, "RNASeqGene")
+#' data(accmini)
+#' getData(accmini, "clinical")
+#' getData(accmini, "RNASeq2GeneNorm")
 #'
 #' @return Returns matrix or data.frame depending on data type
 setGeneric("getData", function(object, type, platform) {
@@ -249,10 +249,7 @@ setMethod("show", "DGEResult",function(object){
 #' @param object A \code{\linkS4class{DGEResult}} or \code{\linkS4class{CorResult}} object
 #' @return Returns toptable or correlation data frame
 #' @examples
-#' data(RTCGASample)
-#' dgeRes = getDiffExpressedGenes(RTCGASample)
-#' dgeRes
-#' showResults(dgeRes[[1]])
+#' data(accmini)
 setGeneric("showResults",
            function(object) standardGeneric("showResults")
 )
@@ -264,10 +261,7 @@ setGeneric("showResults",
 #' @return Returns toptable for DGE results
 #' @export
 #' @examples
-#' data(RTCGASample)
-#' dgeRes = getDiffExpressedGenes(RTCGASample)
-#' dgeRes
-#' showResults(dgeRes[[1]])
+#' data(accmini)
 setMethod("showResults", "DGEResult",function(object){
   message(paste0("Dataset: ",object@Dataset))
   print(head(object@Toptable))
@@ -291,10 +285,7 @@ setMethod("show", "CorResult",function(object){
 #' @aliases showResults,CorResult,CorResult-method
 #' @return Returns correlation results data frame
 #' @examples
-#' data(RTCGASample)
-#' corRes = getCNGECorrelation(RTCGASample,adj.pval = 1,raw.pval = 1)
-#' corRes
-#' showResults(corRes[[1]])
+#' data(accmini)
 setMethod("showResults", "CorResult",function(object){
   message(paste0("Dataset: ",object@Dataset))
   print(head(object@Correlations))
@@ -305,7 +296,8 @@ setMethod("showResults", "CorResult",function(object){
 .hasOldAPI <- function(object) {
     isTRUE(methods::.hasSlot(object, "RNAseq")) ||
     isTRUE(methods::.hasSlot(object, "Mutations")) ||
-    isTRUE(methods::.hasSlot(object, "Clinical"))
+    isTRUE(methods::.hasSlot(object, "Clinical")) ||
+    !isTRUE(methods::.hasSlot(object, "RNASeq2Gene"))
 }
 
 .hasOldGISTIC <- function(object) {
@@ -329,7 +321,6 @@ setMethod("updateObject", "FirehoseData",
         clinical = if (.hasSlot(object, "Clinical")) { object@Clinical }
         else { object@clinical },
         RNASeqGene = object@RNASeqGene,
-        RNASeq2Gene = object@RNASeq2Gene,
         RNASeq2GeneNorm = object@RNASeq2GeneNorm,
         miRNASeqGene = object@miRNASeqGene, CNASNP = object@CNASNP,
         CNVSNP = object@CNVSNP,

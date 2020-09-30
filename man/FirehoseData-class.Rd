@@ -60,7 +60,9 @@ the most recent API
 
 \item{\code{RNASeqGene}}{Gene level expression data matrix from RNAseq}
 
-\item{\code{RNASeq2GeneNorm}}{Gene level expression data matrix from RNAseq (RSEM)}
+\item{\code{RNASeq2Gene}}{Gene level expression data matrix from RNAseqV2}
+
+\item{\code{RNASeq2GeneNorm}}{Gene level expression data matrix from RNAseqV2 (RSEM)}
 
 \item{\code{miRNASeqGene}}{miRNA expression data from matrix smallRNAseq}
 

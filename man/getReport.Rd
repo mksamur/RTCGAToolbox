@@ -22,7 +22,7 @@ Draws a circle plot
 \code{getReport} draws a circle plot into your workin director to show log fold changes for differentially expressed genes, copy number alterations and mutations.
 }
 \examples{
-data(RTCGASample)
+data(accmini)
 require("Homo.sapiens")
 locations <- genes(Homo.sapiens,columns="SYMBOL")
 locations <- as.data.frame(locations)
@@ -30,8 +30,8 @@ locations <- locations[,c(6,1,5,2:3)]
 locations <- locations[!is.na(locations[,1]),]
 locations <- locations[!duplicated(locations[,1]),]
 rownames(locations) <- locations[,1]
-t1 <- getDiffExpressedGenes(RTCGASample)
+t1 <- getDiffExpressedGenes(accmini)
 \dontrun{
-getReport(dataObject=RTCGASample,DGEResult1=t1[[1]],geneLocations=locations)
+getReport(dataObject=accmini,DGEResult1=t1[[1]],geneLocations=locations)
 }
 }

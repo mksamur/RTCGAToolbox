@@ -11,7 +11,6 @@
 #' @name RTCGAToolbox
 NULL
 
-
 #' Gene coordinates for circle plot.
 #'
 #' A dataset containing the gene coordinates
@@ -29,15 +28,3 @@ NULL
 #' @name hg19.ucsc.gene.locations
 NULL
 
-#' A sample data object for sample codes.
-#'
-#' A \code{FirehoseData} object for running sample codes.
-#' The variables are as follows:
-#'
-#' \itemize{
-#'   \item a2. A sample data object
-#' }
-#'
-#' @format A \code{FirehoseData} data object
-#' @name RTCGASample
-NULL

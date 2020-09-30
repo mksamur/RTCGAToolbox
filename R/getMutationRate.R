@@ -4,12 +4,10 @@
 #' @return Returns a data table
 #' @export getMutationRate
 #' @examples
-#' data(RTCGASample)
-#' mutRate <- getMutationRate(dataObject=RTCGASample)
+#' data(accmini)
+#' mutRate <- getMutationRate(dataObject=accmini)
 #' mutRate <- mutRate[order(mutRate[,2],decreasing = TRUE),]
 #' head(mutRate)
-#' \dontrun{
-#' }
 getMutationRate <- function(dataObject)
 {
   if(is.null(dataObject) | class(dataObject) != "FirehoseData"){stop("'dataObject' must be 'FirehoseData' class!")}

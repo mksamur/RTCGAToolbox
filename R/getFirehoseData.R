@@ -4,7 +4,7 @@
   tmpCols = read.delim(file,nrows=1,colClasses="character")
   if (!arrayData) {
     colOrder <- 1:ncol(tmpCols)
-    colOrder <- colOrder[tmpCols[1,] == normMethod]
+    colOrder <- colOrder[startsWith(unlist(tmpCols[1, ]), normMethod)]
   } else {
     colOrder <- 2:ncol(tmpCols)
   }
@@ -46,8 +46,7 @@
   } else {
     plinks = plinks[grepl(paste0("*.",datasetLink,keyWord2),plinks)]
   }
-  message(plinks)
-  return(plinks)
+  plinks
 }
 
 .barcodeUUID <- function(object) {
@@ -58,9 +57,6 @@
   }
   if (dim(object@RNASeq2Gene)[1] > 0 & dim(object@RNASeq2Gene)[2] > 0) {
     barcodes <- c(barcodes,colnames(object@RNASeq2Gene))
-  }
-  if (dim(object@RNASeq2GeneCount)[1] > 0 & dim(object@RNASeq2GeneCount)[2] > 0) {
-    barcodes <- c(barcodes,colnames(object@RNASeq2GeneCount))
   }
   if (dim(object@RNASeq2GeneNorm)[1] > 0 & dim(object@RNASeq2GeneNorm)[2] > 0) {
     barcodes <- c(barcodes,colnames(object@RNASeq2GeneNorm))
@@ -217,10 +213,9 @@
 #' @param dataset A cohort name. TCGA cancer code obtained via \code{\link{getFirehoseDatasets}}
 #' @param runDate Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}
 #' @param gistic2Date Analysis run date for GISTIC obtained via \code{\link{getFirehoseAnalyzeDates}}
-#' @param RNASeqGene Logical (default FALSE) RNAseq TPM data:
-#'     gdac.broadinstitute.org_*.Merge_rnaseq__illuminaga_rnaseq__unc_edu__Level_3__gene_expression__data.Level_3*
+#' @param RNASeqGene Logical (default FALSE) RNAseq TPM data.
 #' @param clinical Logical (default TRUE) clinical data.
-#' @param RNASeq2Gene Logical (default FALSE) RNAseq v2 (RSEM processed) data.
+#' @param RNASeq2Gene Logical (default FALSE) RNAseq v2 (RSEM processed) data; see `RNAseqNorm` argument.
 #' @param RNASeq2GeneNorm Logical (default FALSE) RNAseq v2 (RSEM processed) data.
 #' @param miRNASeqGene Logical (default FALSE) smallRNAseq data.
 #' @param CNASNP Logical (default FALSE) somatic copy number alterations data from SNP array.
@@ -232,7 +227,7 @@
 #' @param mRNAArray Logical (default FALSE) mRNA expression data from microarray.
 #' @param miRNAArray Logical (default FALSE) miRNA expression data from microarray.
 #' @param RPPAArray Logical (default FALSE) RPPA data
-#' @param RNAseqNorm RNAseq data normalization method. (Default raw_counts)
+#' @param RNAseqNorm RNAseq data normalization method. (Default raw_count)
 #' @param RNAseq2Norm RNAseq v2 data normalization method. (Default normalized_count, raw_count, scaled_estimate)
 #' @param GISTIC logical (default FALSE) processed copy number data
 #' @param forceDownload A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.
@@ -241,11 +236,16 @@
 #' @param fileSizeLimit Files that are larger than set value (megabyte) won't be downloaded (Default: 500)
 #' @param getUUIDs Logical key to get UUIDs from barcode (Default: FALSE)
 #' @param ... Additional arguments to pass down.
+#'
 #' @return A \code{FirehoseData} data object that stores data for selected data types.
+#'
+#' @seealso \link{getLinks}
+#'
+#' @md
 #' @examples
 #' # Sample Dataset
-#' data(RTCGASample)
-#' RTCGASample
+#' data(accmini)
+#' accmini
 #' \dontrun{
 #' BRCAdata <- getFirehoseData(dataset="BRCA",
 #' runDate="20140416",gistic2Date="20140115",
@@ -253,11 +253,12 @@
 #' }
 #' @export getFirehoseData
 getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
-    RNASeqGene=FALSE, RNASeq2Gene=FALSE, clinical=TRUE, miRNASeqGene=FALSE, RNASeq2GeneNorm=FALSE,
-    CNASNP=FALSE, CNVSNP=FALSE, CNASeq=FALSE, CNACGH=FALSE, Methylation=FALSE,
-    Mutation=FALSE, mRNAArray=FALSE, miRNAArray=FALSE, RPPAArray=FALSE,
-    GISTIC=FALSE, RNAseqNorm="raw_counts",  RNAseq2Norm="normalized_count",
-    forceDownload=FALSE, destdir=tempdir(), fileSizeLimit=500, getUUIDs=FALSE, ...) {
+    RNASeqGene=FALSE, RNASeq2Gene=FALSE, clinical=TRUE, miRNASeqGene=FALSE,
+    RNASeq2GeneNorm=FALSE, CNASNP=FALSE, CNVSNP=FALSE, CNASeq=FALSE,
+    CNACGH=FALSE, Methylation=FALSE, Mutation=FALSE, mRNAArray=FALSE,
+    miRNAArray=FALSE, RPPAArray=FALSE, GISTIC=FALSE, RNAseqNorm="raw_count",
+    RNAseq2Norm="normalized_count", forceDownload=FALSE, destdir=tempdir(),
+    fileSizeLimit=500, getUUIDs=FALSE, ...) {
   #check input parameters
   if (!class(dataset)=="character" || is.null(dataset) || !length(dataset) == 1 || nchar(dataset) < 2) {
       stop('Please set "dataset" parameter! You should specify one dataset name. Ex: dataset="BRCA"...')
@@ -344,13 +345,13 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
         }
       }
     }
-    
+
     #Download RNAseq2 gene level data (scaled estimates = TPM / 1e6 or raw_count, not rounded)
     if (RNASeq2Gene)
     {
       #Search for links
       plinks <- .getLinks("Level_3__RSEM_genes__data.Level_3","*.Merge_rnaseqv2__.*._rnaseqv2__.*.tar[.]gz$",NULL,doc)
-      
+
       for(i in trim(plinks))
       {
         if (.checkFileSize(paste0(fh_url,i),fileSizeLimit))
@@ -359,7 +360,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
                                       "[.]rnaseqv2__.*.__Level_3__RSEM_genes__data.data.txt$",
                                       TRUE,"-RNAseq2Gene.txt",FALSE,destdir,forceDownload,runDate)
           #Get selected type only
-          resultClass@RNASeq2Gene <- .makeExprMat(export.file,RNAseq2Norm,"RNAseq2",mergeSize=1000,arrayData=FALSE)
+          resultClass@RNASeq2Gene <- .makeExprMat(export.file, RNAseqNorm, "RNAseq2",mergeSize=1000,arrayData=FALSE)
           gc()
         }
       }

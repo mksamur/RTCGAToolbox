@@ -9,6 +9,7 @@ getFirehoseData(
   runDate = "20160128",
   gistic2Date = "20160128",
   RNASeqGene = FALSE,
+  RNASeq2Gene = FALSE,
   clinical = TRUE,
   miRNASeqGene = FALSE,
   RNASeq2GeneNorm = FALSE,
@@ -22,7 +23,7 @@ getFirehoseData(
   miRNAArray = FALSE,
   RPPAArray = FALSE,
   GISTIC = FALSE,
-  RNAseqNorm = "raw_counts",
+  RNAseqNorm = "raw_count",
   RNAseq2Norm = "normalized_count",
   forceDownload = FALSE,
   destdir = tempdir(),
@@ -38,8 +39,9 @@ getFirehoseData(
 
 \item{gistic2Date}{Analysis run date for GISTIC obtained via \code{\link{getFirehoseAnalyzeDates}}}
 
-\item{RNASeqGene}{Logical (default FALSE) RNAseq TPM data:
-gdac.broadinstitute.org_*.Merge_rnaseq__illuminaga_rnaseq__unc_edu__Level_3__gene_expression__data.Level_3*}
+\item{RNASeqGene}{Logical (default FALSE) RNAseq TPM data.}
+
+\item{RNASeq2Gene}{Logical (default FALSE) RNAseq v2 (RSEM processed) data; see \code{RNAseqNorm} argument.}
 
 \item{clinical}{Logical (default TRUE) clinical data.}
 
@@ -67,14 +69,14 @@ gdac.broadinstitute.org_*.Merge_rnaseq__illuminaga_rnaseq__unc_edu__Level_3__gen
 
 \item{GISTIC}{logical (default FALSE) processed copy number data}
 
-\item{RNAseqNorm}{RNAseq data normalization method. (Default raw_counts)}
+\item{RNAseqNorm}{RNAseq data normalization method. (Default raw_count)}
 
-\item{RNAseq2Norm}{RNAseq v2 data normalization method. (Default normalized_count)}
+\item{RNAseq2Norm}{RNAseq v2 data normalization method. (Default normalized_count, raw_count, scaled_estimate)}
 
 \item{forceDownload}{A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.}
 
 \item{destdir}{Directory in which to store the resulting downloaded file.
-Defaults to a temporary directory given by `tempdir()`.}
+Defaults to a temporary directory given by \code{tempdir()}.}
 
 \item{fileSizeLimit}{Files that are larger than set value (megabyte) won't be downloaded (Default: 500)}
 
@@ -93,11 +95,14 @@ This is a main client function to download data from Firehose TCGA portal.
 }
 \examples{
 # Sample Dataset
-data(RTCGASample)
-RTCGASample
+data(accmini)
+accmini
 \dontrun{
 BRCAdata <- getFirehoseData(dataset="BRCA",
 runDate="20140416",gistic2Date="20140115",
 RNASeqGene=TRUE,clinical=TRUE,mRNAArray=TRUE,Mutation=TRUE)
 }
+}
+\seealso{
+\link{getLinks}
 }

@@ -14,10 +14,3 @@ getFirehoseDatasets <- function() {
     "STES", "TGCT", "THCA", "THYM", "UCEC", "UCS", "UVM")
 }
 
-#' RTCGASample
-#'
-#' Example dataset not biologically meaningful
-#' @docType data
-#'
-#' @keywords data
-"RTCGASample"
