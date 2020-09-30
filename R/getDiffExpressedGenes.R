@@ -14,15 +14,13 @@
 #' @return Returns a list that stores results for each dataset
 #' @export getDiffExpressedGenes
 #' @examples
-#' data(RTCGASample)
-#' dgegenes <- getDiffExpressedGenes(RTCGASample)
-#' dgegenes
-#' showResults(dgegenes[[1]])
-#' dgegenes <- showResults(dgegenes[[1]])
-#' head(dgegenes)
+#' data(accmini)
 getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.pval=0.05,raw.pval=0.05,logFC=2,
                                   hmTopUpN=100,hmTopDownN=100,meanFilter=10)
 {
+  .Deprecated(
+    msg = "This function is no longer maintained and will be retired."
+  )
   if(is.null(dataObject) | class(dataObject) != "FirehoseData")
   {stop("Please set a valid object! dataObject must be set as FirehoseData class!")}
   validMatrix <- character()

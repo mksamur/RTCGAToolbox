@@ -2,7 +2,7 @@
 % Please edit documentation in R/getCNGECorrelation.R
 \name{getCNGECorrelation}
 \alias{getCNGECorrelation}
-\title{Perform correlation analysis betwwen gene expression and copy number data}
+\title{Perform correlation analysis between gene expression and copy number data}
 \usage{
 getCNGECorrelation(
   dataObject,
@@ -27,8 +27,5 @@ Returns a list that stores results for each dataset
 \code{getCNGECorrelation} returns a list that stores the results correlation between gene expression and copy number data.
 }
 \examples{
-data(RTCGASample)
-corRes <- getCNGECorrelation(RTCGASample)
-corRes
-showResults(corRes[[1]])
+data(accmini)
 }

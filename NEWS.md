@@ -1,5 +1,19 @@
 ## CHANGES IN VERSION 2.20.0
 
+### New features
+
+* Added the `RNASeq2Gene` slot to the `FirehoseData` class. This data type
+mainly obtains RNASeq v2 `raw_counts` from the pipeline (`scaled_estimates`
+also available; @mherberg #39)
+* Added an `accmini` example dataset as obtained from `getFirehoseData`
+* `getLinks` function shows the user some file provenance based on data
+requested
+* Newly deprecated functions: `getDiffExpressedGenes`, `getCNGECorrelation`,
+`getSurvival` and `getReport`. It is no longer possible for the maintainer to
+update these functions in a way that would benefit users. A transfer of
+responsibility would be required for these functions to remain. The would
+best be in another package.
+
 ### Bug fixes and minor improvements
 
 * Remove static file dependencies from GitHub and use text inside function

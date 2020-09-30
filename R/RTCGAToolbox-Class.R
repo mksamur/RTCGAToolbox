@@ -105,7 +105,8 @@ setMethod("isEmpty", "FirehoseGISTIC", function(x) {
 #' @slot gistic2Date Analyze running date from \code{\link{getFirehoseAnalyzeDates}}
 #' @slot clinical clinical data frame
 #' @slot RNASeqGene Gene level expression data matrix from RNAseq
-#' @slot RNASeq2GeneNorm Gene level expression data matrix from RNAseq (RSEM)
+#' @slot RNASeq2Gene Gene level expression data matrix from RNAseqV2
+#' @slot RNASeq2GeneNorm Gene level expression data matrix from RNAseqV2 (RSEM)
 #' @slot miRNASeqGene miRNA expression data from matrix smallRNAseq
 #' @slot CNASNP A data frame to store somatic copy number alterations from SNP array platform
 #' @slot CNVSNP A data frame to store germline copy number variants from SNP array platform
@@ -121,7 +122,7 @@ setMethod("isEmpty", "FirehoseGISTIC", function(x) {
 #' @exportClass FirehoseData
 setClass("FirehoseData", representation(Dataset = "character",
     runDate = "character", gistic2Date = "character", clinical = "data.frame",
-    RNASeqGene = "matrix", RNASeq2GeneNorm="list", miRNASeqGene="matrix",
+    RNASeqGene = "matrix", RNASeq2Gene = "matrix", RNASeq2GeneNorm="list", miRNASeqGene="matrix",
     CNASNP="data.frame", CNVSNP="data.frame", CNASeq="data.frame", CNACGH="list",
     Methylation="list", mRNAArray="list", miRNAArray="list", RPPAArray="list",
     Mutation="data.frame", GISTIC="FirehoseGISTIC", BarcodeUUID="data.frame"))
@@ -143,6 +144,9 @@ setMethod("show", "FirehoseData",function(object) {
     if (dim(object@RNASeqGene)[1] > 0 & dim(object@RNASeqGene)[2] > 0) {
         cat("  RNASeqGene: A matrix of count or normalized data, dim: ",
             paste(dim(object@RNASeqGene),collapse = " x "), "\n")}
+    if (dim(object@RNASeq2Gene)[1] > 0 & dim(object@RNASeq2Gene)[2] > 0) {
+      cat("  RNASeq2Gene: A matrix of count or scaled estimate data, dim: ",
+          paste(dim(object@RNASeq2Gene),collapse = " x "), "\n")}
     if (length(object@RNASeq2GeneNorm)) {
         cat("  RNASeq2GeneNorm: A list of FirehosemRNAArray object(s), length: ",
             length(object@RNASeq2GeneNorm), "\n")}
@@ -193,9 +197,9 @@ setMethod("show", "FirehoseData",function(object) {
 #' 'AllByGene' or 'ThresholdedByGene'
 #'
 #' @examples
-#' data(RTCGASample)
-#' getData(RTCGASample, "clinical")
-#' getData(RTCGASample, "RNASeqGene")
+#' data(accmini)
+#' getData(accmini, "clinical")
+#' getData(accmini, "RNASeq2GeneNorm")
 #'
 #' @return Returns matrix or data.frame depending on data type
 setGeneric("getData", function(object, type, platform) {
@@ -245,10 +249,7 @@ setMethod("show", "DGEResult",function(object){
 #' @param object A \code{\linkS4class{DGEResult}} or \code{\linkS4class{CorResult}} object
 #' @return Returns toptable or correlation data frame
 #' @examples
-#' data(RTCGASample)
-#' dgeRes = getDiffExpressedGenes(RTCGASample)
-#' dgeRes
-#' showResults(dgeRes[[1]])
+#' data(accmini)
 setGeneric("showResults",
            function(object) standardGeneric("showResults")
 )
@@ -260,10 +261,7 @@ setGeneric("showResults",
 #' @return Returns toptable for DGE results
 #' @export
 #' @examples
-#' data(RTCGASample)
-#' dgeRes = getDiffExpressedGenes(RTCGASample)
-#' dgeRes
-#' showResults(dgeRes[[1]])
+#' data(accmini)
 setMethod("showResults", "DGEResult",function(object){
   message(paste0("Dataset: ",object@Dataset))
   print(head(object@Toptable))
@@ -287,10 +285,7 @@ setMethod("show", "CorResult",function(object){
 #' @aliases showResults,CorResult,CorResult-method
 #' @return Returns correlation results data frame
 #' @examples
-#' data(RTCGASample)
-#' corRes = getCNGECorrelation(RTCGASample,adj.pval = 1,raw.pval = 1)
-#' corRes
-#' showResults(corRes[[1]])
+#' data(accmini)
 setMethod("showResults", "CorResult",function(object){
   message(paste0("Dataset: ",object@Dataset))
   print(head(object@Correlations))
@@ -301,7 +296,8 @@ setMethod("showResults", "CorResult",function(object){
 .hasOldAPI <- function(object) {
     isTRUE(methods::.hasSlot(object, "RNAseq")) ||
     isTRUE(methods::.hasSlot(object, "Mutations")) ||
-    isTRUE(methods::.hasSlot(object, "Clinical"))
+    isTRUE(methods::.hasSlot(object, "Clinical")) ||
+    !isTRUE(methods::.hasSlot(object, "RNASeq2Gene"))
 }
 
 .hasOldGISTIC <- function(object) {

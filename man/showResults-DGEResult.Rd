@@ -17,8 +17,5 @@ Returns toptable for DGE results
 Export toptable or correlation data frame
 }
 \examples{
-data(RTCGASample)
-dgeRes = getDiffExpressedGenes(RTCGASample)
-dgeRes
-showResults(dgeRes[[1]])
+data(accmini)
 }

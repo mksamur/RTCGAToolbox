@@ -16,10 +16,8 @@ Returns a data table
 Make a table for mutation rate of each gene in the cohort
 }
 \examples{
-data(RTCGASample)
-mutRate <- getMutationRate(dataObject=RTCGASample)
+data(accmini)
+mutRate <- getMutationRate(dataObject=accmini)
 mutRate <- mutRate[order(mutRate[,2],decreasing = TRUE),]
 head(mutRate)
-\dontrun{
-}
 }

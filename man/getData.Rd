@@ -25,8 +25,8 @@ particular object can be seen by entering the object name in the
 console ('show' method).
 }
 \examples{
-data(RTCGASample)
-getData(RTCGASample, "clinical")
-getData(RTCGASample, "RNASeqGene")
+data(accmini)
+getData(accmini, "clinical")
+getData(accmini, "RNASeq2GeneNorm")
 
 }

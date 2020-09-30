@@ -25,11 +25,11 @@ Draws a KM plot
 ## get data with  getFirehoseData function and call survival analysis
 ## Always check clinical data file for structural changes
 
-data(RTCGASample)
-clinicData <- getData(RTCGASample,"clinical")
+data(accmini)
+clinicData <- getData(accmini,"clinical")
 clinicData = clinicData[,3:5]
 clinicData[is.na(clinicData[,3]),3] = clinicData[is.na(clinicData[,3]),2]
 survData <- data.frame(Samples=rownames(clinicData),Time=as.numeric(clinicData[,3]),
 Censor=as.numeric(clinicData[,1]))
-getSurvival(dataObject=RTCGASample,geneSymbols=c("FCGBP"),sampleTimeCensor=survData)
+getSurvival(dataObject=accmini,geneSymbols=c("FCGBP"),sampleTimeCensor=survData)
 }

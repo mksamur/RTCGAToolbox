@@ -18,7 +18,7 @@
 #' setTxtProgressBar txtProgressBar untar write.table
 NULL
 
-#' Perform correlation analysis betwwen gene expression and copy number data
+#' Perform correlation analysis between gene expression and copy number data
 #'
 #' \code{getCNGECorrelation} returns a list that stores the results correlation between gene expression and copy number data.
 #'
@@ -29,12 +29,12 @@ NULL
 #' @return Returns a list that stores results for each dataset
 #' @export
 #' @examples
-#' data(RTCGASample)
-#' corRes <- getCNGECorrelation(RTCGASample)
-#' corRes
-#' showResults(corRes[[1]])
+#' data(accmini)
 getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval=0.05)
 {
+  .Deprecated(
+    msg = "This function is no longer maintained and is being retired."
+  )
   if(is.null(dataObject) | class(dataObject) != "FirehoseData")
   {stop("Please set a valid object! dataObject must be set as FirehoseData class! ")}
   validMatrix <- character()
