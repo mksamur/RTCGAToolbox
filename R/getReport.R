@@ -17,9 +17,8 @@
 #' locations <- locations[!is.na(locations[,1]),]
 #' locations <- locations[!duplicated(locations[,1]),]
 #' rownames(locations) <- locations[,1]
-#' t1 <- getDiffExpressedGenes(accmini)
 #' \dontrun{
-#' getReport(dataObject=accmini,DGEResult1=t1[[1]],geneLocations=locations)
+#'   getReport(dataObject=accmini,DGEResult1=t1[[1]],geneLocations=locations)
 #' }
 getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations) {
   .Deprecated(
