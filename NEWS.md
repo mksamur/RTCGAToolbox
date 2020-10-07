@@ -18,6 +18,9 @@ best be in another package.
 
 * Remove static file dependencies from GitHub and use text inside function
 (@DavisWeaver, #34)
+* Added an ellipsis argument to `biocExtract` for specifying the `names.field`
+in tabular data that will correspond to the row names of a
+`SummarizedExperiment`
 
 ## CHANGES IN VERSION 2.18.0
 

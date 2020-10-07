@@ -11,9 +11,11 @@ args$getUUIDs <- FALSE
 args <- args[-length(args)]
 args$dataset <- "ACC"
 
-accmini <- do.call(getFirehoseData, args)
+acc <- do.call(getFirehoseData, args)
+accmini <- acc
 
 accmini@RNASeq2GeneNorm[[1]]@DataMatrix <- head(acc@RNASeq2GeneNorm[[1]]@DataMatrix)
+accmini@RNASeq2Gene <- head(acc@RNASeq2Gene)
 accmini@miRNASeqGene <- head(acc@miRNASeqGene)
 accmini@CNASNP <- head(acc@CNASNP)
 accmini@CNVSNP <- head(acc@CNVSNP)
