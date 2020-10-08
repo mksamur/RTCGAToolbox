@@ -7,9 +7,10 @@
 \usage{
 biocExtract(
   object,
-  type = c("clinical", "RNASeqGene", "miRNASeqGene", "RNASeq2GeneNorm", "CNASNP",
-    "CNVSNP", "CNASeq", "CNACGH", "Methylation", "Mutation", "mRNAArray", "miRNAArray",
-    "RPPAArray", "GISTIC", "GISTICA", "GISTICT", "GISTICP")
+  type = c("clinical", "RNASeqGene", "RNASeq2Gene", "miRNASeqGene", "RNASeq2GeneNorm",
+    "CNASNP", "CNVSNP", "CNASeq", "CNACGH", "Methylation", "Mutation", "mRNAArray",
+    "miRNAArray", "RPPAArray", "GISTIC", "GISTICA", "GISTICT", "GISTICP"),
+  ...
 )
 }
 \arguments{
@@ -17,6 +18,11 @@ biocExtract(
 
 \item{type}{The type of data to extract from the "FirehoseData" object,
 see type section.}
+
+\item{...}{Additional arguments passed to lower level functions that
+convert tabular data into Bioconductor object such as
+\code{.makeRangedSummarizedExperimentFromDataFrame} or
+\code{.makeRaggedExperimentFromDataFrame}}
 }
 \value{
 Either an \linkS4class{SummarizedExperiment} object or a
@@ -33,35 +39,51 @@ functionality is provided with more control as part of the
 \code{RaggedExperiment} features. See
 \code{\link[RaggedExperiment]{RaggedExperiment-class}} for more details.
 }
+\details{
+A typical additional argument for this function passed down to
+lower level functions is the \code{names.field} which indicates the row names
+in the data. By default, it is the "Hugo_Symbol" column in the internal
+code that converts \code{data.frame}s to \code{SummarizedExperiment} representations
+(via the \code{.makeSummarizedExperimentFromDataFrame} internal function).
+}
 \section{type}{
 
 Choices include:
 \itemize{
-    \item{clinical} - Get the clinical data slot
-    \item{RNASeqGene} - RNASeqGene
-    \item{RNASeq2GeneNorm} - Normalized
-    \item{miRNASeqGene} - micro RNA SeqGene
-    \item{CNASNP} - Copy Number Alteration
-    \item{CNVSNP} - Copy Number Variation
-    \item{CNASeq} - Copy Number Alteration
-    \item{CNACGH} - Copy Number Alteration
-    \item{Methylation} - Methylation
-    \item{mRNAArray} - Messenger RNA
-    \item{miRNAArray} - micro RNA
-    \item{RPPAArray} - Reverse Phase Protein Array
-    \item{Mutation} - Mutations
-    \item{GISTICA} - GISTIC v2 ('AllByGene' only)
-    \item{GISTICT} - GISTIC v2 ('ThresholdedByGene' only)
-    \item{GISTICP} - GISTIC v2 ('Peaks' only)
-    \item{GISTIC} - GISTIC v2 scores, probabilities, and peaks
+\item{clinical} - Get the clinical data slot
+\item{RNASeqGene} - RNASeqGene - RNASeq v1
+\item{RNASeqGene} - RNASeq2Gene - RNASeq v2
+\item{RNASeq2GeneNorm} - RNASeq v2 Normalized
+\item{miRNASeqGene} - micro RNA SeqGene
+\item{CNASNP} - Copy Number Alteration
+\item{CNVSNP} - Copy Number Variation
+\item{CNASeq} - Copy Number Alteration
+\item{CNACGH} - Copy Number Alteration
+\item{Methylation} - Methylation
+\item{mRNAArray} - Messenger RNA
+\item{miRNAArray} - micro RNA
+\item{RPPAArray} - Reverse Phase Protein Array
+\item{Mutation} - Mutations
+\item{GISTICA} - GISTIC v2 ('AllByGene' only)
+\item{GISTICT} - GISTIC v2 ('ThresholdedByGene' only)
+\item{GISTICP} - GISTIC v2 ('Peaks' only)
+\item{GISTIC} - GISTIC v2 scores, probabilities, and peaks
 }
 }
 
 \examples{
-\dontrun{
-    coadmut <- getFirehoseData("COAD", Mutation = TRUE)
-    biocExtract(coadmut, "Mutation")
-}
+
+data(accmini)
+biocExtract(accmini, "RNASeq2Gene")
+biocExtract(accmini, "miRNASeqGene")
+biocExtract(accmini, "RNASeq2GeneNorm")
+biocExtract(accmini, "CNASNP")
+biocExtract(accmini, "CNVSNP")
+biocExtract(accmini, "Methylation")
+biocExtract(accmini, "Mutation")
+biocExtract(accmini, "RPPAArray")
+biocExtract(accmini, "GISTIC")
+
 }
 \author{
 Marcel Ramos \email{marcel.ramos@roswellpark.org}

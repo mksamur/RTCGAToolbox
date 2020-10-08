@@ -209,11 +209,35 @@
     })
 }
 
-.setAnnoRows <- function(df, rowAnnotation = "Hugo_Symbol") {
-    annoName <- .findCol(df, rowAnnotation)
-    annos <- df[[annoName]]
-    if (identical(length(annos), length(unique(annos))))
+.findUniqueAnnoCol <-
+    function(df, annoCol = c("Hugo_Symbol", "Entrez_Gene_Id"))
+{
+    resname <- unlist(lapply(annoCol, function(anno) {
+        annoName <- .findCol(df, anno)
+        if (!length(annoName)) {
+            character(0L)
+        } else {
+            annos <- df[[annoName]]
+            if (identical(length(annos), length(unique(annos))))
+                annoName
+            else
+                character(0L)
+        }
+    }))
+    resname <- Filter(nchar, resname)
+    if (length(resname) > 1L)
+        resname[[1L]]
+    else
+        resname
+}
+
+.setAnnoRows <- function(df, rowAnnotation = c("Hugo_Symbol", "Entrez_Gene_Id"))
+{
+    annoName <- .findUniqueAnnoCol(df, rowAnnotation)
+    if (length(annoName)) {
+        annos <- df[[annoName]]
         rownames(df) <- annos
+    }
     df
 }
 
@@ -280,11 +304,18 @@
     if (is.na(primary)) {
         return(FALSE)
     }
-    if (is(object, "DataFrame"))
-        asListData <- S4Vectors::splitAsList(object, object[[primary]])
+    ansRanges <- .ansRangeNames(object)
+    # check if all ranges are of the same length
+    grl <- do.call(makeGRangesListFromDataFrame,
+        c(list(df = object, split.field = primary), ansRanges))
+    uniranges <- S4Vectors::isSingleInteger(unique(lengths(grl)))
+    # then check if all ranges have same values
+    if (!uniranges)
+        return(FALSE)
     else
-        asListData <- base::split(object, object[[primary]])
-    S4Vectors::isSingleInteger(unique( vapply(asListData, nrow, integer(1L)) ))
+        all(vapply(grl[-1L], function(gr)
+            S4Vectors::setequal(gr, grl[[1L]]), logical(1L))
+        )
 }
 
 .hasRangeNames <- function(x) {
@@ -327,8 +358,7 @@
     args <- list(...)
     names.field <- args[["names.field"]]
     if (is.null(names.field) || !length(names.field)) {
-        if (.hasInfo(df, "Hugo_Symbol"))
-            df <- .setAnnoRows(df)
+        df <- .setAnnoRows(df)
     } else {
         rownames(df) <- rowData[[names.field]]
     }
@@ -347,9 +377,12 @@
     args <- list(...)
     build <- args[["build"]]
     names.field <- args[["names.field"]]
-    metadat <- metadata(df)
-    if (!.hasConsistentRanges(df))
-        stop("All ranges must be equal in number by 'split.field'")
+    if (is.null(names.field) || !length(names.field)) {
+        df <- .setAnnoRows(df)
+    } else {
+        rownames(df) <- df[[names.field]]
+    }
+    metadat <- if (is(df, "DataFrame")) metadata(df) else list()
     split.field <- .findSampleCol(df)
     ansRanges <- .ansRangeNames(df)
     strictRanges <- Filter(function(x) !is.logical(x), ansRanges)
@@ -363,15 +396,18 @@
         numInfo <- base::split(numInfo, df[[split.field]])
     countList <- vector(mode = "list", length = numAssays)
     for (i in seq_len(numAssays)) {
-        countList[[i]] <- do.call(cbind, lapply(numInfo,
-            function(smalldf) { smalldf[[i]] }))
+        countList[[i]] <- do.call(cbind, lapply(numInfo, `[[`, i))
     }
     names(countList) <- nameAssays
-    rowRanges <- makeGRangesListFromDataFrame(df[, unlist(RangeInfo)],
-        split.field = split.field, names.field = names.field)
-    GenomeInfoDb::genome(rowRanges) <- build
+    rowRanges <- do.call(makeGRangesListFromDataFrame,
+        c(list(df = df[, unlist(RangeInfo)], split.field = split.field,
+            names.field = names.field), ansRanges)
+    )
+    if (!is.null(build))
+        GenomeInfoDb::genome(rowRanges) <- build
+    ## All row ranges the same, take first one
     newSE <- SummarizedExperiment(assays = SimpleList(countList),
-        rowRanges = rowRanges)
+        rowRanges = rowRanges[[1L]])
     metadata(newSE) <- metadat
     return(newSE)
 }
@@ -387,13 +423,12 @@
     args <- list(...)
     build <- args[["build"]]
     names.field <- args[["names.field"]]
+    if (is.null(names.field) || !length(names.field))
+        df <- .setAnnoRows(df)
     metadat <- if (is(df, "DataFrame")) { metadata(df) } else { list() }
     split.field <- args[["split.field"]]
     if (is.null(split.field))
         split.field <- .findSampleCol(df)
-    rowanno <- args[["rowanno"]]
-    if (is.null(rowanno))
-        rowanno <- "Hugo_Symbol"
 
     ansRanges <- .ansRangeNames(df)
     rangeInfo <- c(ansRanges, list(split.field = split.field,
@@ -405,12 +440,11 @@
     dropIdx <- .omitAdditionalIdx(df, ansRanges)
     if (length(dropIdx))
         df <- df[, -dropIdx]
-    if (.hasInfo(df, rowanno))
-        df <- .setAnnoRows(df)
 
     newGRL <- do.call(makeGRangesListFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), rangeInfo))
-    GenomeInfoDb::genome(newGRL) <- build
+    if (!is.null(build))
+        GenomeInfoDb::genome(newGRL) <- build
     newRE <- RaggedExperiment::RaggedExperiment(newGRL)
     metadata(newRE) <- metadat
     return(newRE)
@@ -432,11 +466,11 @@
     dropIdx <- .omitAdditionalIdx(df, ansRanges)
     if (length(dropIdx))
         df <- df[, -dropIdx]
-    if (.hasInfo(df, "Hugo_Symbol"))
-        df <- .setAnnoRows(df)
+    df <- .setAnnoRows(df)
     newgr <- do.call(GenomicRanges::makeGRangesFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), ansRanges))
-    GenomeInfoDb::genome(newgr) <- if (is.null(build)) NA else build
+    if (!is.null(build))
+        GenomeInfoDb::genome(newgr) <- build
     metadata(newgr) <- metadat
     return(newgr)
 }

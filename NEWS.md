@@ -20,6 +20,9 @@ best be in another package.
 (@DavisWeaver, #34)
 * Added default values to helper for making `SummarizedExperiment` datasets
 * Coerce sample names to character when in (rare) case they're numeric
+* Added an ellipsis argument to `biocExtract` for specifying the `names.field`
+in tabular data that will correspond to the row names of a
+`SummarizedExperiment`
 
 ## CHANGES IN VERSION 2.18.0
 
