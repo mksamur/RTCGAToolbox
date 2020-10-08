@@ -146,7 +146,7 @@ biocExtract <- function(object, type = c("clinical", "RNASeqGene",
                 build = build)
         else
             object <- .makeRaggedExperimentFromDataFrame(
-                object, split.field = split.field, ...)
+                object, split.field = split.field, build = build, ...)
     }
     object
 }

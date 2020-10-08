@@ -403,7 +403,8 @@
         c(list(df = df[, unlist(RangeInfo)], split.field = split.field,
             names.field = names.field), ansRanges)
     )
-    GenomeInfoDb::genome(rowRanges) <- build
+    if (!is.null(build))
+        GenomeInfoDb::genome(rowRanges) <- build
     ## All row ranges the same, take first one
     newSE <- SummarizedExperiment(assays = SimpleList(countList),
         rowRanges = rowRanges[[1L]])
@@ -442,7 +443,8 @@
 
     newGRL <- do.call(makeGRangesListFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), rangeInfo))
-    GenomeInfoDb::genome(newGRL) <- build
+    if (!is.null(build))
+        GenomeInfoDb::genome(newGRL) <- build
     newRE <- RaggedExperiment::RaggedExperiment(newGRL)
     metadata(newRE) <- metadat
     return(newRE)
@@ -467,7 +469,8 @@
     df <- .setAnnoRows(df)
     newgr <- do.call(GenomicRanges::makeGRangesFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), ansRanges))
-    GenomeInfoDb::genome(newgr) <- build
+    if (!is.null(build))
+        GenomeInfoDb::genome(newgr) <- build
     metadata(newgr) <- metadat
     return(newgr)
 }
