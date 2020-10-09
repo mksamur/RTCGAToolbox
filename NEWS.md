@@ -13,6 +13,7 @@ requested
 update these functions in a way that would benefit users. A transfer of
 responsibility would be required for these functions to remain. The would
 best be in another package.
+* Vignettes are updated to reflect changes in the codebase.
 
 ### Bug fixes and minor improvements
 
