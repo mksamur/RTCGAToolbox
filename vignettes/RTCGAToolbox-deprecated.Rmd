@@ -81,7 +81,7 @@ references:
     year: 2014
 
 vignette: >
-  %\VignetteIndexEntry{RTCGAToolbox Tutorial}
+  %\VignetteIndexEntry{RTCGAToolbox Deprecated Functions}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
