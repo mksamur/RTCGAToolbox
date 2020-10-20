@@ -11,16 +11,18 @@ requested
 * Newly deprecated functions: `getDiffExpressedGenes`, `getCNGECorrelation`,
 `getSurvival` and `getReport`. It is no longer possible for the maintainer to
 update these functions in a way that would benefit users. A transfer of
-responsibility would be required for these functions to remain. The would
-best be in another package.
+responsibility would be required, i.e. to another package.
 * Vignettes are updated to reflect changes in the codebase.
 
 ### Bug fixes and minor improvements
 
+* Improvements to internal functions for converting tabular data to
+Bioconductor classes
+* Missing (NA) `seqnames` are removed when converting to `RaggedExperiment`
 * Remove static file dependencies from GitHub and use text inside function
 (@DavisWeaver, #34)
 * Added default values to helper for making `SummarizedExperiment` datasets
-* Coerce sample names to character when in (rare) case they're numeric
+* Coerce sample names to character when in (the rare) case they're numeric
 * Added an ellipsis argument to `biocExtract` for specifying the `names.field`
 in tabular data that will correspond to the row names of a
 `SummarizedExperiment`
