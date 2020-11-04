@@ -514,8 +514,8 @@
     rangeNames <- Filter(function(x) !is.logical(x), rangeNames)
     rangeIdx <- match(rangeNames, names(object))
     omitAdditional <- c("seqnames", "seqname", "chromosome", "chrom",
-                        "chromosome_name", "ranges", "seqlevels", "seqlengths", "seq_id",
-                        "iscircular", "start", "end", "strand", "width", "element", "chr")
+        "chromosome_name", "ranges", "seqlevels", "seqlengths", "seq_id",
+        "iscircular", "start", "end", "strand", "width", "element", "chr")
     rmIdx <- which(tolower(names(object)) %in% omitAdditional)
     setdiff(rmIdx, rangeIdx)
 }
