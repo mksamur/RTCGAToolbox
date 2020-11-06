@@ -539,7 +539,10 @@
     .runOnDupElements(x, function(dup, ...) {
         nrows <- vapply(dup, nrow, integer(1L))
         if (length(unique(nrows)) == 1L) {
-            meta <- as.list(do.call(rbind.data.frame, lapply(dup, metadata)))
+            mets <- lapply(dup, metadata)
+            meta <- split(
+                unlist(mets, use.names = FALSE), names(unlist(unname(mets)))
+            )
             dup <- do.call(cbind, unname(dup))
             metadata(dup) <- meta
         }
