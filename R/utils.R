@@ -165,7 +165,9 @@
             platNames <- vapply(x, function(y) {
                 metadata(y)[["platform"]] }, character(1L))
             platNames <- gsub("human|hum|agilent", "", platNames)
-            names(x) <- make.unique(platNames, sep = "_")
+            if (anyDuplicated(platNames))
+                x <- .mergePlatforms(setNames(x, platNames))
+            names(x) <- make.unique(names(x), sep = "_")
         } else if (length(x) == 1L) { x <- x[[1L]] }
     }
     return(x)
@@ -518,6 +520,31 @@
         "iscircular", "start", "end", "strand", "width", "element", "chr")
     rmIdx <- which(tolower(names(object)) %in% omitAdditional)
     setdiff(rmIdx, rangeIdx)
+}
+
+.runOnDupElements <- function(vect, FUN, ...) {
+    vnames <- names(vect)
+    uvect <- unique(vnames)
+    dups <- setNames(nm = vnames[duplicated(vnames)])
+    nonDups <- !vnames %in% dups
+    cdups <- vector("list", length(dups))
+    for (d in dups) {
+        cdups[[d]] <- FUN(vect[vnames %in% d], ...)
+    }
+    res <- c(cdups[dups], vect[nonDups])
+    res[order(match(names(res), uvect))]
+}
+
+.mergePlatforms <- function(x) {
+    .runOnDupElements(x, function(dup, ...) {
+        nrows <- vapply(dup, nrow, integer(1L))
+        if (length(unique(nrows)) == 1L) {
+            meta <- as.list(do.call(rbind.data.frame, lapply(dup, metadata)))
+            dup <- do.call(cbind, unname(dup))
+            metadata(dup) <- meta
+        }
+        dup
+    })
 }
 
 ## Genome build from FILENAME
