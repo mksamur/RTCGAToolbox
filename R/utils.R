@@ -165,8 +165,9 @@
             platNames <- vapply(x, function(y) {
                 metadata(y)[["platform"]] }, character(1L))
             platNames <- gsub("human|hum|agilent", "", platNames)
+            names(x) <- platNames
             if (anyDuplicated(platNames))
-                x <- .mergePlatforms(setNames(x, platNames))
+                x <- .mergePlatforms(x)
             names(x) <- make.unique(names(x), sep = "_")
         } else if (length(x) == 1L) { x <- x[[1L]] }
     }
