@@ -526,7 +526,7 @@
 .runOnDupElements <- function(vect, FUN, ...) {
     vnames <- names(vect)
     uvect <- unique(vnames)
-    dups <- setNames(nm = vnames[duplicated(vnames)])
+    dups <- stats::setNames(nm = vnames[duplicated(vnames)])
     nonDups <- !vnames %in% dups
     cdups <- vector("list", length(dups))
     for (d in dups) {
