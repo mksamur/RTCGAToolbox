@@ -133,6 +133,11 @@ biocExtract <- function(object, type = c("clinical", "RNASeqGene",
     } else {
         object <- .standardizeBC(object)
         metadat <- metadata(object)
+        object <- tryCatch({
+            data.matrix(object)
+        }, error = function(e) {
+            object
+        })
         object <- SummarizedExperiment(assays = SimpleList(object))
         metadata(object) <- metadat
     }

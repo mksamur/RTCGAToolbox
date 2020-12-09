@@ -165,7 +165,10 @@
             platNames <- vapply(x, function(y) {
                 metadata(y)[["platform"]] }, character(1L))
             platNames <- gsub("human|hum|agilent", "", platNames)
-            names(x) <- make.unique(platNames, sep = "_")
+            names(x) <- platNames
+            if (anyDuplicated(platNames))
+                x <- .mergePlatforms(x)
+            names(x) <- make.unique(names(x), sep = "_")
         } else if (length(x) == 1L) { x <- x[[1L]] }
     }
     return(x)
@@ -306,7 +309,7 @@
     }
     ansRanges <- .ansRangeNames(object)
     # check if all ranges are of the same length
-    grl <- do.call(makeGRangesListFromDataFrame,
+    grl <- do.call(.makeGRangesListFromDataFrame,
         c(list(df = object, split.field = primary), ansRanges))
     uniranges <- S4Vectors::isSingleInteger(unique(lengths(grl)))
     # then check if all ranges have same values
@@ -399,7 +402,7 @@
         countList[[i]] <- do.call(cbind, lapply(numInfo, `[[`, i))
     }
     names(countList) <- nameAssays
-    rowRanges <- do.call(makeGRangesListFromDataFrame,
+    rowRanges <- do.call(.makeGRangesListFromDataFrame,
         c(list(df = df[, unlist(RangeInfo)], split.field = split.field,
             names.field = names.field), ansRanges)
     )
@@ -441,7 +444,7 @@
     if (length(dropIdx))
         df <- df[, -dropIdx]
 
-    newGRL <- do.call(makeGRangesListFromDataFrame,
+    newGRL <- do.call(.makeGRangesListFromDataFrame,
         args = c(list(df = df, keep.extra.columns = TRUE), rangeInfo))
     if (!is.null(build))
         GenomeInfoDb::genome(newGRL) <- build
@@ -475,14 +478,77 @@
     return(newgr)
 }
 
+## replacing .makeGRangesFromDataFrame in GenomicRanges
+.makeGRangesListFromDataFrame <-
+    function(df, split.field = NULL, names.field = NULL, ...)
+{
+    splitIdx <- namesIdx <- integer()
+    if (!is.null(split.field)) {
+        if (!isSingleString(split.field))
+            stop("'split.field' must be a single string")
+        splitIdx <- which(names(df) %in% split.field)
+        if (!length(splitIdx))
+            stop("'split.field' is not in 'names(df)'")
+        if (length(splitIdx) > 1L)
+            stop("'split.field' matched more than one 'names(df)'")
+        splitField <- df[[split.field]]
+    }
+    else splitField <- seq_len(nrow(df))
+    if (!is.null(names.field)) {
+        if (!isSingleString(names.field))
+            stop("'names.field' must be a single string")
+        namesIdx <- which(names(df) %in% names.field)
+        if (!length(namesIdx))
+            stop("'names.field' is not found in 'names(df)'")
+        if (length(namesIdx) > 1L)
+            stop("'names.field' matched more than one 'names(df)'")
+        namesField <- df[[names.field]]
+    }
+    else namesField <- NULL
+    if (length(c(splitIdx, namesIdx)))
+        df <- df[, -c(splitIdx, namesIdx)]
+    gr <- .makeGRangesFromDataFrame(df, ...)
+    names(gr) <- namesField
+    S4Vectors::split(gr, splitField)
+}
+
+
 .omitAdditionalIdx <- function(object, rangeNames) {
     rangeNames <- Filter(function(x) !is.logical(x), rangeNames)
     rangeIdx <- match(rangeNames, names(object))
     omitAdditional <- c("seqnames", "seqname", "chromosome", "chrom",
-                        "chromosome_name", "ranges", "seqlevels", "seqlengths", "seq_id",
-                        "iscircular", "start", "end", "strand", "width", "element", "chr")
+        "chromosome_name", "ranges", "seqlevels", "seqlengths", "seq_id",
+        "iscircular", "start", "end", "strand", "width", "element", "chr")
     rmIdx <- which(tolower(names(object)) %in% omitAdditional)
     setdiff(rmIdx, rangeIdx)
+}
+
+.runOnDupElements <- function(vect, FUN, ...) {
+    vnames <- names(vect)
+    uvect <- unique(vnames)
+    dups <- setNames(nm = vnames[duplicated(vnames)])
+    nonDups <- !vnames %in% dups
+    cdups <- vector("list", length(dups))
+    for (d in dups) {
+        cdups[[d]] <- FUN(vect[vnames %in% d], ...)
+    }
+    res <- c(cdups[dups], vect[nonDups])
+    res[order(match(names(res), uvect))]
+}
+
+.mergePlatforms <- function(x) {
+    .runOnDupElements(x, function(dup, ...) {
+        nrows <- vapply(dup, nrow, integer(1L))
+        if (length(unique(nrows)) == 1L) {
+            mets <- lapply(dup, metadata)
+            meta <- split(
+                unlist(mets, use.names = FALSE), names(unlist(unname(mets)))
+            )
+            dup <- do.call(cbind, unname(dup))
+            metadata(dup) <- meta
+        }
+        dup
+    })
 }
 
 ## Genome build from FILENAME
