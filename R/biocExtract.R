@@ -102,11 +102,17 @@ biocExtract <- function(object, type = c("clinical", "RNASeqGene",
             GISTICP = "Peaks",
             GISTIC = c("AllByGene", "ThresholdedByGene", "Peaks")
         )
-        result <- if (type == "GISTIC") {
+        result <-
+        if (type == "GISTIC") {
             names(slotreq) <- slotreq
             Filter(length,
-                lapply(slotreq, function (x) { .getGISTIC(object, x) }))
-        } else { .getGISTIC(object, slotreq) }
+                lapply(slotreq, function (x) {
+                    makeSummarizedExperimentFromGISTIC(object, x)
+                })
+            )
+        } else {
+            makeSummarizedExperimentFromGISTIC(object, slotreq)
+        }
         if (length(result) == 1L)
             result <- result[[1L]]
         return(result)

@@ -71,5 +71,6 @@ Collate:
     'getMutationRate.R'
     'getReport.R'
     'getSurvival.R'
+    'makeSummarizedExperimentFromGISTIC.R'
     'selectType.R'
 Encoding: UTF-8

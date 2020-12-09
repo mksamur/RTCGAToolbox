@@ -28,5 +28,6 @@ console ('show' method).
 data(accmini)
 getData(accmini, "clinical")
 getData(accmini, "RNASeq2GeneNorm")
+getData(accmini, "Methylation", 1)[1:4]
 
 }

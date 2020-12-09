@@ -31,7 +31,7 @@ getGISTICPeaks <-
         object,  peak = c("wide", "narrow", "full"), rm.chrX = TRUE
     )
 {
-    stopifnot(is(object, "FirehoseData"), is(object@GISTIC, "FirehoseGISTIC"))
+    stopifnot(is(object, "FirehoseData") || is(object, "FirehoseGISTIC"))
 
     gistic <- getData(object, "GISTIC", "Peaks")
 

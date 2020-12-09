@@ -1,6 +1,6 @@
 #' @importFrom GenomicRanges makeGRangesListFromDataFrame makeGRangesFromDataFrame
 #' @importFrom SummarizedExperiment SummarizedExperiment
-#' makeSummarizedExperimentFromDataFrame
+#' makeSummarizedExperimentFromDataFrame rowData<-
 #' @importFrom DelayedArray DelayedArray
 #' @importFrom RaggedExperiment RaggedExperiment
 #' @importFrom S4Vectors SimpleList metadata metadata<- DataFrame mcols mcols<- splitAsList

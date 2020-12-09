@@ -5,6 +5,8 @@
 \alias{FirehoseData-class}
 \alias{show,FirehoseData-method}
 \alias{getData,FirehoseData-method}
+\alias{getData,FirehoseGISTIC-method}
+\alias{getData,ANY-method}
 \alias{updateObject,FirehoseData-method}
 \alias{selectType,FirehoseData-method}
 \title{An S4 class to store main data object from clinent function.}
@@ -12,6 +14,10 @@
 \S4method{show}{FirehoseData}(object)
 
 \S4method{getData}{FirehoseData}(object, type, platform)
+
+\S4method{getData}{FirehoseGISTIC}(object, type, platform)
+
+\S4method{getData}{ANY}(object, type, platform)
 
 \S4method{updateObject}{FirehoseData}(object, ..., verbose = FALSE)
 
@@ -24,7 +30,7 @@
 
 \item{platform}{An index for data types that may come from multiple
 platforms (such as mRNAArray), for GISTIC data, one of the options:
-'AllByGene' or 'ThresholdedByGene'}
+'AllByGene', 'ThresholdedByGene', or 'Peaks'}
 
 \item{...}{additional arguments for updateObject}
 
@@ -40,6 +46,11 @@ An S4 class to store main data object from clinent function.
 \item \code{show}: show method
 
 \item \code{getData}: Get a matrix or data.frame from \code{FirehoseData}
+
+\item \code{getData}: Get GISTIC data from \code{FirehoseData}
+
+\item \code{getData}: Default method for getting data from
+\code{FirehoseData}
 
 \item \code{updateObject}: Update an old RTCGAToolbox FirehoseData object to
 the most recent API

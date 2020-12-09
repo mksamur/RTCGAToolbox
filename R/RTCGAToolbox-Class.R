@@ -1,23 +1,17 @@
 .getListData <- function(object, platform) {
-    if (is.null(platform)) { stop("Please set platform") }
-    switch(class(platform),
-        "numeric" = {
-            if (platform > length(object)) {
-                message("Accessible platforms:")
-                for (i in seq_along(object)) {
-                    message(paste0("#",i," :",object[[i]]@Filename))
-                }
-                stop("Invalid list member")
-            }
-            invisible(object[[platform]]@DataMatrix)
-        }, {
-            message("Accessible platforms:")
-            for (i in seq_along(object)) {
-                message(paste0("#",i," :",object[[i]]@Filename))
-            }
-            stop("Set a valid platfrom")
+    stopifnot(length(platform) == 1L, !is.na(platform), !is.null(platform))
+    if (!length(object))
+        stop("No data available in platform")
+    if (!is.numeric(platform) || platform > length(object)) {
+        for (i in seq_along(object)) {
+            message("Accessible platforms:\n",
+                paste0("[",i,"] ",object[[i]]@Filename)
+            )
         }
-    )
+        stop("Provide a valid 'platform' index")
+    } else {
+        invisible(object[[platform]]@DataMatrix)
+    }
 }
 
 #' An S4 class to store data from CGA platforms
@@ -27,6 +21,7 @@
 #' @exportClass FirehoseCGHArray
 setClass("FirehoseCGHArray", representation(Filename = "character",
     DataMatrix = "data.frame"))
+
 setMethod("show", "FirehoseCGHArray",function(object) {
     message(paste0("Platform:", object@Filename))
     if (dim(object@DataMatrix)[1] > 0 ) {
@@ -130,7 +125,7 @@ setClass("FirehoseData", representation(Dataset = "character",
 #' @describeIn FirehoseData show method
 #' @param object A FirehoseData object
 setMethod("show", "FirehoseData",function(object) {
-    if (.hasOldAPI(object) || .hasOldGISTIC(selectType(object, "GISTIC"))) {
+    if (.hasOldAPI(object) || .hasOldGISTIC(getElement(object, "GISTIC"))) {
         object <- updateObject(object)
     warning("'FirehoseData' object is outdated, please run 'updateObject()'")
     }
@@ -200,6 +195,7 @@ setMethod("show", "FirehoseData",function(object) {
 #' data(accmini)
 #' getData(accmini, "clinical")
 #' getData(accmini, "RNASeq2GeneNorm")
+#' getData(accmini, "Methylation", 1)[1:4]
 #'
 #' @return Returns matrix or data.frame depending on data type
 setGeneric("getData", function(object, type, platform) {
@@ -210,28 +206,38 @@ setGeneric("getData", function(object, type, platform) {
 #' @param type A data type to be extracted
 #' @param platform An index for data types that may come from multiple
 #' platforms (such as mRNAArray), for GISTIC data, one of the options:
-#' 'AllByGene' or 'ThresholdedByGene'
+#' 'AllByGene', 'ThresholdedByGene', or 'Peaks'
+#' @importFrom methods callNextMethod
 #' @exportMethod getData
-setMethod("getData", "FirehoseData",
-    function(object, type, platform) {
-        withPlat <- c("CNACGH", "mRNAArray", "Methylation", "miRNAArray",
-            "RPPAArray")
-        if (missing(type))
-            stop("Enter a data type")
-        if (type %in% withPlat) {
-            res <- .getListData(getElement(object, type), platform)
-        } else if (identical(type, "GISTIC")) {
-            if (!platform %in% c("ThresholdedByGene", "AllByGene", "Peaks") ||
-                !S4Vectors::isSingleString(platform))
-        stop("GISTIC platforms available:\n",
-             "\t'AllByGene', 'ThresholdedByGene', & 'Peaks'")
-            res <-  getElement(selectType(object, "GISTIC"), platform)
-        } else {
-            res <- selectType(object, type)
-        }
+setMethod("getData", "FirehoseData", function(object, type, platform) {
+    withPlat <- c("CNACGH", "mRNAArray", "Methylation", "miRNAArray",
+        "RPPAArray")
+    stopifnot(!missing(type), length(type) == 1L, !is.na(type))
+    if (type %in% withPlat) {
+        res <- .getListData(getElement(object, type), platform)
         if (!length(res))
             stop("No data available for that type")
         res
+    } else if (identical(type, "GISTIC")) {
+        getData(getElement(object, "GISTIC"), type, platform)
+    } else {
+        callNextMethod()
+    }
+})
+
+#' @describeIn FirehoseData Get GISTIC data from \code{FirehoseData}
+setMethod("getData", "FirehoseGISTIC", function(object, type, platform) {
+    if (!platform %in% c("ThresholdedByGene", "AllByGene", "Peaks") ||
+        !S4Vectors::isSingleString(platform))
+        stop("GISTIC platforms available:\n",
+             "\t'AllByGene', 'ThresholdedByGene', & 'Peaks'")
+    callNextMethod(object, type = platform)
+})
+
+#' @describeIn FirehoseData Default method for getting data from
+#' \code{FirehoseData}
+setMethod("getData", "ANY", function(object, type, platform) {
+    getElement(object, type)
 })
 
 #' An S4 class to store differential gene expression results
@@ -314,7 +320,7 @@ setMethod("updateObject", "FirehoseData",
     if (verbose)
         message("updateObject(object = 'FirehoseData')")
     oldAPI <- .hasOldAPI(object)
-    oldGISTIC <- .hasOldGISTIC(selectType(object, "GISTIC"))
+    oldGISTIC <- .hasOldGISTIC(getElement(object, "GISTIC"))
     if (oldAPI) {
     object <- new(class(object), Dataset = object@Dataset,
         runDate = NA_character_, gistic2Date = NA_character_,
@@ -334,7 +340,7 @@ setMethod("updateObject", "FirehoseData",
         GISTIC = object@GISTIC, BarcodeUUID = object@BarcodeUUID)
     }
     if (oldGISTIC) {
-       object@GISTIC <- updateObject(selectType(object, "GISTIC"))
+       object@GISTIC <- updateObject(getElement(object, "GISTIC"))
     }
     return(object)
 })
