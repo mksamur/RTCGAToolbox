@@ -39,6 +39,7 @@ makeSummarizedExperimentFromGISTIC <- function(gistic, dataType, ...) {
                 rows <- rows[uniq]
                 rowdata <- rowdata[uniq, ]
                 gistData <- gistData[uniq, ]
+                gist <- gist[uniq, , drop = FALSE]
             }
             rownames(rowdata) <- rows
         }

@@ -107,7 +107,9 @@ biocExtract <- function(object, type = c("clinical", "RNASeqGene",
             names(slotreq) <- slotreq
             Filter(length,
                 lapply(slotreq, function (x) {
-                    makeSummarizedExperimentFromGISTIC(object, x)
+                    makeSummarizedExperimentFromGISTIC(
+                        gistic = object, dataType = x
+                    )
                 })
             )
         } else {
