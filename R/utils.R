@@ -454,10 +454,14 @@
 }
 
 .rmNAse <- function(x, ansranges) {
+    naRanges <- .missingRanges(x, ansranges)
+    x[!naRanges, ]
+}
+
+.missingRanges <- function(x, ansranges) {
     startf <- ansranges[["start.field"]]
     endf <- ansranges[["end.field"]]
-    naRanges <- is.na(x[[startf]]) | is.na(x[[endf]])
-    x[!naRanges, ]
+    is.na(x[[startf]]) | is.na(x[[endf]])
 }
 
 .makeGRangesFromDataFrame <- function(df, ...) {
@@ -507,6 +511,12 @@
     else namesField <- NULL
     if (length(c(splitIdx, namesIdx)))
         df <- df[, -c(splitIdx, namesIdx)]
+
+    ansRanges <- .ansRangeNames(df)
+    NAranges <- .missingRanges(df, ansRanges)
+    df <- df[!NAranges, ]
+    splitField <- splitField[!NAranges]
+
     gr <- .makeGRangesFromDataFrame(df, ...)
     names(gr) <- namesField
     S4Vectors::split(gr, splitField)
