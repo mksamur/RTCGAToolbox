@@ -1,3 +1,17 @@
+## CHANGES IN VERSION 2.22.0
+
+### New features
+
+* `makeSummarizedExperimentFromGISTIC` transferred from `TCGAutils`
+
+### Bug fixes and minor improvements
+
+* `biocExtract` now merges datasets from the same platforms
+* Re-worked and simplified `getData` method for `FirehoseData` and
+`FirehoseGISTIC`
+* Remove missing ranges when creating `GRanges` and `GRangesList` from
+`DataFrame`
+
 ## CHANGES IN VERSION 2.20.0
 
 ### New features
