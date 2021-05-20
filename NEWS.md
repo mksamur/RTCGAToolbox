@@ -1,4 +1,4 @@
-## CHANGES IN VERSION 2.22.0
+## Changes in version 2.22.0
 
 ### New features
 
@@ -12,7 +12,7 @@
 * Remove missing ranges when creating `GRanges` and `GRangesList` from
 `DataFrame`
 
-## CHANGES IN VERSION 2.20.0
+## Changes in version 2.20.0
 
 ### New features
 
@@ -41,7 +41,7 @@ Bioconductor classes
 in tabular data that will correspond to the row names of a
 `SummarizedExperiment`
 
-## CHANGES IN VERSION 2.18.0
+## Changes in version 2.18.0
 
 ### New features
 
@@ -56,7 +56,7 @@ in tabular data that will correspond to the row names of a
 * Increase robustness of internal helper functions that work with strands
 * 'TCGA' sample column identification is less strict
 
-## CHANGES IN VERSION 2.16.0
+## Changes in version 2.16.0
 
 ### New features
 
@@ -75,7 +75,7 @@ locations
 * Check file sizes using `httr` instead of 'canevolve.org' query
 (@mksamur, #32)
 
-## CHANGES IN VERSION 2.14.0
+## Changes in version 2.14.0
 
 ### Bug fixes and minor improvements
 
@@ -84,7 +84,7 @@ locations
 * Helpers now correctly assign row names in presence of ranged data when
 using `biocExtract`
 
-## CHANGES IN VERSION 2.12.0
+## Changes in version 2.12.0
 
 ### New features
 
@@ -100,14 +100,14 @@ option
 * Functionality from the `TCGAutils` package is now employed such as
 `findGRangesCols` and `uniformBuilds`
 
-## CHANGES IN VERSION 2.9.41
+## Changes in version 2.9.41
 
 ### Bug fixes and minor improvements
 
 * Fixed bug where file rename was not working due to incorrect path location
 in `getFirehoseData`
 
-## CHANGES IN VERSION 2.9.40
+## Changes in version 2.9.40
 
 ### New features
 
@@ -118,7 +118,7 @@ Thanks to @lgeistlinger!
 * Numerous improvements to internal helpers
 * Added a `GISTIC` argument to `getFirehoseData`
 
-## CHANGES IN VERSION 2.7.44
+## Changes in version 2.7.44
 
 ### New features
 
@@ -132,14 +132,14 @@ Thanks to @lgeistlinger!
 * Added appropriate import directives
 * Re-organized documentation for readability
 
-## CHANGES IN VERSION 2.7.21
+## Changes in version 2.7.21
 
 ### New features
 
 * `biocExtract` function now available - convert data objects to Bioconductor
 friendly data classes
 
-## CHANGES IN VERSION 2.7.21
+## Changes in version 2.7.21
 
 ### New features
 
