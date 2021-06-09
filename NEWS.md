@@ -1,3 +1,10 @@
+## Changes in version 2.24.0
+
+### Bug fixes and minor improvements
+
+* The deprecated functionality vignette moved to the `vignettes/analysis/`
+folder
+
 ## Changes in version 2.22.0
 
 ### New features
