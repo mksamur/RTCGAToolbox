@@ -33,7 +33,7 @@ getFirehoseData(
 )
 }
 \arguments{
-\item{dataset}{A cohort name. TCGA cancer code obtained via \code{\link{getFirehoseDatasets}}}
+\item{dataset}{A cohort disease code. TCGA cancer codes can be obtained via \code{\link{getFirehoseDatasets}}}
 
 \item{runDate}{Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}}
 
@@ -104,5 +104,5 @@ RNASeqGene=TRUE,clinical=TRUE,mRNAArray=TRUE,Mutation=TRUE)
 }
 }
 \seealso{
-\link{getLinks}
+\link{getLinks}, \url{https://gdac.broadinstitute.org/}
 }

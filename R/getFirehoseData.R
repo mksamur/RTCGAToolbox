@@ -210,7 +210,7 @@
 #'
 #' This is a main client function to download data from Firehose TCGA portal.
 #'
-#' @param dataset A cohort name. TCGA cancer code obtained via \code{\link{getFirehoseDatasets}}
+#' @param dataset A cohort disease code. TCGA cancer codes can be obtained via \code{\link{getFirehoseDatasets}}
 #' @param runDate Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}
 #' @param gistic2Date Analysis run date for GISTIC obtained via \code{\link{getFirehoseAnalyzeDates}}
 #' @param RNASeqGene Logical (default FALSE) RNAseq TPM data.
@@ -239,7 +239,7 @@
 #'
 #' @return A \code{FirehoseData} data object that stores data for selected data types.
 #'
-#' @seealso \link{getLinks}
+#' @seealso \link{getLinks}, \url{https://gdac.broadinstitute.org/}
 #'
 #' @md
 #' @examples

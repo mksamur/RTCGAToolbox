@@ -1,10 +1,16 @@
-#' Get list of TCGA cohorts.
+#' Get a list of TCGA disease cohorts
 #'
-#' \code{getFirehoseDatasets} returns a character array for cohorts.
+#' \code{getFirehoseDatasets} returns a character vector of TCGA disease codes.
+#' A reference table can be seen at \url{https://gdac.broadinstitute.org/}.
+#'
+#' @seealso \url{https://gdac.broadinstitute.org/}
 #'
 #' @return A character string
+#'
 #' @examples
+#'
 #' getFirehoseDatasets()
+#'
 #' @export getFirehoseDatasets
 getFirehoseDatasets <- function() {
     c("ACC", "BLCA", "BRCA", "CESC", "CHOL", "COADREAD", "COAD",
