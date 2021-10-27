@@ -2,7 +2,7 @@
 % Please edit documentation in R/getFirehoseDatasets.R
 \name{getFirehoseDatasets}
 \alias{getFirehoseDatasets}
-\title{Get list of TCGA cohorts.}
+\title{Get a list of TCGA disease cohorts}
 \usage{
 getFirehoseDatasets()
 }
@@ -10,8 +10,14 @@ getFirehoseDatasets()
 A character string
 }
 \description{
-\code{getFirehoseDatasets} returns a character array for cohorts.
+\code{getFirehoseDatasets} returns a character vector of TCGA disease codes.
+A reference table can be seen at \url{https://gdac.broadinstitute.org/}.
 }
 \examples{
+
 getFirehoseDatasets()
+
+}
+\seealso{
+\url{https://gdac.broadinstitute.org/}
 }

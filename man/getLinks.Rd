@@ -25,7 +25,7 @@ getLinks(
 )
 }
 \arguments{
-\item{dataset}{A cohort name. TCGA cancer code obtained via \code{\link{getFirehoseDatasets}}}
+\item{dataset}{A cohort disease code. TCGA cancer codes can be obtained via \code{\link{getFirehoseDatasets}}}
 
 \item{data_date}{Either a runDate or analysisDate typically entered in
 `getFirehoseData`}
