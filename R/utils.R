@@ -326,7 +326,11 @@
     if (all(grepl("^TCGA", names(x)))) { return(FALSE) }
     if (!any(is.data.frame(x), is(x, "DataFrame"), is.matrix(x)))
         stop("(internal) 'x' must be rectangular")
-    !all(is.na(TCGAutils::findGRangesCols(names(x))))
+    res <- is.na(TCGAutils::findGRangesCols(names(x)))
+    if (any(res[c("seqnames", "start", "end")]))
+        FALSE
+    else
+        !all(res)
 }
 
 .samplesAsCols <- function(x, sampleNames = character(0L)) {
