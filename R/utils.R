@@ -369,6 +369,10 @@
     } else {
         rownames(df) <- rowData[[names.field]]
     }
+    ## Use "" instead of missing due to changes in SummarizedExperiment
+    ## constructor
+    if (any(is.na(rownames(df))))
+        rownames(df)[is.na(rownames(df))] <- ""
     if (length(rowData))
     object <- SummarizedExperiment(assays = SimpleList(df),
         rowData = rowData)
