@@ -6,7 +6,12 @@
 #' peak regions.
 #'
 #' @param gistic A \link[RTCGAToolbox]{FirehoseGISTIC-class} object
-#' @param dataType Either one of "ThresholdedByGene", "AllByGene", "Peaks"
+#' @param dataType character(1) One of "ThresholdedByGene" (default),
+#'   "AllByGene", or "Peaks"
+#' @param rownameCol character(1) The name of the column in the data to use as
+#'   rownames in the data matrix (default: 'Gene.Symbol'). The row names are
+#'   only set when the column name is found in the data and all values are
+#'   unique.
 #' @param ... Additional arguments passed to 'getGISTICPeaks'.
 #'
 #' @author L. Geistlinger, M. Ramos
@@ -19,7 +24,16 @@
 #'
 #' @return A \code{SummarizedExperiment} object
 #' @export
-makeSummarizedExperimentFromGISTIC <- function(gistic, dataType, ...) {
+makeSummarizedExperimentFromGISTIC <-
+    function(
+        gistic,
+        dataType = c("AllByGene", "ThresholdedByGene", "Peaks"),
+        rownameCol = "Gene.Symbol", ...
+    )
+{
+    if (!is(gistic, "FirehoseData"))
+        stop("'gistic' must be a 'FirehoseData' object")
+    dataType <- match.arg(dataType)
     if (identical(dataType, "Peaks")) {
         gist <- getGISTICPeaks(gistic, ...)
         if (!length(gist)) return(list())
@@ -58,6 +72,9 @@ makeSummarizedExperimentFromGISTIC <- function(gistic, dataType, ...) {
         rel.cols <- grepl("^TCGA", colnames(gist))
         gistData <- as.matrix(gist[, rel.cols])
         annoteRowDF <- gist[, !rel.cols, drop = FALSE]
+        anyduprows <- anyDuplicated(annoteRowDF[[rownameCol]])
+        if (rownameCol %in% names(annoteRowDF) && !anyduprows)
+            rownames(gistData) <- annoteRowDF[[rownameCol]]
         colnames(gistData) <- .stdIDs(colnames(gistData))
         gisticSE <- SummarizedExperiment(gistData, rowData = annoteRowDF)
     }

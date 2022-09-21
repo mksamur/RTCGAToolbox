@@ -25,13 +25,13 @@ An S4 class to store processed copy number data. (Data processed by using GISTIC
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{isEmpty}: check whether the FirehoseGISTIC object has
+\item \code{isEmpty(FirehoseGISTIC)}: check whether the FirehoseGISTIC object has
 data in it or not
 
-\item \code{updateObject}: Update an old FirehoseGISTIC object to
+\item \code{updateObject(FirehoseGISTIC)}: Update an old FirehoseGISTIC object to
 the most recent API
-}}
 
+}}
 \section{Slots}{
 
 \describe{

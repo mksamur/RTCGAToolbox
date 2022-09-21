@@ -43,21 +43,21 @@ An S4 class to store main data object from clinent function.
 }
 \section{Methods (by generic)}{
 \itemize{
-\item \code{show}: show method
+\item \code{show(FirehoseData)}: show method
 
-\item \code{getData}: Get a matrix or data.frame from \code{FirehoseData}
+\item \code{getData(FirehoseData)}: Get a matrix or data.frame from \code{FirehoseData}
 
-\item \code{getData}: Get GISTIC data from \code{FirehoseData}
+\item \code{getData(FirehoseGISTIC)}: Get GISTIC data from \code{FirehoseData}
 
-\item \code{getData}: Default method for getting data from
+\item \code{getData(ANY)}: Default method for getting data from
 \code{FirehoseData}
 
-\item \code{updateObject}: Update an old RTCGAToolbox FirehoseData object to
+\item \code{updateObject(FirehoseData)}: Update an old RTCGAToolbox FirehoseData object to
 the most recent API
 
-\item \code{selectType}: Extract data type
-}}
+\item \code{selectType(FirehoseData)}: Extract data type
 
+}}
 \section{Slots}{
 
 \describe{
