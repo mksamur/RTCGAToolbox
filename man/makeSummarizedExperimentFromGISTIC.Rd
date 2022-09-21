@@ -4,12 +4,23 @@
 \alias{makeSummarizedExperimentFromGISTIC}
 \title{Create a SummarizedExperiment from FireHose GISTIC}
 \usage{
-makeSummarizedExperimentFromGISTIC(gistic, dataType, ...)
+makeSummarizedExperimentFromGISTIC(
+  gistic,
+  dataType = c("AllByGene", "ThresholdedByGene", "Peaks"),
+  rownameCol = "Gene.Symbol",
+  ...
+)
 }
 \arguments{
 \item{gistic}{A \link[RTCGAToolbox]{FirehoseGISTIC-class} object}
 
-\item{dataType}{Either one of "ThresholdedByGene", "AllByGene", "Peaks"}
+\item{dataType}{character(1) One of "ThresholdedByGene" (default),
+"AllByGene", or "Peaks"}
+
+\item{rownameCol}{character(1) The name of the column in the data to use as
+rownames in the data matrix (default: 'Gene.Symbol'). The row names are
+only set when the column name is found in the data and all values are
+unique.}
 
 \item{...}{Additional arguments passed to 'getGISTICPeaks'.}
 }
