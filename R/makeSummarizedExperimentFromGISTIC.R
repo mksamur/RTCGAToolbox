@@ -31,8 +31,8 @@ makeSummarizedExperimentFromGISTIC <-
         rownameCol = "Gene.Symbol", ...
     )
 {
-    if (!is(gistic, "FirehoseData"))
-        stop("'gistic' must be a 'FirehoseData' object")
+    if (!is(gistic, "FirehoseData") && !is(gistic, "FirehoseGISTIC"))
+        stop("'gistic' must be a 'FirehoseData' or 'FirehoseGISTIC' object")
     dataType <- match.arg(dataType)
     if (identical(dataType, "Peaks")) {
         gist <- getGISTICPeaks(gistic, ...)
