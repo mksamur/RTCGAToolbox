@@ -118,7 +118,7 @@
     uuids = fromJSON(getURL(urlToGo, customrequest="POST",
                             httpheader=c("Content-Type: text/plain"),
                             postfields=searchBarcode))$uuidMapping
-    if (class(uuids)=="character") {
+    if (is.character(uuids)) {
       if (exists("convertTable")) {
         convertTable <- rbind(convertTable,c(uuids[1],uuids[2]))
       } else {
@@ -260,7 +260,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     RNAseq2Norm="normalized_count", forceDownload=FALSE, destdir=tempdir(),
     fileSizeLimit=500, getUUIDs=FALSE, ...) {
   #check input parameters
-  if (!class(dataset)=="character" || is.null(dataset) || !length(dataset) == 1 || nchar(dataset) < 2) {
+  if (!is.character(dataset) || is.null(dataset) || !length(dataset) == 1 || nchar(dataset) < 2) {
       stop('Please set "dataset" parameter! You should specify one dataset name. Ex: dataset="BRCA"...')
       }
   runDatasets <- getFirehoseDatasets()
@@ -268,7 +268,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
       stop('Please use valid dataset name! "getFirehoseDatasets" function gives you the vector of valid dataset names!')
       }
   if (!is.null(runDate)) {
-    if (!class(runDate)=="character" || !length(runDate) == 1 || !nchar(runDate) == 8) {
+    if (!is.character(runDate) || !length(runDate) == 1 || !nchar(runDate) == 8) {
         stop('Please set "runDate" parameter! You should specify one Firehose run date. Ex: runDate="20140416"...')
         }
     runDateList <- getFirehoseRunningDates()

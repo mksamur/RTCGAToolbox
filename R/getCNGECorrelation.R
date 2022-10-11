@@ -35,7 +35,7 @@ getCNGECorrelation <- function(dataObject,adj.method="BH",adj.pval=0.05,raw.pval
   .Deprecated(
     msg = "This function is no longer maintained and is being retired."
   )
-  if(is.null(dataObject) | class(dataObject) != "FirehoseData")
+  if(is.null(dataObject) | !is(dataObject, "FirehoseData"))
   {stop("Please set a valid object! dataObject must be set as FirehoseData class! ")}
   validMatrix <- character()
   #check expression data matrices

@@ -25,7 +25,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
     msg = "This function is no longer maintained and will be retired."
   )
   return(NULL)
-  if(is.null(dataObject) | class(dataObject) != "FirehoseData")
+  if(is.null(dataObject) | !is(dataObject, "FirehoseData"))
   {stop("Please set a valid object! dataObject must be set as FirehoseData class!")}
   validMatrix <- character()
   #check expression data matrices
@@ -33,7 +33,7 @@ getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor
   if(dim(dataObject@RNASeq2GeneNorm)[1] > 0 & dim(dataObject@RNASeq2GeneNorm)[2] > 0){validMatrix <- append(validMatrix,"RNASeq2")}
   if(length(dataObject@mRNAArray) > 0){validMatrix <- append(validMatrix,"mRNAArray")}
   if(length(validMatrix) == 0){stop("There is no valid expression data in the object!")}
-  if(class(numberofGroups)!="numeric"){stop("numberofGroups must be numeric!")}
+  if(!is.numeric(numberofGroups)){stop("numberofGroups must be numeric!")}
   if(as.integer(numberofGroups) < 2 | as.integer(numberofGroups) > 3){stop("numberofGroups must be 2 or 3!")}
   stcs <- as.character(sampleTimeCensor[,1])
   stcs <- gsub(pattern="\\.",replacement="-",stcs)

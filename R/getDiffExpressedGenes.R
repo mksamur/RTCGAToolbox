@@ -21,7 +21,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
   .Deprecated(
     msg = "This function is no longer maintained and will be retired."
   )
-  if(is.null(dataObject) | class(dataObject) != "FirehoseData")
+  if(is.null(dataObject) | !is(dataObject, "FirehoseData"))
   {stop("Please set a valid object! dataObject must be set as FirehoseData class!")}
   validMatrix <- character()
   #check expression data matrices
@@ -29,7 +29,7 @@ getDiffExpressedGenes <- function(dataObject,DrawPlots=TRUE,adj.method="BH",adj.
   if(dim(dataObject@RNASeq2GeneNorm)[1] > 0 & dim(dataObject@RNASeq2GeneNorm)[2] > 0){validMatrix <- append(validMatrix,"RNASeq2")}
   if(length(dataObject@mRNAArray) > 0){validMatrix <- append(validMatrix,"mRNAArray")}
   if(length(validMatrix) == 0){stop("There is no valid expression data in the object!")}
-  if(class(DrawPlots) != "logical" | is.null(DrawPlots)){stop("DrawPlots must be logical!")}
+  if(!is.logical(DrawPlots) | is.null(DrawPlots)){stop("DrawPlots must be logical!")}
   if(is.null(adj.method) | is.na(adj.method) | (adj.method %in% c("BH","BY","holm","none"))){adj.method="BH"}
   if(is.null(adj.pval) | is.na(adj.pval) | length(adj.pval) > 1 | adj.pval > 1 | adj.pval < 0){adj.pval=0.05}
   if(is.null(raw.pval) | is.na(raw.pval) | length(raw.pval) > 1 | raw.pval > 1 | raw.pval < 0){raw.pval=0.05}

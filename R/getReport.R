@@ -24,11 +24,11 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations) 
   .Deprecated(
     msg = "This function is no longer maintained and will be retired."
   )
-  if (is.null(dataObject) | class(dataObject) != "FirehoseData") {
+  if (is.null(dataObject) | !is(dataObject, "FirehoseData")) {
       stop("Please set a valid FirehoseData class!")
       }
-  if (!is.null(DGEResult1) & class(DGEResult1) != "DGEResult"){stop("DGEResult1 must be DGEResult class!")}
-  if (!is.null(DGEResult2) & class(DGEResult2) != "DGEResult"){stop("DGEResult2 must be DGEResult class!")}
+  if (!is.null(DGEResult1) & !is(DGEResult1, "DGEResult")){stop("DGEResult1 must be DGEResult class!")}
+  if (!is.null(DGEResult2) & !is(DGEResult2, "DGEResult")){stop("DGEResult2 must be DGEResult class!")}
   pdf(file=paste(dataObject@Dataset,"-reportImage.pdf",sep=""),height=30,width=30)
   plotpos <- 1
   localData <- new.env(parent = emptyenv())
@@ -96,7 +96,7 @@ getReport <- function(dataObject,DGEResult1=NULL,DGEResult2=NULL,geneLocations) 
     }
     #}
   }
-  if(!is.null(dataObject@GISTIC) & class(dataObject@GISTIC)=="FirehoseGISTIC" & length(dataObject@GISTIC@Dataset) > 0)
+  if(!is.null(dataObject@GISTIC) & is(dataObject@GISTIC, "FirehoseGISTIC") & length(dataObject@GISTIC@Dataset) > 0)
   {
     cnMat <- dataObject@GISTIC@ThresholdedByGene
     rownames(cnMat) <- cnMat[,1]
