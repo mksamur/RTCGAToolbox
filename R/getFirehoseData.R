@@ -209,6 +209,11 @@
 #' \code{getFirehoseData} returns \code{FirehoseData} object that stores TCGA data.
 #'
 #' This is a main client function to download data from Firehose TCGA portal.
+#' 
+#' @details To avoid unnecessary downloads, we use
+#'   `tools::R_user_dir("RTCGAToolbox", "cache")` to set the default `destdir`
+#'   parameter to the cached directory. To get the actual default directory,
+#'   one can run `RTCGAToolbox:::.setCache()`.
 #'
 #' @param dataset A cohort disease code. TCGA cancer codes can be obtained via \code{\link{getFirehoseDatasets}}
 #' @param runDate Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}
@@ -232,7 +237,7 @@
 #' @param GISTIC logical (default FALSE) processed copy number data
 #' @param forceDownload A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.
 #' @param destdir Directory in which to store the resulting downloaded file.
-#'   Defaults to a temporary directory given by `tempdir()`.
+#'   Defaults to a cache directory given by `RTCGAToolbox:::.setCache()`.
 #' @param fileSizeLimit Files that are larger than set value (megabyte) won't be downloaded (Default: 500)
 #' @param getUUIDs Logical key to get UUIDs from barcode (Default: FALSE)
 #' @param ... Additional arguments to pass down.
@@ -257,7 +262,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     RNASeq2GeneNorm=FALSE, CNASNP=FALSE, CNVSNP=FALSE, CNASeq=FALSE,
     CNACGH=FALSE, Methylation=FALSE, Mutation=FALSE, mRNAArray=FALSE,
     miRNAArray=FALSE, RPPAArray=FALSE, GISTIC=FALSE, RNAseqNorm="raw_count",
-    RNAseq2Norm="normalized_count", forceDownload=FALSE, destdir=tempdir(),
+    RNAseq2Norm="normalized_count", forceDownload=FALSE, destdir=.setCache(),
     fileSizeLimit=500, getUUIDs=FALSE, ...) {
   #check input parameters
   if (!is.character(dataset) || is.null(dataset) || !length(dataset) == 1 || nchar(dataset) < 2) {
@@ -765,4 +770,47 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     resultClass@BarcodeUUID <- .barcodeUUID(resultClass)
   }
   return(resultClass)
+}
+
+.setCache <- function(
+    directory = tools::R_user_dir("RTCGAToolbox", "cache"),
+    verbose = TRUE,
+    ask = interactive()
+) {
+    stopifnot(
+        is.character(directory),
+        S4Vectors::isSingleString(directory),
+        !is.na(directory)
+    )
+
+    if (!dir.exists(directory)) {
+        if (ask) {
+            qtxt <- sprintf(
+                "Create RTCGAToolbox cache at \n    %s? [y/n]: ",
+                directory
+            )
+            answer <- .getAnswer(qtxt, allowed = c("y", "Y", "n", "N"))
+            if ("n" == answer)
+                stop("RTCGAToolbox directory not created")
+        }
+        dir.create(directory, recursive = TRUE, showWarnings = FALSE)
+    }
+
+    if (verbose)
+        message("RTCGAToolbox cache directory set to:\n    ", directory)
+    invisible(directory)
+}
+
+.getAnswer <- function(msg, allowed) {
+    if (interactive()) {
+        repeat {
+            message(msg)
+            answer <- readLines(n = 1)
+            if (answer %in% allowed)
+                break
+        }
+        tolower(answer)
+    } else {
+        "n"
+    }
 }

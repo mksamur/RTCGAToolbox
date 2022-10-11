@@ -26,7 +26,7 @@ getFirehoseData(
   RNAseqNorm = "raw_count",
   RNAseq2Norm = "normalized_count",
   forceDownload = FALSE,
-  destdir = tempdir(),
+  destdir = .setCache(),
   fileSizeLimit = 500,
   getUUIDs = FALSE,
   ...
@@ -76,7 +76,7 @@ getFirehoseData(
 \item{forceDownload}{A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.}
 
 \item{destdir}{Directory in which to store the resulting downloaded file.
-Defaults to a temporary directory given by \code{tempdir()}.}
+Defaults to a cache directory given by \code{RTCGAToolbox:::.setCache()}.}
 
 \item{fileSizeLimit}{Files that are larger than set value (megabyte) won't be downloaded (Default: 500)}
 
@@ -92,6 +92,11 @@ A \code{FirehoseData} data object that stores data for selected data types.
 }
 \details{
 This is a main client function to download data from Firehose TCGA portal.
+
+To avoid unnecessary downloads, we use
+\code{tools::R_user_dir("RTCGAToolbox", "cache")} to set the default \code{destdir}
+parameter to the cached directory. To get the actual default directory,
+one can run \code{RTCGAToolbox:::.setCache()}.
 }
 \examples{
 # Sample Dataset
