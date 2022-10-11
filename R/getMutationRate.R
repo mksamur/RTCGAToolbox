@@ -10,7 +10,7 @@
 #' head(mutRate)
 getMutationRate <- function(dataObject)
 {
-  if(is.null(dataObject) | class(dataObject) != "FirehoseData"){stop("'dataObject' must be 'FirehoseData' class!")}
+  if(is.null(dataObject) | !is(dataObject, "FirehoseData")){stop("'dataObject' must be 'FirehoseData' class!")}
   if(!is.null(dataObject@Mutation) & dim(dataObject@Mutation)[1] > 0 & dim(dataObject@Mutation)[2] > 0)
   {
     mutAll <- dataObject@Mutation

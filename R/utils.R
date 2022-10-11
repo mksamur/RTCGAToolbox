@@ -144,6 +144,7 @@
     return(result)
 }
 
+#' @importFrom methods is
 .unNestList <- function(x) {
     suppclasses <- all(vapply(x, function(y) {
         any(is(y, "FirehosemRNAArray"), is(y, "FirehoseCGHArray"),
