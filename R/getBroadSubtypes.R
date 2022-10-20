@@ -31,8 +31,8 @@ getBroadSubtypes <- function(dataset, clust.alg = c("CNMF", "ConsensusPlus"))
         paste0("mRNA_Clustering_", clust.alg),
         paste0(dataset, "-TP.bestclus.txt"))
 
-    if (dataset == "LAML") url <- gsub("TP", "TB", url)
-    else if (dataset == "SKCM") url <- gsub("TP", "TM", url)
+    rplmt <- switch(dataset, LAML = "TB", SKCM = "TM", "TP")
+    url <- gsub("TP", rplmt, url)
 
     # check mRNA cLustering availability
     if (!RCurl::url.exists(url)) {
