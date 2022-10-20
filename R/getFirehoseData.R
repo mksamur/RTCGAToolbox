@@ -36,17 +36,11 @@
   return(tmpMat)
 }
 
-.getLinks <- function(keyWord1,keyWord2,datasetLink=NULL,doc)
-{
-  keyWord = keyWord1#paste0(dataset,keyWord1)
-  keyWord = paste0("//a[contains(@href, '",keyWord,"')]")
-  plinks = xpathSApply(doc, keyWord, xmlAttrs)
-  if (is.null(datasetLink)) {
-    plinks = plinks[grepl(keyWord2,plinks)]
-  } else {
-    plinks = plinks[grepl(paste0("*.",datasetLink,keyWord2),plinks)]
-  }
-  plinks
+.getLinks <- function(keyWord1,keyWord2,datasetLink=NULL,doc) {
+  plinks <- grep(keyWord1, doc, value = TRUE)
+  search <-
+    if (is.null(datasetLink)) keyWord2 else paste0("*.", datasetLink, keyWord2)
+  grep(search,plinks,value=TRUE)
 }
 
 .barcodeUUID <- function(object) {
@@ -304,11 +298,16 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
   if (!is.null(runDate))
   {
     ##build URL for getting file links
-    fh_url <- "http://gdac.broadinstitute.org/runs/stddata__"
+    fh_url <- "https://gdac.broadinstitute.org/runs/stddata__"
     fh_url <- paste0(fh_url,substr(runDate,1,4),"_",substr(runDate,5,6),"_",substr(runDate,7,8),"/data/")
     fh_url <- paste0(fh_url,dataset,"/",runDate,"/")
-    doc = htmlTreeParse(fh_url, useInternalNodes = TRUE)
-
+    page_table <- rvest::html_table(rvest::read_html(fh_url))[[1L]]
+    rm.cols <- vapply(page_table, function(x) !all(is.na(x)), logical(1L))
+    page_table <- page_table[, rm.cols]
+    doc <- page_table[
+      -which(page_table[["Name"]] %in% c("", "Parent Directory")), "Name"
+    ]
+    doc <- unlist(doc)
 
     #Download clinical data
     if (clinical)
