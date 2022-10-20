@@ -8,7 +8,7 @@
 A \code{FirehoseData} data object
 }
 \usage{
-accmini
+data("accmini", package = "RTCGAToolbox")
 }
 \description{
 See the `acc_sample.R` script to see how the data was generated.

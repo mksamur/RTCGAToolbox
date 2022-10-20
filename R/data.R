@@ -6,6 +6,8 @@
 #'
 #' @format A \code{FirehoseData} data object
 #'
+#' @usage data("accmini", package = "RTCGAToolbox")
+#'
 #' @docType data
 #'
 "accmini"
