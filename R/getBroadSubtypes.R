@@ -26,7 +26,7 @@ getBroadSubtypes <- function(dataset, clust.alg = c("CNMF", "ConsensusPlus"))
     if (!isSingleString(dataset))
         stop("Enter a valid cancer code. See '?getFirehoseDatasets'")
 
-    url <- file.path("http://gdac.broadinstitute.org/runs/analyses__latest",
+    url <- file.path("https://gdac.broadinstitute.org/runs/analyses__latest",
         "reports/cancer", paste0(dataset, "-TP"),
         paste0("mRNA_Clustering_", clust.alg),
         paste0(dataset, "-TP.bestclus.txt"))

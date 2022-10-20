@@ -198,12 +198,23 @@
   return(destfile)
 }
 
+
+.files_from_html_table <- function(url) {
+    page_table <- rvest::html_table(rvest::read_html(url))[[1L]]
+    rm.cols <- vapply(page_table, function(x) !all(is.na(x)), logical(1L))
+    page_table <- page_table[, rm.cols]
+    doc <- page_table[
+      -which(page_table[["Name"]] %in% c("", "Parent Directory")), "Name"
+    ]
+    unlist(doc)
+}
+
 #' Get data from Firehose portal.
 #'
 #' \code{getFirehoseData} returns \code{FirehoseData} object that stores TCGA data.
 #'
 #' This is a main client function to download data from Firehose TCGA portal.
-#' 
+#'
 #' @details To avoid unnecessary downloads, we use
 #'   `tools::R_user_dir("RTCGAToolbox", "cache")` to set the default `destdir`
 #'   parameter to the cached directory. To get the actual default directory,
@@ -301,13 +312,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     fh_url <- "https://gdac.broadinstitute.org/runs/stddata__"
     fh_url <- paste0(fh_url,substr(runDate,1,4),"_",substr(runDate,5,6),"_",substr(runDate,7,8),"/data/")
     fh_url <- paste0(fh_url,dataset,"/",runDate,"/")
-    page_table <- rvest::html_table(rvest::read_html(fh_url))[[1L]]
-    rm.cols <- vapply(page_table, function(x) !all(is.na(x)), logical(1L))
-    page_table <- page_table[, rm.cols]
-    doc <- page_table[
-      -which(page_table[["Name"]] %in% c("", "Parent Directory")), "Name"
-    ]
-    doc <- unlist(doc)
+    doc <- .files_from_html_table(fh_url)
 
     #Download clinical data
     if (clinical)
@@ -699,12 +704,12 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     tag <- switch(dataset, SKCM = "TM", LAML = "TB", "TP")
     dset <- paste0(dataset, "-", tag)
     ##build URL for getting file links
-    fh_url <- "http://gdac.broadinstitute.org/runs/analyses__"
+    fh_url <- "https://gdac.broadinstitute.org/runs/analyses__"
     fh_url <- paste(fh_url, substr(gistic2Date, 1, 4), "_",
         substr(gistic2Date, 5, 6), "_", substr(gistic2Date, 7, 8),
         "/data/", sep="")
     fh_url <- paste(fh_url, dset, "/", gistic2Date, "/", sep="")
-    doc = htmlTreeParse(fh_url, useInternalNodes = TRUE)
+    doc <- .files_from_html_table(fh_url)
     #Search for links
     plinks <- .getLinks("CopyNumber_Gistic2.Level_4",
         "[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$", dset, doc)
