@@ -1,3 +1,20 @@
+## Changes in version 2.28.0
+
+### New features
+
+* Resolve disparate columns in mutation files from `GBMLGG` (@andreagrioni, #45)
+* Update codebase to download https resources from newer layout in
+<gdac.broadinstitute.org> (@biostars-nyc, #44).
+* Update `makeSummarizedExperimentFromGISTIC` interface with `rownameCol` input,
+type checking, and set row names when the are not duplicated.
+
+### Bug fixes and minor improvements
+
+* Use cache directory obtained from `tools::R_user_dir`
+* Clean up class membership checks, e.g., with `is(x, "classname")`
+* Set missing rows to `""` for downstream compatibility with
+`SummarizedExperiment`.
+
 ## Changes in version 2.24.0
 
 ### Bug fixes and minor improvements
