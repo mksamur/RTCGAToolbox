@@ -685,9 +685,18 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
             fileList = fileList[!grepl(grepSearch,fileList)]
             ###
             untar(tarfile, files = fileList, exdir = destdir)
-            retMutations <- do.call(rbind,lapply(file.path(destdir, fileList),FUN=function(files) {
+            datalist <- lapply(file.path(destdir, fileList),FUN=function(files) {
               read.delim(files,header=TRUE,colClasses="character")
-            }))
+            })
+            dlenghts <- lengths(datalist)
+            if (!identical(length(unique(dlengths)), 1L)) {
+                splitlist <- split(datalist, dlengths)
+                splitlist <- lapply(splitlist, function(g) do.call(rbind, g))
+                retMutations <-
+                    Reduce(function(...) merge(..., all = TRUE), splitlist)
+            } else {
+                retMutations <- do.call(rbind, datalist)
+            }
             delFolder <- file.path(destdir, dirname(fileList[[1L]]))
             unlink(delFolder, recursive = TRUE)
             file.remove(tarfile)
