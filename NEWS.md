@@ -2,6 +2,8 @@
 
 ### New features
 
+* The functions `getCNGECorrelation`, `getDiffExpressedGenes`, and `getSurvival`
+have been defunct and removed from the package (see `?'RTCGAToolbox-defunct'`).
 * Resolve disparate columns in mutation files from `GBMLGG` (@andreagrioni, #45)
 * Update codebase to download https resources from newer layout in
 <gdac.broadinstitute.org> (@biostars-nyc, #44).
