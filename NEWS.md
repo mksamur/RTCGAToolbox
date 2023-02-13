@@ -1,3 +1,10 @@
+## Changes in version 2.30.0
+
+### New features
+
+* The functions `getCNGECorrelation`, `getDiffExpressedGenes`, and `getSurvival`
+have been defunct and removed from the package (see `?'RTCGAToolbox-defunct'`).
+
 ## Changes in version 2.28.0
 
 ### New features
