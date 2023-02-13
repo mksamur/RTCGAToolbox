@@ -696,7 +696,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
             datalist <- lapply(file.path(destdir, fileList),FUN=function(files) {
               read.delim(files,header=TRUE,colClasses="character")
             })
-            dlenghts <- lengths(datalist)
+            dlengths <- lengths(datalist)
             if (!identical(length(unique(dlengths)), 1L)) {
                 splitlist <- split(datalist, dlengths)
                 splitlist <- lapply(splitlist, function(g) do.call(rbind, g))
