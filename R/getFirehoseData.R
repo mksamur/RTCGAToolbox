@@ -1,3 +1,4 @@
+#' @importFrom data.table fread
 .makeExprMat <- function(file, normMethod, dataType, mergeSize = 1000, arrayData = FALSE)
 {
   #Get selected type only
@@ -36,6 +37,7 @@
   return(tmpMat)
 }
 
+#' @importFrom utils setTxtProgressBar
 .getLinks <- function(keyWord1,keyWord2,datasetLink=NULL,doc) {
   plinks <- grep(keyWord1, doc, value = TRUE)
   search <-
@@ -43,6 +45,9 @@
   grep(search,plinks,value=TRUE)
 }
 
+#' @importFrom utils txtProgressBar
+#' @importFrom RJSONIO fromJSON
+#' @importFrom RCurl getURL 
 .barcodeUUID <- function(object) {
   message("Converting barcodes to UUID")
   barcodes <- NULL
@@ -158,6 +163,7 @@
   }
 }
 
+#' @importFrom utils download.file untar
 .exportFiles <- function(fileLink, dataset, fileExt, searchName,subSearch=FALSE,
     exportName, manifest=FALSE, destdir=destdir, forceDownload=FALSE, runDate)
 {
@@ -250,6 +256,8 @@
 #' @return A \code{FirehoseData} data object that stores data for selected data types.
 #'
 #' @seealso \link{getLinks}, \url{https://gdac.broadinstitute.org/}
+#'
+#' @importFrom utils write.table
 #'
 #' @md
 #' @examples

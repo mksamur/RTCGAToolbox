@@ -8,7 +8,8 @@
 \S4method{showResults}{DGEResult}(object)
 }
 \arguments{
-\item{object}{A \code{\linkS4class{DGEResult}} or \code{\linkS4class{CorResult}} object}
+\item{object}{A \code{\linkS4class{DGEResult}} or
+\code{\linkS4class{CorResult}} object}
 }
 \value{
 Returns toptable for DGE results
