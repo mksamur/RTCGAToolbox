@@ -18,7 +18,7 @@ Description: Managing data from large scale projects such as The Cancer Genome
     studies. Results showed that RTCGAToolbox could improve data management for
     researchers who are interested with TCGA data. In addition, it can be
     integrated with other analysis pipelines for following data analysis.
-License: file LICENSE
+License: GPL-2
 Depends:
     R (>= 3.5.0)
 Imports:
