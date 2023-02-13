@@ -20,7 +20,7 @@ Description: Managing data from large scale projects such as The Cancer Genome
     integrated with other analysis pipelines for following data analysis.
 License: GPL-2
 Depends:
-    R (>= 3.5.0)
+    R (>= 4.3.0)
 Imports:
     BiocGenerics,
     data.table,
