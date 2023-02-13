@@ -19,7 +19,9 @@ getReport(dataObject, DGEResult1 = NULL, DGEResult2 = NULL, geneLocations)
 Draws a circle plot
 }
 \description{
-\code{getReport} draws a circle plot into your workin director to show log fold changes for differentially expressed genes, copy number alterations and mutations.
+\code{getReport} draws a circle plot into your working directory to show log
+fold changes for differentially expressed genes, copy number alterations and
+mutations.
 }
 \examples{
 data(accmini)

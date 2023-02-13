@@ -11,6 +11,7 @@
 #'
 #' @importFrom RCurl url.exists
 #' @importFrom S4Vectors isSingleString
+#' @importFrom utils read.delim
 #'
 #' @author Ludwig Geistlinger
 #'

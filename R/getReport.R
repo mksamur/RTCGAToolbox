@@ -1,11 +1,21 @@
 #' Draws a circle plot into working directory
 #'
-#' \code{getReport} draws a circle plot into your workin director to show log fold changes for differentially expressed genes, copy number alterations and mutations.
+#' \code{getReport} draws a circle plot into your working directory to show log
+#' fold changes for differentially expressed genes, copy number alterations and
+#' mutations.
 #'
 #' @param dataObject This must be \code{FirehoseData} object.
 #' @param DGEResult1 Differential gene expression results object (Optional)
 #' @param DGEResult2 Differential gene expression results object (Optional)
 #' @param geneLocations Gene coordinates.
+#' 
+#' @importFrom grDevices dev.off pdf
+#' @importFrom utils data
+#' @importFrom RCircos RCircos.Set.Core.Components RCircos.Get.Plot.Parameters
+#'   RCircos.Reset.Plot.Parameters RCircos.Set.Plot.Area RCircos.Scatter.Plot
+#'   RCircos.Heatmap.Plot RCircos.Gene.Connector.Plot RCircos.Gene.Name.Plot
+#'   RCircos.Chromosome.Ideogram.Plot
+#' 
 #' @return Draws a circle plot
 #' @export getReport
 #' @examples

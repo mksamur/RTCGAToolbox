@@ -28,8 +28,8 @@ An S4 class to store processed copy number data. (Data processed by using GISTIC
 \item \code{isEmpty(FirehoseGISTIC)}: check whether the FirehoseGISTIC object has
 data in it or not
 
-\item \code{updateObject(FirehoseGISTIC)}: Update an old FirehoseGISTIC object to
-the most recent API
+\item \code{updateObject(FirehoseGISTIC)}: Update an old FirehoseGISTIC object to the most
+recent API
 
 }}
 \section{Slots}{

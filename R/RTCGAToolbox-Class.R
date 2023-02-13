@@ -123,6 +123,9 @@ setClass("FirehoseData", representation(Dataset = "character",
     Mutation="data.frame", GISTIC="FirehoseGISTIC", BarcodeUUID="data.frame"))
 
 #' @describeIn FirehoseData show method
+#' 
+#' @importFrom BiocGenerics updateObject
+#'
 #' @param object A FirehoseData object
 setMethod("show", "FirehoseData",function(object) {
     if (.hasOldAPI(object) || .hasOldGISTIC(getElement(object, "GISTIC"))) {
@@ -261,10 +264,15 @@ setGeneric("showResults",
 )
 
 #' Export toptable or correlation data frame
-#' @param object A \code{\linkS4class{DGEResult}} or \code{\linkS4class{CorResult}} object
+#' @param object A \code{\linkS4class{DGEResult}} or
+#'   \code{\linkS4class{CorResult}} object
+#'   
 #' @rdname showResults-DGEResult
 #' @aliases showResults,DGEResult,DGEResult-method
 #' @return Returns toptable for DGE results
+#'
+#' @importFrom utils head
+#'
 #' @export
 #' @examples
 #' data(accmini)
@@ -311,9 +319,13 @@ setMethod("showResults", "CorResult",function(object){
 }
 
 #' @describeIn FirehoseData Update an old RTCGAToolbox FirehoseData object to
-#' the most recent API
+#'   the most recent API
+#' 
 #' @param verbose logical (default FALSE) whether to print extra messages
 #' @param ... additional arguments for updateObject
+#' 
+#' @importFrom methods new
+#' 
 #' @exportMethod updateObject
 setMethod("updateObject", "FirehoseData",
     function(object, ..., verbose = FALSE) {
@@ -345,11 +357,13 @@ setMethod("updateObject", "FirehoseData",
     return(object)
 })
 
-#' @describeIn FirehoseGISTIC Update an old FirehoseGISTIC object to
-#' the most recent API
+#' @describeIn FirehoseGISTIC Update an old FirehoseGISTIC object to the most
+#'   recent API
+#' 
 #' @param object A \code{FirehoseGISTIC} object
 #' @param verbose logical (default FALSE) whether to print extra messages
 #' @param ... additional arguments for updateObject
+#' 
 #' @exportMethod updateObject
 setMethod("updateObject", "FirehoseGISTIC",
     function(object, ..., verbose = FALSE) {

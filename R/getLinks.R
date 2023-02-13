@@ -5,6 +5,7 @@
 #' URL location to the resource if there exists one.
 #'
 #' @inheritParams getFirehoseData
+#' @importFrom XML htmlTreeParse
 #'
 #' @param data_date Either a runDate or analysisDate typically entered in
 #' `getFirehoseData`

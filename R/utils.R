@@ -291,6 +291,7 @@
     Filter(function(g) {!is.na(g)}, Fargs)
 }
 
+#' @importFrom stats na.omit
 .findSampleCol <-
     function(x, sampcols = c("tumor_sample_barcode", "sample", "id"))
 {

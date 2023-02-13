@@ -27,8 +27,8 @@ Imports:
     DelayedArray,
     GenomicRanges,
     GenomeInfoDb,
+    grDevices,
     httr,
-    limma,
     methods,
     RaggedExperiment,
     RCircos,
@@ -39,8 +39,8 @@ Imports:
     stats,
     stringr,
     SummarizedExperiment,
-    survival,
     TCGAutils (>= 1.9.4),
+    utils,
     XML
 Suggests:
     BiocStyle,
