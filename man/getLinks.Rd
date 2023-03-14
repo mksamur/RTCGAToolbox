@@ -68,3 +68,8 @@ This function provides a reference to the resources downloaded from the
 GDAC Firehose pipeline. Based on the input, the function returns a
 URL location to the resource if there exists one.
 }
+\examples{
+
+getLinks("BRCA", CNASeq = TRUE)
+
+}

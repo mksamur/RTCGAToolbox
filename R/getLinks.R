@@ -5,12 +5,15 @@
 #' URL location to the resource if there exists one.
 #'
 #' @inheritParams getFirehoseData
-#' @importFrom XML htmlTreeParse
 #'
 #' @param data_date Either a runDate or analysisDate typically entered in
 #' `getFirehoseData`
 #'
 #' @return A character URL to a dataset location
+#'
+#' @examples
+#'
+#' getLinks("BRCA", CNASeq = TRUE)
 #'
 #' @export
 getLinks <- function(dataset, data_date="20160128",
@@ -19,17 +22,19 @@ getLinks <- function(dataset, data_date="20160128",
     CNACGH=FALSE, Methylation=FALSE, Mutation=FALSE, mRNAArray=FALSE,
     miRNAArray=FALSE, RPPAArray=FALSE, GISTIC=FALSE)
 {
-    fh_url <- "http://gdac.broadinstitute.org/runs/stddata__"
+    fh_url <- "https://gdac.broadinstitute.org/runs/stddata__"
 
     if (GISTIC)
-        fh_url <- "http://gdac.broadinstitute.org/runs/analyses__"
+        fh_url <- "https://gdac.broadinstitute.org/runs/analyses__"
 
     fh_url <- paste0(fh_url, substr(data_date, 1, 4), "_",
         substr(data_date, 5, 6), "_", substr(data_date, 7, 8), "/data/")
     fh_url <- paste0(fh_url, dataset, "/", data_date, "/")
 
-    doc <- htmlTreeParse(fh_url, useInternalNodes = TRUE)
+    doc <- .files_from_html_table(fh_url)
 
+    paste0(
+        fh_url,
     if (RNASeqGene)
         .getLinks("Level_3__gene_expression__data.Level_3", "*.Merge_rnaseq__.*._rnaseq__.*.tar[.]gz$", NULL, doc)
     else if (RNASeq2Gene)
@@ -67,5 +72,6 @@ getLinks <- function(dataset, data_date="20160128",
         dset <- paste0(dataset, "-", tag)
         .getLinks("CopyNumber_Gistic2.Level_4", "[.]CopyNumber_Gistic2[.]Level_4.*.tar[.]gz$", dset, doc)
     }
+    )
 }
 

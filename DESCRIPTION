@@ -40,8 +40,7 @@ Imports:
     stringr,
     SummarizedExperiment,
     TCGAutils (>= 1.9.4),
-    utils,
-    XML
+    utils
 Suggests:
     BiocStyle,
     Homo.sapiens,
