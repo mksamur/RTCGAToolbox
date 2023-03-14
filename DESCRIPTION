@@ -6,7 +6,7 @@ Authors@R: c(
     person("Mehmet", "Samur", email = "rtcgatoolbox@gmail.com",
     role = "aut"),
     person("Marcel", "Ramos", email = "marcel.ramos@roswellpark.org",
-    role = c("aut", "cre")),
+    role = c("aut", "cre"), comment = c(ORCID = "0000-0002-3242-0582")),
     person("Ludwig", "Geistlinger", role = "ctb"))
 Description: Managing data from large scale projects such as The Cancer Genome
     Atlas (TCGA) for further analysis is an important and time consuming step
@@ -18,7 +18,7 @@ Description: Managing data from large scale projects such as The Cancer Genome
     studies. Results showed that RTCGAToolbox could improve data management for
     researchers who are interested with TCGA data. In addition, it can be
     integrated with other analysis pipelines for following data analysis.
-License: file LICENSE
+License: GPL-2
 Depends:
     R (>= 3.5.0)
 Imports:
@@ -27,6 +27,7 @@ Imports:
     DelayedArray,
     GenomicRanges,
     GenomeInfoDb,
+    grDevices,
     httr,
     limma,
     methods,
@@ -41,6 +42,7 @@ Imports:
     SummarizedExperiment,
     survival,
     TCGAutils (>= 1.9.4),
+    utils,
     XML
 Suggests:
     BiocStyle,
