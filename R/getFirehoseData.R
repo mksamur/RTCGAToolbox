@@ -264,6 +264,8 @@
 #' @export getFirehoseData
 getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     RNASeqGene=FALSE, RNASeq2Gene=FALSE, clinical=TRUE, miRNASeqGene=FALSE,
+    miRNASeqGeneType =
+      c("reads_per_million_miRNA_mapped", "read_count", "cross-mapped"),
     RNASeq2GeneNorm=FALSE, CNASNP=FALSE, CNVSNP=FALSE, CNASeq=FALSE,
     CNACGH=FALSE, Methylation=FALSE, Mutation=FALSE, mRNAArray=FALSE,
     miRNAArray=FALSE, RPPAArray=FALSE, GISTIC=FALSE, RNAseqNorm="raw_count",
@@ -407,6 +409,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     {
       #Search for links
       plinks <- .getLinks("Level_3__miR_gene_expression__data.Level_3","[.]Merge_mirnaseq__.*.hiseq_mirnaseq__.*.tar[.]gz$",dataset,doc)
+      miRNAtype <- match.arg(miRNASeqGeneType)
 
       for(i in trim(plinks))
       {
@@ -418,7 +421,7 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
                       TRUE,
                       "-miRNAseqGene.txt",FALSE,destdir,forceDownload,runDate)
 
-          resultClass@miRNASeqGene <- .makeExprMat(export.file,"read_count","miRNAseq",mergeSize=100,arrayData=FALSE)
+          resultClass@miRNASeqGene <- .makeExprMat(export.file,miRNAtype,"miRNAseq",mergeSize=100,arrayData=FALSE)
           gc()
         }
       }
