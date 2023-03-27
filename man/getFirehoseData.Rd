@@ -12,6 +12,7 @@ getFirehoseData(
   RNASeq2Gene = FALSE,
   clinical = TRUE,
   miRNASeqGene = FALSE,
+  miRNASeqGeneType = c("reads_per_million_miRNA_mapped", "read_count", "cross-mapped"),
   RNASeq2GeneNorm = FALSE,
   CNASNP = FALSE,
   CNVSNP = FALSE,
@@ -46,6 +47,11 @@ getFirehoseData(
 \item{clinical}{Logical (default TRUE) clinical data.}
 
 \item{miRNASeqGene}{Logical (default FALSE) smallRNAseq data.}
+
+\item{miRNASeqGeneType}{Character (default "reads_per_million_miRNA_mapped")
+Indicate which type of data should be pulled from the miRNASeqGene data.
+Must be one of "reads_per_million_miRNA_mapped", "read_count", or
+"cross-mapped".}
 
 \item{RNASeq2GeneNorm}{Logical (default FALSE) RNAseq v2 (RSEM processed) data.}
 
