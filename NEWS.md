@@ -5,6 +5,13 @@
 * The functions `getCNGECorrelation`, `getDiffExpressedGenes`, and `getSurvival`
 have been defunct and removed from the package (see `?'RTCGAToolbox-defunct'`).
 
+### Bug fixes and minor improvements
+
+* `getFirehoseData` when used with the `miRNASeqGene` argument was
+downloading read counts data rather than RPM. This has been fixed with the
+`miRNASeqGeneType` argument. "read_count" and "cross-mapped" data are still
+available but must be entered explicitly in `miRNASeqGeneType`.
+
 ## Changes in version 2.28.0
 
 ### New features
