@@ -228,6 +228,10 @@
 #' @param RNASeq2Gene Logical (default FALSE) RNAseq v2 (RSEM processed) data; see `RNAseqNorm` argument.
 #' @param RNASeq2GeneNorm Logical (default FALSE) RNAseq v2 (RSEM processed) data.
 #' @param miRNASeqGene Logical (default FALSE) smallRNAseq data.
+#' @param miRNASeqGeneType Character (default "reads_per_million_miRNA_mapped")
+#'   Indicate which type of data should be pulled from the miRNASeqGene data.
+#'   Must be one of "reads_per_million_miRNA_mapped", "read_count", or
+#'   "cross-mapped".
 #' @param CNASNP Logical (default FALSE) somatic copy number alterations data from SNP array.
 #' @param CNVSNP Logical (default FALSE) germline copy number variants data from SNP array.
 #' @param CNASeq Logical (default FALSE) somatic copy number alterations data from sequencing.
