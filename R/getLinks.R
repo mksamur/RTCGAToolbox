@@ -42,7 +42,7 @@ getLinks <- function(dataset, data_date="20160128",
     else if (clinical)
         .getLinks(".Clinical_Pick_Tier1.Level_4", "*.tar[.]gz$", NULL, doc)
     else if (miRNASeqGene)
-        .getLinks("miRseq_Preprocess", "[.]miRseq_Preprocess.Level_3.*tar.gz$", dataset, doc)
+        .getLinks("Level_3__miR_gene_expression__data.Level_3", "[.]Merge_mirnaseq__.*.hiseq_mirnaseq__.*.tar[.]gz$", dataset, doc)
     else if (RNASeq2GeneNorm)
         .getLinks("Level_3__RSEM_genes_normalized__data.Level_3", "*.Merge_rnaseqv2__.*._rnaseqv2__.*.tar[.]gz$", NULL, doc)
     else if (CNASNP)
