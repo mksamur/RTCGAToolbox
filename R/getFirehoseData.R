@@ -1,3 +1,4 @@
+#' @importFrom data.table fread
 .makeExprMat <- function(file, normMethod, dataType, mergeSize = 1000, arrayData = FALSE)
 {
   #Get selected type only
@@ -36,6 +37,7 @@
   return(tmpMat)
 }
 
+#' @importFrom utils setTxtProgressBar
 .getLinks <- function(keyWord1,keyWord2,datasetLink=NULL,doc) {
   plinks <- grep(keyWord1, doc, value = TRUE)
   search <-
@@ -43,6 +45,9 @@
   grep(search,plinks,value=TRUE)
 }
 
+#' @importFrom utils txtProgressBar
+#' @importFrom RJSONIO fromJSON
+#' @importFrom RCurl getURL
 .barcodeUUID <- function(object) {
   message("Converting barcodes to UUID")
   barcodes <- NULL
@@ -158,6 +163,7 @@
   }
 }
 
+#' @importFrom utils download.file untar
 .exportFiles <- function(fileLink, dataset, fileExt, searchName,subSearch=FALSE,
     exportName, manifest=FALSE, destdir=destdir, forceDownload=FALSE, runDate)
 {
@@ -255,6 +261,8 @@
 #'
 #' @seealso \link{getLinks}, \url{https://gdac.broadinstitute.org/}
 #'
+#' @importFrom utils write.table
+#'
 #' @md
 #' @examples
 #' # Sample Dataset
@@ -269,11 +277,14 @@
 getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     RNASeqGene=FALSE, RNASeq2Gene=FALSE, clinical=TRUE, miRNASeqGene=FALSE,
     miRNASeqGeneType =
-      c("reads_per_million_miRNA_mapped", "read_count", "cross-mapped"),
+      c("read_count", "reads_per_million_miRNA_mapped", "cross-mapped"),
     RNASeq2GeneNorm=FALSE, CNASNP=FALSE, CNVSNP=FALSE, CNASeq=FALSE,
     CNACGH=FALSE, Methylation=FALSE, Mutation=FALSE, mRNAArray=FALSE,
     miRNAArray=FALSE, RPPAArray=FALSE, GISTIC=FALSE, RNAseqNorm="raw_count",
-    RNAseq2Norm="normalized_count", forceDownload=FALSE, destdir=.setCache(),
+    RNAseq2Norm = c(
+      "normalized_counts", "RSEM_normalized_log2", "raw_counts", "scaled_estimate"
+    ),
+    forceDownload=FALSE, destdir=.setCache(),
     fileSizeLimit=500, getUUIDs=FALSE, ...) {
   #check input parameters
   if (!is.character(dataset) || is.null(dataset) || !length(dataset) == 1 || nchar(dataset) < 2) {
@@ -385,8 +396,15 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
     if (RNASeq2GeneNorm)
     {
       #Search for links
-      plinks <- .getLinks("Level_3__RSEM_genes_normalized__data.Level_3","*.Merge_rnaseqv2__.*._rnaseqv2__.*.tar[.]gz$",NULL,doc)
 
+      RNAseq2Norm <- match.arg(RNAseq2Norm)
+      if (identical(RNAseq2Norm, "normalized_counts")) {
+        searchName <- "[.]rnaseqv2__.*.__Level_3__RSEM_genes_normalized__data.data.txt$"
+        plinks <- .getLinks("Level_3__RSEM_genes_normalized__data.Level_3","*.Merge_rnaseqv2__.*._rnaseqv2__.*.tar[.]gz$",NULL,doc)
+      } else {
+        searchName <- paste0(".*\\.mRNAseq_", RNAseq2Norm, "\\.txt$")
+        plinks <- .getLinks("mRNAseq_Preprocess",".*\\.Level_3\\..*\\.tar\\.gz$",NULL,doc)
+      }
       plinks <- stats::setNames(
         vapply(plinks, function(x)
             .checkFileSize(paste0(fh_url, x), fileSizeLimit), logical(1L)
@@ -395,11 +413,19 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
       plinks <- plinks[plinks]
       res <- lapply(seq_along(plinks), function(k) {
         i <- names(plinks)[k]
-        export.file <- .exportFiles(paste0(fh_url,i),dataset,
-            "-RNAseq2GeneNorm.tar.gz",
-            "[.]rnaseqv2__.*.__Level_3__RSEM_genes_normalized__data.data.txt$",
-            TRUE,
-            paste0("-RNAseq2GeneNorm-", k, ".txt"),FALSE,destdir,forceDownload,runDate)
+        export.file <- .exportFiles(
+            fileLink = paste0(fh_url,i),
+            dataset = dataset,
+            fileExt = "-RNAseq2GeneNorm.tar.gz",
+            searchName = searchName,
+            subSearch = TRUE,
+            exportName =
+              paste0("-RNAseq2GeneNorm-", RNAseq2Norm, "-", k, ".txt"),
+            manifest = FALSE,
+            destdir = destdir,
+            forceDownload = forceDownload,
+            runDate = runDate
+        )
             new("FirehosemRNAArray",Filename=i,
                 DataMatrix=.makeExprMat(export.file,
                     RNAseq2Norm,"RNAseq2",mergeSize=1000,arrayData=TRUE))
@@ -419,12 +445,18 @@ getFirehoseData <- function(dataset, runDate="20160128", gistic2Date="20160128",
       {
         if (.checkFileSize(paste0(fh_url,i),fileSizeLimit))
         {
-          export.file <- .exportFiles(paste0(fh_url,i),dataset,
-                      "-miRNAseqGene.tar.gz",
-                      "[.]mirnaseq__.*.__Level_3__miR_gene_expression__data.data.txt$",
-                      TRUE,
-                      "-miRNAseqGene.txt",FALSE,destdir,forceDownload,runDate)
-
+          export.file <- .exportFiles(
+              fileLink = paste0(fh_url,i),
+              dataset = dataset,
+              fileExt = "-miRNAseqGene.tar.gz",
+              searchName = "[.]mirnaseq__.*.__Level_3__miR_gene_expression__data.data.txt$",
+              subSearch = TRUE,
+              exportName = paste0("-", miRNAtype, "-miRNAseqGene.txt"),
+              manifest = FALSE,
+              destdir = destdir,
+              forceDownload = forceDownload,
+              runDate = runDate
+          )
           resultClass@miRNASeqGene <- .makeExprMat(export.file,miRNAtype,"miRNAseq",mergeSize=100,arrayData=FALSE)
           gc()
         }

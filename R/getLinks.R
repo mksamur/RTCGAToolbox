@@ -18,7 +18,11 @@
 #' @export
 getLinks <- function(dataset, data_date="20160128",
     RNASeqGene=FALSE, RNASeq2Gene=FALSE, clinical=FALSE, miRNASeqGene=FALSE,
-    RNASeq2GeneNorm=FALSE, CNASNP=FALSE, CNVSNP=FALSE, CNASeq=FALSE,
+    RNASeq2GeneNorm=FALSE,
+    RNAseq2Norm = c(
+      "normalized_counts", "RSEM_normalized_log2", "raw_counts", "scaled_estimate"
+    ),
+    CNASNP=FALSE, CNVSNP=FALSE, CNASeq=FALSE,
     CNACGH=FALSE, Methylation=FALSE, Mutation=FALSE, mRNAArray=FALSE,
     miRNAArray=FALSE, RPPAArray=FALSE, GISTIC=FALSE)
 {
@@ -42,10 +46,14 @@ getLinks <- function(dataset, data_date="20160128",
     else if (clinical)
         .getLinks(".Clinical_Pick_Tier1.Level_4", "*.tar[.]gz$", NULL, doc)
     else if (miRNASeqGene)
-        .getLinks("miRseq_Preprocess", "[.]miRseq_Preprocess.Level_3.*tar.gz$", dataset, doc)
-    else if (RNASeq2GeneNorm)
-        .getLinks("Level_3__RSEM_genes_normalized__data.Level_3", "*.Merge_rnaseqv2__.*._rnaseqv2__.*.tar[.]gz$", NULL, doc)
-    else if (CNASNP)
+        .getLinks("Level_3__miR_gene_expression__data.Level_3", "[.]Merge_mirnaseq__.*.hiseq_mirnaseq__.*.tar[.]gz$", dataset, doc)
+    else if (RNASeq2GeneNorm) {
+        RNAseq2Norm <- match.arg(RNAseq2Norm)
+        if (!identical(RNAseq2Norm, "normalized_counts"))
+            .getLinks("mRNAseq_Preprocess",".*\\.Level_3\\..*\\.tar\\.gz$",NULL,doc)
+        else
+            .getLinks("Level_3__RSEM_genes_normalized__data.Level_3", "*.Merge_rnaseqv2__.*._rnaseqv2__.*.tar[.]gz$", NULL, doc)
+    } else if (CNASNP)
         .getLinks("Level_3__segmented_scna_hg19__seg.Level_3", "[.]Merge_snp__.*.__Level_3__segmented_scna_hg19__seg.Level_3.*.tar[.]gz$", dataset, doc)
     else if (CNVSNP)
         .getLinks("Level_3__segmented_scna_minus_germline_cnv_hg19__seg.Level_3", "[.]Merge_snp__.*.__Level_3__segmented_scna_minus_germline_cnv_hg19__seg.Level_3.*.tar[.]gz$", dataset, doc)
