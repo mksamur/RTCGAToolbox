@@ -234,10 +234,9 @@
 #' @param RNASeq2Gene Logical (default FALSE) RNAseq v2 (RSEM processed) data; see `RNAseqNorm` argument.
 #' @param RNASeq2GeneNorm Logical (default FALSE) RNAseq v2 (RSEM processed) data.
 #' @param miRNASeqGene Logical (default FALSE) smallRNAseq data.
-#' @param miRNASeqGeneType Character (default "reads_per_million_miRNA_mapped")
-#'   Indicate which type of data should be pulled from the miRNASeqGene data.
-#'   Must be one of "reads_per_million_miRNA_mapped", "read_count", or
-#'   "cross-mapped".
+#' @param miRNASeqGeneType Character (default "read_count") Indicate which type
+#'   of data should be pulled from the miRNASeqGene data. Must be one of
+#'   "reads_per_million_miRNA_mapped", "read_count", or "cross-mapped".
 #' @param CNASNP Logical (default FALSE) somatic copy number alterations data from SNP array.
 #' @param CNVSNP Logical (default FALSE) germline copy number variants data from SNP array.
 #' @param CNASeq Logical (default FALSE) somatic copy number alterations data from sequencing.
@@ -248,7 +247,9 @@
 #' @param miRNAArray Logical (default FALSE) miRNA expression data from microarray.
 #' @param RPPAArray Logical (default FALSE) RPPA data
 #' @param RNAseqNorm RNAseq data normalization method. (Default raw_count)
-#' @param RNAseq2Norm RNAseq v2 data normalization method. (Default normalized_count, raw_count, scaled_estimate)
+#' @param RNAseq2Norm RNAseq v2 data normalization method. (Default
+#'   normalized_count or one of RSEM_normalized_log2, raw_count,
+#'   scaled_estimate)
 #' @param GISTIC logical (default FALSE) processed copy number data
 #' @param forceDownload A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.
 #' @param destdir Directory in which to store the resulting downloaded file.
