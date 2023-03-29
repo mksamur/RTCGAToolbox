@@ -14,10 +14,9 @@ type checking, and set row names when the are not duplicated.
 * Clean up class membership checks, e.g., with `is(x, "classname")`
 * Set missing rows to `""` for downstream compatibility with
 `SummarizedExperiment`.
-* `getFirehoseData` when used with the `miRNASeqGene` argument was
-downloading read counts data rather than RPM. This has been fixed with the
-`miRNASeqGeneType` argument. "read_count" and "cross-mapped" data are still
-available but must be entered explicitly in `miRNASeqGeneType`.
+* `getFirehoseData` when used with the `miRNASeqGene` argument will
+download read counts. Use the "reads_per_million_miRNA_mapped" in the
+`miRNASeqGeneType` to obtain RPM.
 
 ## Changes in version 2.24.0
 
