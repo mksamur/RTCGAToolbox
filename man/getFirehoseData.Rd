@@ -49,10 +49,9 @@ getFirehoseData(
 
 \item{miRNASeqGene}{Logical (default FALSE) smallRNAseq data.}
 
-\item{miRNASeqGeneType}{Character (default "reads_per_million_miRNA_mapped")
-Indicate which type of data should be pulled from the miRNASeqGene data.
-Must be one of "reads_per_million_miRNA_mapped", "read_count", or
-"cross-mapped".}
+\item{miRNASeqGeneType}{Character (default "read_count") Indicate which type
+of data should be pulled from the miRNASeqGene data. Must be one of
+"reads_per_million_miRNA_mapped", "read_count", or "cross-mapped".}
 
 \item{RNASeq2GeneNorm}{Logical (default FALSE) RNAseq v2 (RSEM processed) data.}
 
@@ -78,7 +77,9 @@ Must be one of "reads_per_million_miRNA_mapped", "read_count", or
 
 \item{RNAseqNorm}{RNAseq data normalization method. (Default raw_count)}
 
-\item{RNAseq2Norm}{RNAseq v2 data normalization method. (Default normalized_count, raw_count, scaled_estimate)}
+\item{RNAseq2Norm}{RNAseq v2 data normalization method. (Default
+normalized_count or one of RSEM_normalized_log2, raw_count,
+scaled_estimate)}
 
 \item{forceDownload}{A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.}
 

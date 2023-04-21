@@ -42,7 +42,9 @@ getLinks(
 
 \item{RNASeq2GeneNorm}{Logical (default FALSE) RNAseq v2 (RSEM processed) data.}
 
-\item{RNAseq2Norm}{RNAseq v2 data normalization method. (Default normalized_count, raw_count, scaled_estimate)}
+\item{RNAseq2Norm}{RNAseq v2 data normalization method. (Default
+normalized_count or one of RSEM_normalized_log2, raw_count,
+scaled_estimate)}
 
 \item{CNASNP}{Logical (default FALSE) somatic copy number alterations data from SNP array.}
 

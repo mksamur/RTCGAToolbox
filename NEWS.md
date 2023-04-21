@@ -2,6 +2,8 @@
 
 ### New features
 
+* Include additional options for `miRNASeqGeneType` and `RNAseq2Norm` inputs,
+see `?getFirehoseData`.
 * The functions `getCNGECorrelation`, `getDiffExpressedGenes`, and `getSurvival`
 have been defunct and removed from the package (see `?'RTCGAToolbox-defunct'`).
 
