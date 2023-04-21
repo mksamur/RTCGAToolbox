@@ -10,7 +10,7 @@
 #'   \code{getSurvival}: Perform survival analysis based on gene expression
 #'   data.
 #'
-#' @details 
+#' @details
 #' \code{getCNGECorrelation} returns a list that stores the results correlation
 #' between gene expression and copy number data.
 #' \code{getDiffExpressedGenes} returns a list that stores the results for each
@@ -69,6 +69,6 @@ getDiffExpressedGenes <- function(
 getSurvival <- function(dataObject,numberofGroups=2,geneSymbols,sampleTimeCensor)
 {
   .Defunct(
-    msg = "This function is no longer maintained and will be retired."
+    msg = "This function is no longer maintained and is defunct."
   )
 }
