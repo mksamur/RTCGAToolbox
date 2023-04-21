@@ -6,6 +6,9 @@
 see `?getFirehoseData`.
 * The functions `getCNGECorrelation`, `getDiffExpressedGenes`, and `getSurvival`
 have been defunct and removed from the package (see `?'RTCGAToolbox-defunct'`).
+* The `RNAseq2Norm` argument in `getFirehoseData` allows additional
+options: "RSEM_normalized_log2", "raw_counts", "scaled_estimate" from the
+'preprocessed' tarballs in Firehose. The "normalized_counts" default remains.
 
 ### Bug fixes and minor improvements
 
