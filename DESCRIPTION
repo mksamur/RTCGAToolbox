@@ -54,7 +54,6 @@ VignetteBuilder: knitr
 RoxygenNote: 7.2.3
 Collate: 
     'RTCGAToolbox-Class.R'
-    'RTCGAToolbox-defunct.R'
     'RTCGAToolbox.R'
     'utils.R'
     'biocExtract.R'
