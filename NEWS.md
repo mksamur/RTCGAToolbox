@@ -1,3 +1,9 @@
+## Changes in version 2.34.0
+
+### Significant user-visible changes
+
+* `getReport` has been removed from the package.
+
 ## Changes in version 2.32.0
 
 ### New features
