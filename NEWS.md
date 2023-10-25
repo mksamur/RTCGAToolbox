@@ -1,9 +1,10 @@
-## Changes in version 2.32.0
+## Changes in version 2.32.1
 
 ### New features
 
 * The functions `getCNGECorrelation`, `getDiffExpressedGenes`, and `getSurvival`
 have been removed from the package.
+* The `getReport` function has been defunct.
 
 ## Changes in version 2.30.0
 
