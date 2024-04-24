@@ -4,6 +4,10 @@
 
 * `getReport` has been removed from the package.
 
+### Bug fixes and minor improvements
+
+* Remove unnecessary imports e.g., from `RCircos`.
+
 ## Changes in version 2.32.0
 
 ### New features
