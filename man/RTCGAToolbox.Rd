@@ -9,9 +9,9 @@
 Managing data from large-scale projects (such as The Cancer Genome Atlas (TCGA) for further analysis is an important and time consuming step for research projects. Several efforts, such as the Firehose project, make TCGA pre-processed data publicly available via web services and data portals, but this information must be managed, downloaded and prepared for subsequent steps. We have developed an open source and extensible R based data client for pre-processed data from the Firehose, and demonstrate its use with sample case studies. Results show that our RTCGAToolbox can facilitate data management for researchers interested in working with TCGA data. The RTCGAToolbox can also be integrated with other analysis pipelines for further data processing.
 }
 \details{
-The main function you're likely to need from \pkg{RTCGAToolbox} is
-\code{\link{getFirehoseData}}. Otherwise refer to the vignettes to see
-how to use the \pkg{RTCGAToolbox}
+The main function you're likely to need from \code{RTCGAToolbox} is
+\link{getFirehoseData}. Otherwise refer to the vignettes to see
+how to use the \code{RTCGAToolbox}
 }
 \seealso{
 Useful links:

@@ -27,40 +27,49 @@ getLinks(
 )
 }
 \arguments{
-\item{dataset}{A cohort disease code. TCGA cancer codes can be obtained via \code{\link{getFirehoseDatasets}}}
+\item{dataset}{A cohort disease code. TCGA cancer codes can be obtained via
+\link{getFirehoseDatasets}}
 
 \item{data_date}{Either a runDate or analysisDate typically entered in
-`getFirehoseData`}
+\code{getFirehoseData}}
 
 \item{RNASeqGene}{Logical (default FALSE) RNAseq TPM data.}
 
-\item{RNASeq2Gene}{Logical (default FALSE) RNAseq v2 (RSEM processed) data; see \code{RNAseqNorm} argument.}
+\item{RNASeq2Gene}{Logical (default FALSE) RNAseq v2 (RSEM processed) data;
+see \code{RNAseqNorm} argument.}
 
 \item{clinical}{Logical (default TRUE) clinical data.}
 
 \item{miRNASeqGene}{Logical (default FALSE) smallRNAseq data.}
 
-\item{RNASeq2GeneNorm}{Logical (default FALSE) RNAseq v2 (RSEM processed) data.}
+\item{RNASeq2GeneNorm}{Logical (default FALSE) RNAseq v2 (RSEM processed)
+data.}
 
 \item{RNAseq2Norm}{RNAseq v2 data normalization method. (Default
 normalized_count or one of RSEM_normalized_log2, raw_count,
 scaled_estimate)}
 
-\item{CNASNP}{Logical (default FALSE) somatic copy number alterations data from SNP array.}
+\item{CNASNP}{Logical (default FALSE) somatic copy number alterations data
+from SNP array.}
 
-\item{CNVSNP}{Logical (default FALSE) germline copy number variants data from SNP array.}
+\item{CNVSNP}{Logical (default FALSE) germline copy number variants data from
+SNP array.}
 
-\item{CNASeq}{Logical (default FALSE) somatic copy number alterations data from sequencing.}
+\item{CNASeq}{Logical (default FALSE) somatic copy number alterations data
+from sequencing.}
 
-\item{CNACGH}{Logical (default FALSE) somatic copy number alterations data from CGH.}
+\item{CNACGH}{Logical (default FALSE) somatic copy number alterations data
+from CGH.}
 
 \item{Methylation}{Logical (default FALSE) methylation data.}
 
 \item{Mutation}{Logical (default FALSE) mutation data from sequencing.}
 
-\item{mRNAArray}{Logical (default FALSE) mRNA expression data from microarray.}
+\item{mRNAArray}{Logical (default FALSE) mRNA expression data from
+microarray.}
 
-\item{miRNAArray}{Logical (default FALSE) miRNA expression data from microarray.}
+\item{miRNAArray}{Logical (default FALSE) miRNA expression data from
+microarray.}
 
 \item{RPPAArray}{Logical (default FALSE) RPPA data}
 

@@ -7,7 +7,7 @@
 getData(object, type, platform)
 }
 \arguments{
-\item{object}{A \code{\linkS4class{FirehoseData}} object}
+\item{object}{A \linkS4class{FirehoseData} object}
 
 \item{type}{A data type to be extracted}
 
@@ -20,7 +20,7 @@ Returns matrix or data.frame depending on data type
 }
 \description{
 A go-to function for getting top level information from a
-\code{\linkS4class{FirehoseData}} object. Available datatypes for a
+\linkS4class{FirehoseData} object. Available datatypes for a
 particular object can be seen by entering the object name in the
 console ('show' method).
 }

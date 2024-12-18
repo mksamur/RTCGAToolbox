@@ -35,15 +35,19 @@ getFirehoseData(
 )
 }
 \arguments{
-\item{dataset}{A cohort disease code. TCGA cancer codes can be obtained via \code{\link{getFirehoseDatasets}}}
+\item{dataset}{A cohort disease code. TCGA cancer codes can be obtained via
+\link{getFirehoseDatasets}}
 
-\item{runDate}{Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}}
+\item{runDate}{Standard data run dates. Date list can be accessible via
+\link{getFirehoseRunningDates}}
 
-\item{gistic2Date}{Analysis run date for GISTIC obtained via \code{\link{getFirehoseAnalyzeDates}}}
+\item{gistic2Date}{Analysis run date for GISTIC obtained via
+\link{getFirehoseAnalyzeDates}}
 
 \item{RNASeqGene}{Logical (default FALSE) RNAseq TPM data.}
 
-\item{RNASeq2Gene}{Logical (default FALSE) RNAseq v2 (RSEM processed) data; see \code{RNAseqNorm} argument.}
+\item{RNASeq2Gene}{Logical (default FALSE) RNAseq v2 (RSEM processed) data;
+see \code{RNAseqNorm} argument.}
 
 \item{clinical}{Logical (default TRUE) clinical data.}
 
@@ -53,23 +57,30 @@ getFirehoseData(
 of data should be pulled from the miRNASeqGene data. Must be one of
 "reads_per_million_miRNA_mapped", "read_count", or "cross-mapped".}
 
-\item{RNASeq2GeneNorm}{Logical (default FALSE) RNAseq v2 (RSEM processed) data.}
+\item{RNASeq2GeneNorm}{Logical (default FALSE) RNAseq v2 (RSEM processed)
+data.}
 
-\item{CNASNP}{Logical (default FALSE) somatic copy number alterations data from SNP array.}
+\item{CNASNP}{Logical (default FALSE) somatic copy number alterations data
+from SNP array.}
 
-\item{CNVSNP}{Logical (default FALSE) germline copy number variants data from SNP array.}
+\item{CNVSNP}{Logical (default FALSE) germline copy number variants data from
+SNP array.}
 
-\item{CNASeq}{Logical (default FALSE) somatic copy number alterations data from sequencing.}
+\item{CNASeq}{Logical (default FALSE) somatic copy number alterations data
+from sequencing.}
 
-\item{CNACGH}{Logical (default FALSE) somatic copy number alterations data from CGH.}
+\item{CNACGH}{Logical (default FALSE) somatic copy number alterations data
+from CGH.}
 
 \item{Methylation}{Logical (default FALSE) methylation data.}
 
 \item{Mutation}{Logical (default FALSE) mutation data from sequencing.}
 
-\item{mRNAArray}{Logical (default FALSE) mRNA expression data from microarray.}
+\item{mRNAArray}{Logical (default FALSE) mRNA expression data from
+microarray.}
 
-\item{miRNAArray}{Logical (default FALSE) miRNA expression data from microarray.}
+\item{miRNAArray}{Logical (default FALSE) miRNA expression data from
+microarray.}
 
 \item{RPPAArray}{Logical (default FALSE) RPPA data}
 
@@ -81,12 +92,15 @@ of data should be pulled from the miRNASeqGene data. Must be one of
 normalized_count or one of RSEM_normalized_log2, raw_count,
 scaled_estimate)}
 
-\item{forceDownload}{A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.}
+\item{forceDownload}{A logic (Default FALSE) key to force download
+RTCGAToolbox every time. By default if you download files into your working
+directory once than RTCGAToolbox using local files next time.}
 
 \item{destdir}{Directory in which to store the resulting downloaded file.
 Defaults to a cache directory given by \code{RTCGAToolbox:::.setCache()}.}
 
-\item{fileSizeLimit}{Files that are larger than set value (megabyte) won't be downloaded (Default: 500)}
+\item{fileSizeLimit}{Files that are larger than set value (megabyte) won't be
+downloaded (Default: 500)}
 
 \item{getUUIDs}{Logical key to get UUIDs from barcode (Default: FALSE)}
 

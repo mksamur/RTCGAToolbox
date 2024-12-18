@@ -1,7 +1,7 @@
 #' Download GISTIC2 peak-level data from the Firehose pipeline
 #'
 #' @description Access GISTIC2 level 4 copy number data through
-#' \code{gdac.broadinstitute.org}
+#' `gdac.broadinstitute.org`
 #'
 #' @param object A FirehoseData GISTIC type object
 #'
@@ -10,7 +10,7 @@
 #' @param rm.chrX (logical default TRUE) Whether to remove observations in the
 #' X chromosome
 #'
-#' @return A \code{data.frame} of peak values
+#' @return A `data.frame` of peak values
 #'
 #' @importFrom GenomicRanges seqnames order
 #' @importFrom GenomeInfoDb orderSeqlevels seqlevels seqlevels<-

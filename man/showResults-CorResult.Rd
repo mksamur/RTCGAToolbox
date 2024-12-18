@@ -8,7 +8,8 @@
 \S4method{showResults}{CorResult}(object)
 }
 \arguments{
-\item{object}{A \code{\linkS4class{DGEResult}} or \code{\linkS4class{CorResult}} object}
+\item{object}{A \linkS4class{DGEResult} or
+\linkS4class{CorResult} object}
 }
 \value{
 Returns correlation results data frame

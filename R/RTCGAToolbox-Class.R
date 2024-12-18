@@ -96,24 +96,34 @@ setMethod("isEmpty", "FirehoseGISTIC", function(x) {
 #' An S4 class to store main data object from clinent function.
 #'
 #' @slot Dataset A cohort name
-#' @slot runDate Standard data run date from \code{\link{getFirehoseRunningDates}}
-#' @slot gistic2Date Analyze running date from \code{\link{getFirehoseAnalyzeDates}}
+#' @slot runDate Standard data run date from [getFirehoseRunningDates]
+#' @slot gistic2Date Analyze running date from [getFirehoseAnalyzeDates]
 #' @slot clinical clinical data frame
 #' @slot RNASeqGene Gene level expression data matrix from RNAseq
 #' @slot RNASeq2Gene Gene level expression data matrix from RNAseqV2
 #' @slot RNASeq2GeneNorm Gene level expression data matrix from RNAseqV2 (RSEM)
 #' @slot miRNASeqGene miRNA expression data from matrix smallRNAseq
-#' @slot CNASNP A data frame to store somatic copy number alterations from SNP array platform
-#' @slot CNVSNP A data frame to store germline copy number variants from SNP array platform
-#' @slot CNASeq A data frame to store somatic copy number alterations from sequencing platform
-#' @slot CNACGH A list that stores \code{FirehoseCGHArray} object for somatic copy number alterations from CGH platform
-#' @slot Methylation A list that stores \code{FirehoseMethylationArray} object for methylation data
-#' @slot mRNAArray A list that stores \code{FirehosemRNAArray} object for gene expression data from microarray
-#' @slot miRNAArray A list that stores \code{FirehosemRNAArray} object for miRNA expression data from microarray
-#' @slot RPPAArray A list that stores \code{FirehosemRNAArray} object for RPPA data
+#' @slot CNASNP A data frame to store somatic copy number alterations from SNP
+#'   array platform
+#' @slot CNVSNP A data frame to store germline copy number variants from SNP
+#'   array platform
+#' @slot CNASeq A data frame to store somatic copy number alterations from
+#'   sequencing platform
+#' @slot CNACGH A list that stores `FirehoseCGHArray` object for somatic
+#'   copy number alterations from CGH platform
+#' @slot Methylation A list that stores `FirehoseMethylationArray` object
+#'   for methylation data
+#' @slot mRNAArray A list that stores `FirehosemRNAArray` object for gene
+#'   expression data from microarray
+#' @slot miRNAArray A list that stores `FirehosemRNAArray` object for miRNA
+#'   expression data from microarray
+#' @slot RPPAArray A list that stores `FirehosemRNAArray` object for RPPA
+#'   data
 #' @slot Mutation A data frame for mutation infromation from sequencing data
-#' @slot GISTIC A \code{FirehoseGISTIC} object to store processed copy number data
-#' @slot BarcodeUUID A data frame that stores the Barcodes, UUIDs and Short sample identifiers
+#' @slot GISTIC A `FirehoseGISTIC` object to store processed copy number
+#'   data
+#' @slot BarcodeUUID A data frame that stores the Barcodes, UUIDs and Short
+#'   sample identifiers
 #' @exportClass FirehoseData
 setClass("FirehoseData", representation(Dataset = "character",
     runDate = "character", gistic2Date = "character", clinical = "data.frame",
@@ -123,7 +133,7 @@ setClass("FirehoseData", representation(Dataset = "character",
     Mutation="data.frame", GISTIC="FirehoseGISTIC", BarcodeUUID="data.frame"))
 
 #' @describeIn FirehoseData show method
-#' 
+#'
 #' @importFrom BiocGenerics updateObject
 #'
 #' @param object A FirehoseData object
@@ -184,11 +194,11 @@ setMethod("show", "FirehoseData",function(object) {
 #' @title Extract data from FirehoseData object
 #'
 #' @description A go-to function for getting top level information from a
-#' \code{\linkS4class{FirehoseData}} object. Available datatypes for a
+#' [RTCGAToolbox::FirehoseData-class] object. Available datatypes for a
 #' particular object can be seen by entering the object name in the
 #' console ('show' method).
 #'
-#' @param object A \code{\linkS4class{FirehoseData}} object
+#' @param object A [RTCGAToolbox::FirehoseData-class] object
 #' @param type A data type to be extracted
 #' @param platform An index for data types that may come from multiple
 #' platforms (such as mRNAArray), for GISTIC data, one of the options:
@@ -205,7 +215,7 @@ setGeneric("getData", function(object, type, platform) {
     standardGeneric("getData")
 })
 
-#' @describeIn FirehoseData Get a matrix or data.frame from \code{FirehoseData}
+#' @describeIn FirehoseData Get a matrix or data.frame from `FirehoseData`
 #' @param type A data type to be extracted
 #' @param platform An index for data types that may come from multiple
 #' platforms (such as mRNAArray), for GISTIC data, one of the options:
@@ -228,7 +238,7 @@ setMethod("getData", "FirehoseData", function(object, type, platform) {
     }
 })
 
-#' @describeIn FirehoseData Get GISTIC data from \code{FirehoseData}
+#' @describeIn FirehoseData Get GISTIC data from `FirehoseData`
 setMethod("getData", "FirehoseGISTIC", function(object, type, platform) {
     if (!platform %in% c("ThresholdedByGene", "AllByGene", "Peaks") ||
         !S4Vectors::isSingleString(platform))
@@ -238,7 +248,7 @@ setMethod("getData", "FirehoseGISTIC", function(object, type, platform) {
 })
 
 #' @describeIn FirehoseData Default method for getting data from
-#' \code{FirehoseData}
+#' `FirehoseData`
 setMethod("getData", "ANY", function(object, type, platform) {
     getElement(object, type)
 })
@@ -255,7 +265,8 @@ setMethod("show", "DGEResult",function(object){
 })
 
 #' Export toptable or correlation data frame
-#' @param object A \code{\linkS4class{DGEResult}} or \code{\linkS4class{CorResult}} object
+#' @param object A [RTCGAToolbox::DGEResult-class] or
+#'   [RTCGAToolbox::CorResult-class] object
 #' @return Returns toptable or correlation data frame
 #' @examples
 #' data(accmini)
@@ -264,9 +275,9 @@ setGeneric("showResults",
 )
 
 #' Export toptable or correlation data frame
-#' @param object A \code{\linkS4class{DGEResult}} or
-#'   \code{\linkS4class{CorResult}} object
-#'   
+#' @param object A [RTCGAToolbox::DGEResult-class] or
+#'   [RTCGAToolbox::CorResult-class] object
+#'
 #' @rdname showResults-DGEResult
 #' @aliases showResults,DGEResult,DGEResult-method
 #' @return Returns toptable for DGE results
@@ -294,7 +305,8 @@ setMethod("show", "CorResult",function(object){
 })
 
 #' Export toptable or correlation data frame
-#' @param object A \code{\linkS4class{DGEResult}} or \code{\linkS4class{CorResult}} object
+#' @param object A [RTCGAToolbox::DGEResult-class] or
+#'   [RTCGAToolbox::CorResult-class] object
 #' @rdname showResults-CorResult
 #' @aliases showResults,CorResult,CorResult-method
 #' @return Returns correlation results data frame
@@ -320,12 +332,12 @@ setMethod("showResults", "CorResult",function(object){
 
 #' @describeIn FirehoseData Update an old RTCGAToolbox FirehoseData object to
 #'   the most recent API
-#' 
+#'
 #' @param verbose logical (default FALSE) whether to print extra messages
 #' @param ... additional arguments for updateObject
-#' 
+#'
 #' @importFrom methods new
-#' 
+#'
 #' @exportMethod updateObject
 setMethod("updateObject", "FirehoseData",
     function(object, ..., verbose = FALSE) {
@@ -359,11 +371,11 @@ setMethod("updateObject", "FirehoseData",
 
 #' @describeIn FirehoseGISTIC Update an old FirehoseGISTIC object to the most
 #'   recent API
-#' 
-#' @param object A \code{FirehoseGISTIC} object
+#'
+#' @param object A `FirehoseGISTIC` object
 #' @param verbose logical (default FALSE) whether to print extra messages
 #' @param ... additional arguments for updateObject
-#' 
+#'
 #' @exportMethod updateObject
 setMethod("updateObject", "FirehoseGISTIC",
     function(object, ..., verbose = FALSE) {

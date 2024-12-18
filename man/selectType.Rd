@@ -15,25 +15,25 @@ selectType(object, dataType)
 The data type element of the \code{FirehoseData} object
 }
 \description{
-An accessor function for the \linkS4class{FirehoseData}
-class. An argument will specify the data type to return
-See \link{FirehoseData-class} for more details.
+An accessor function for the \linkS4class{FirehoseData}. An argument
+will specify the data type to return See \linkS4class{FirehoseData}
+for more details.
 }
 \details{
 \itemize{
-    \item{clinical} - Get the clinical data slot
-    \item{RNASeqGene} - RNASeqGene
-    \item{RNASeq2GeneNorm} - Normalized
-    \item{miRNASeqGene} - micro RNA SeqGene
-    \item{CNASNP} - Copy Number Alteration
-    \item{CNVSNP} - Copy Number Variation
-    \item{CNASeq} - Copy Number Alteration
-    \item{CNACGH} - Copy Number Alteration
-    \item{Methylation} - Methylation
-    \item{mRNAArray} - Messenger RNA
-    \item{miRNAArray} - micro RNA
-    \item{RPPAArray} - Reverse Phase Protein Array
-    \item{Mutation} - Mutations
-    \item{GISTIC} - GISTIC v2 scores and probabilities
+\item clinical: Get the clinical data slot
+\item RNASeqGene: RNASeqGene
+\item RNASeq2GeneNorm: Normalized
+\item miRNASeqGene: micro RNA SeqGene
+\item CNASNP: Copy Number Alteration
+\item CNVSNP: Copy Number Variation
+\item CNASeq: Copy Number Alteration
+\item CNACGH: Copy Number Alteration
+\item Methylation: Methylation
+\item mRNAArray: Messenger RNA
+\item miRNAArray: micro RNA
+\item RPPAArray: Reverse Phase Protein Array
+\item Mutation: Mutations
+\item GISTIC: GISTIC v2 scores and probabilities
 }
 }

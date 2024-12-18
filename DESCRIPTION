@@ -50,6 +50,7 @@ URL: http://mksamur.github.io/RTCGAToolbox/
 BugReports: https://github.com/mksamur/RTCGAToolbox/issues
 VignetteBuilder: knitr
 RoxygenNote: 7.3.2
+Roxygen: list(markdown = TRUE)
 Collate: 
     'RTCGAToolbox-Class.R'
     'RTCGAToolbox.R'

@@ -1,32 +1,31 @@
 #' @include RTCGAToolbox-Class.R
 NULL
 
-#' @title Accessor function for the FirehoseData object
-#' @description An accessor function for the \linkS4class{FirehoseData}
-#' class. An argument will specify the data type to return
-#' See \link{FirehoseData-class} for more details.
+#' Accessor function for the FirehoseData object
+#'
+#' An accessor function for the [RTCGAToolbox::FirehoseData-class]. An argument
+#' will specify the data type to return See [RTCGAToolbox::FirehoseData-class]
+#' for more details.
 #'
 #' @details
-#' \itemize{
-#'     \item{clinical} - Get the clinical data slot
-#'     \item{RNASeqGene} - RNASeqGene
-#'     \item{RNASeq2GeneNorm} - Normalized
-#'     \item{miRNASeqGene} - micro RNA SeqGene
-#'     \item{CNASNP} - Copy Number Alteration
-#'     \item{CNVSNP} - Copy Number Variation
-#'     \item{CNASeq} - Copy Number Alteration
-#'     \item{CNACGH} - Copy Number Alteration
-#'     \item{Methylation} - Methylation
-#'     \item{mRNAArray} - Messenger RNA
-#'     \item{miRNAArray} - micro RNA
-#'     \item{RPPAArray} - Reverse Phase Protein Array
-#'     \item{Mutation} - Mutations
-#'     \item{GISTIC} - GISTIC v2 scores and probabilities
-#' }
+#' * clinical: Get the clinical data slot
+#' * RNASeqGene: RNASeqGene
+#' * RNASeq2GeneNorm: Normalized
+#' * miRNASeqGene: micro RNA SeqGene
+#' * CNASNP: Copy Number Alteration
+#' * CNVSNP: Copy Number Variation
+#' * CNASeq: Copy Number Alteration
+#' * CNACGH: Copy Number Alteration
+#' * Methylation: Methylation
+#' * mRNAArray: Messenger RNA
+#' * miRNAArray: micro RNA
+#' * RPPAArray: Reverse Phase Protein Array
+#' * Mutation: Mutations
+#' * GISTIC: GISTIC v2 scores and probabilities
 #'
-#' @param object A \code{FirehoseData} class object
+#' @param object A `FirehoseData` class object
 #' @param dataType A data type, see details.
-#' @return The data type element of the \code{FirehoseData} object
+#' @return The data type element of the `FirehoseData` object
 setGeneric("selectType", function(object, dataType) standardGeneric("selectType"))
 
 

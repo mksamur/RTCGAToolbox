@@ -1,13 +1,13 @@
 #' Download expression-based cancer subtypes from the Broad Institute
 #'
 #' @description Obtain the mRNA expression clustering results from the
-#' Broad Institute for a specific cancer code (see \link{getFirehoseDatasets}).
+#' Broad Institute for a specific cancer code (see [getFirehoseDatasets]).
 #'
 #' @param dataset A TCGA cancer code, e.g. "OV" for ovarian cancer
 #' @param clust.alg The selected cluster algorithm, either "CNMF" or
 #' "ConsensusPlus" (default "CNMF")
 #'
-#' @return A \code{data.frame} of cluster and silhouette values
+#' @return A `data.frame` of cluster and silhouette values
 #'
 #' @importFrom RCurl url.exists
 #' @importFrom S4Vectors isSingleString

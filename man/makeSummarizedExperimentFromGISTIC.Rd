@@ -12,7 +12,7 @@ makeSummarizedExperimentFromGISTIC(
 )
 }
 \arguments{
-\item{gistic}{A \link[RTCGAToolbox]{FirehoseGISTIC-class} object}
+\item{gistic}{A \linkS4class{FirehoseGISTIC} object}
 
 \item{dataType}{character(1) One of "ThresholdedByGene" (default),
 "AllByGene", or "Peaks"}
@@ -30,7 +30,7 @@ A \code{SummarizedExperiment} object
 \description{
 Use the output of \code{getFirehoseData} to create a
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}.
-This can be done for three types of data, G-scores thresholded by gene, copy
+This can be done for three types of data, G-scores threshold by gene, copy
 number by gene, and copy number by peak regions.
 }
 \examples{

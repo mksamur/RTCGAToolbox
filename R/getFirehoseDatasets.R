@@ -1,9 +1,9 @@
 #' Get a list of TCGA disease cohorts
 #'
-#' \code{getFirehoseDatasets} returns a character vector of TCGA disease codes.
-#' A reference table can be seen at \url{https://gdac.broadinstitute.org/}.
+#' `getFirehoseDatasets` returns a character vector of TCGA disease codes.
+#' A reference table can be seen at <https://gdac.broadinstitute.org/>.
 #'
-#' @seealso \url{https://gdac.broadinstitute.org/}
+#' @seealso <https://gdac.broadinstitute.org/>
 #'
 #' @return A character string
 #'

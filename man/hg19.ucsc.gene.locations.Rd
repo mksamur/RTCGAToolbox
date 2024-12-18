@@ -12,10 +12,10 @@ The variables are as follows:
 }
 \details{
 \itemize{
-  \item GeneSymbol. Gene symbols
-  \item Chromosome. Chromosome name
-  \item Strand. Gene strand on chromosome
-  \item Start. Gene location on chromosome
-  \item End. Gene location on chromosome
+\item GeneSymbol: Gene symbols
+\item Chromosome: Chromosome name
+\item Strand: Gene strand on chromosome
+\item Start: Gene location on chromosome
+\item End: Gene location on chromosome
 }
 }

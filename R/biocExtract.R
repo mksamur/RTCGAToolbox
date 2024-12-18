@@ -55,8 +55,6 @@ NULL
 #' [SummarizedExperiment][SummarizedExperiment::SummarizedExperiment-class] or
 #' [RaggedExperiment][RaggedExperiment::RaggedExperiment-class].
 #'
-#' @md
-#'
 #' @author Marcel Ramos \email{marcel.ramos@@sph.cuny.edu}
 #'
 #' @examples

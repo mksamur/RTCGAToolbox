@@ -10,7 +10,6 @@
 #' `getFirehoseData`
 #'
 #' @return A character URL to a dataset location
-#'
 #' @examples
 #'
 #' getLinks("BRCA", CNASeq = TRUE)

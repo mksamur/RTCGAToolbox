@@ -4,7 +4,7 @@
 #' This dataset contains real data from the The Cancer Genome Atlas for
 #' the pipeline run date and GISTIC analysis date of 2016-01-28.
 #'
-#' @format A \code{FirehoseData} data object
+#' @format A `FirehoseData` data object
 #'
 #' @usage data("accmini", package = "RTCGAToolbox")
 #'

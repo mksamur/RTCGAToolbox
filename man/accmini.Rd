@@ -11,7 +11,7 @@ A \code{FirehoseData} data object
 data("accmini", package = "RTCGAToolbox")
 }
 \description{
-See the `acc_sample.R` script to see how the data was generated.
+See the \code{acc_sample.R} script to see how the data was generated.
 This dataset contains real data from the The Cancer Genome Atlas for
 the pipeline run date and GISTIC analysis date of 2016-01-28.
 }

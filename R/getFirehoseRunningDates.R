@@ -1,6 +1,6 @@
 #' Get standard data running dates.
 #'
-#' \code{getFirehoseRunningDates} returns the character vector for standard data release dates.
+#' `getFirehoseRunningDates` returns the character vector for standard data release dates.
 #'
 #' @param last To list last n dates. (Default NULL)
 #' @return A character vector for dates.

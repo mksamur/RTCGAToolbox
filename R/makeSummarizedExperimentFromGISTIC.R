@@ -1,11 +1,11 @@
 #' Create a SummarizedExperiment from FireHose GISTIC
 #'
-#' @description Use the output of \code{getFirehoseData} to create a
-#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}.
-#' This can be done for three types of data, G-scores thresholded by gene, copy
+#' @description Use the output of `getFirehoseData` to create a
+#' [SummarizedExperiment][SummarizedExperiment::SummarizedExperiment-class].
+#' This can be done for three types of data, G-scores threshold by gene, copy
 #' number by gene, and copy number by peak regions.
 #'
-#' @param gistic A \link[RTCGAToolbox]{FirehoseGISTIC-class} object
+#' @param gistic A [RTCGAToolbox::FirehoseGISTIC-class] object
 #' @param dataType character(1) One of "ThresholdedByGene" (default),
 #'   "AllByGene", or "Peaks"
 #' @param rownameCol character(1) The name of the column in the data to use as
@@ -15,14 +15,13 @@
 #' @param ... Additional arguments passed to 'getGISTICPeaks'.
 #'
 #' @author L. Geistlinger, M. Ramos
-#'
 #' @examples
 #'
 #' co <- getFirehoseData("COAD", clinical = FALSE, GISTIC = TRUE,
 #'     destdir = tempdir())
 #' makeSummarizedExperimentFromGISTIC(co, "AllByGene")
 #'
-#' @return A \code{SummarizedExperiment} object
+#' @return A `SummarizedExperiment` object
 #' @export
 makeSummarizedExperimentFromGISTIC <-
     function(

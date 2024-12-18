@@ -217,7 +217,7 @@
 
 #' Get data from Firehose portal.
 #'
-#' \code{getFirehoseData} returns \code{FirehoseData} object that stores TCGA data.
+#' `getFirehoseData` returns `FirehoseData` object that stores TCGA data.
 #'
 #' This is a main client function to download data from Firehose TCGA portal.
 #'
@@ -226,45 +226,58 @@
 #'   parameter to the cached directory. To get the actual default directory,
 #'   one can run `RTCGAToolbox:::.setCache()`.
 #'
-#' @param dataset A cohort disease code. TCGA cancer codes can be obtained via \code{\link{getFirehoseDatasets}}
-#' @param runDate Standard data run dates. Date list can be accessible via \code{\link{getFirehoseRunningDates}}
-#' @param gistic2Date Analysis run date for GISTIC obtained via \code{\link{getFirehoseAnalyzeDates}}
+#' @param dataset A cohort disease code. TCGA cancer codes can be obtained via
+#'   [getFirehoseDatasets]
+#' @param runDate Standard data run dates. Date list can be accessible via
+#'   [getFirehoseRunningDates]
+#' @param gistic2Date Analysis run date for GISTIC obtained via
+#'   [getFirehoseAnalyzeDates]
 #' @param RNASeqGene Logical (default FALSE) RNAseq TPM data.
 #' @param clinical Logical (default TRUE) clinical data.
-#' @param RNASeq2Gene Logical (default FALSE) RNAseq v2 (RSEM processed) data; see `RNAseqNorm` argument.
-#' @param RNASeq2GeneNorm Logical (default FALSE) RNAseq v2 (RSEM processed) data.
+#' @param RNASeq2Gene Logical (default FALSE) RNAseq v2 (RSEM processed) data;
+#'   see `RNAseqNorm` argument.
+#' @param RNASeq2GeneNorm Logical (default FALSE) RNAseq v2 (RSEM processed)
+#'   data.
 #' @param miRNASeqGene Logical (default FALSE) smallRNAseq data.
 #' @param miRNASeqGeneType Character (default "read_count") Indicate which type
 #'   of data should be pulled from the miRNASeqGene data. Must be one of
 #'   "reads_per_million_miRNA_mapped", "read_count", or "cross-mapped".
-#' @param CNASNP Logical (default FALSE) somatic copy number alterations data from SNP array.
-#' @param CNVSNP Logical (default FALSE) germline copy number variants data from SNP array.
-#' @param CNASeq Logical (default FALSE) somatic copy number alterations data from sequencing.
-#' @param CNACGH Logical (default FALSE) somatic copy number alterations data from CGH.
+#' @param CNASNP Logical (default FALSE) somatic copy number alterations data
+#'   from SNP array.
+#' @param CNVSNP Logical (default FALSE) germline copy number variants data from
+#'   SNP array.
+#' @param CNASeq Logical (default FALSE) somatic copy number alterations data
+#'   from sequencing.
+#' @param CNACGH Logical (default FALSE) somatic copy number alterations data
+#'   from CGH.
 #' @param Methylation Logical (default FALSE) methylation data.
 #' @param Mutation Logical (default FALSE) mutation data from sequencing.
-#' @param mRNAArray Logical (default FALSE) mRNA expression data from microarray.
-#' @param miRNAArray Logical (default FALSE) miRNA expression data from microarray.
+#' @param mRNAArray Logical (default FALSE) mRNA expression data from
+#'   microarray.
+#' @param miRNAArray Logical (default FALSE) miRNA expression data from
+#'   microarray.
 #' @param RPPAArray Logical (default FALSE) RPPA data
 #' @param RNAseqNorm RNAseq data normalization method. (Default raw_count)
 #' @param RNAseq2Norm RNAseq v2 data normalization method. (Default
 #'   normalized_count or one of RSEM_normalized_log2, raw_count,
 #'   scaled_estimate)
 #' @param GISTIC logical (default FALSE) processed copy number data
-#' @param forceDownload A logic (Default FALSE) key to force download RTCGAToolbox every time. By default if you download files into your working directory once than RTCGAToolbox using local files next time.
+#' @param forceDownload A logic (Default FALSE) key to force download
+#'   RTCGAToolbox every time. By default if you download files into your working
+#'   directory once than RTCGAToolbox using local files next time.
 #' @param destdir Directory in which to store the resulting downloaded file.
 #'   Defaults to a cache directory given by `RTCGAToolbox:::.setCache()`.
-#' @param fileSizeLimit Files that are larger than set value (megabyte) won't be downloaded (Default: 500)
+#' @param fileSizeLimit Files that are larger than set value (megabyte) won't be
+#'   downloaded (Default: 500)
 #' @param getUUIDs Logical key to get UUIDs from barcode (Default: FALSE)
 #' @param ... Additional arguments to pass down.
 #'
-#' @return A \code{FirehoseData} data object that stores data for selected data types.
+#' @return A `FirehoseData` data object that stores data for selected data types.
 #'
 #' @seealso \link{getLinks}, \url{https://gdac.broadinstitute.org/}
 #'
 #' @importFrom utils write.table
 #'
-#' @md
 #' @examples
 #' # Sample Dataset
 #' data(accmini)

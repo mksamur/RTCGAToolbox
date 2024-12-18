@@ -1,6 +1,6 @@
 #' Get data analyze dates.
 #'
-#' \code{getFirehoseAnalyzeDates} returns the character vector for analyze release dates.
+#' `getFirehoseAnalyzeDates` returns the character vector for analyze release dates.
 #'
 #' @param last To list last n dates. (Default NULL)
 #' @return A character vector for dates.

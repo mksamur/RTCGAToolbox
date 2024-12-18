@@ -1,13 +1,13 @@
 #' Make a table for mutation rate of each gene in the cohort
 #'
-#' @param dataObject This must be \code{FirehoseData} object.
+#' @param dataObject This must be `FirehoseData` object.
 #' @return Returns a data table
-#' @export getMutationRate
 #' @examples
 #' data(accmini)
 #' mutRate <- getMutationRate(dataObject=accmini)
 #' mutRate <- mutRate[order(mutRate[,2],decreasing = TRUE),]
 #' head(mutRate)
+#' @export getMutationRate
 getMutationRate <- function(dataObject)
 {
   if(is.null(dataObject) | !is(dataObject, "FirehoseData")){stop("'dataObject' must be 'FirehoseData' class!")}
