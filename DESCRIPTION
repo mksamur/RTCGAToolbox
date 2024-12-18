@@ -1,7 +1,7 @@
 Package: RTCGAToolbox
 Type: Package
 Title: A new tool for exporting TCGA Firehose data
-Version: 2.37.0
+Version: 2.37.1
 Authors@R: c(
     person("Mehmet", "Samur", email = "rtcgatoolbox@gmail.com",
     role = "aut"),
@@ -67,4 +67,4 @@ Collate:
     'makeSummarizedExperimentFromGISTIC.R'
     'selectType.R'
 Encoding: UTF-8
-Date: 2024-08-22
+Date: 2024-12-18
