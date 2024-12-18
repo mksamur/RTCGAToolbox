@@ -29,9 +29,9 @@ A \code{SummarizedExperiment} object
 }
 \description{
 Use the output of \code{getFirehoseData} to create a
-\linkS4class{SummarizedExperiment}. This can be done for three types of
-data, G-scores thresholded by gene, copy number by gene, and copy number by
-peak regions.
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}.
+This can be done for three types of data, G-scores thresholded by gene, copy
+number by gene, and copy number by peak regions.
 }
 \examples{
 

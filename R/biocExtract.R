@@ -4,15 +4,17 @@ NULL
 #' Extract and convert data from a \code{FirehoseData} object to a
 #' \code{Bioconductor} object
 #'
-#' This function processes data from a \code{\linkS4class{FirehoseData}} object.
-#' Raw data is converted to a conventional Bioconductor object. The function
-#' returns either a \linkS4class{SummarizedExperiment} or a
-#' \linkS4class{RaggedExperiment} class object. In cases where there are
-#' multiple platforms in a data type, an attempt to consolidate datasets will
-#' be made based on matching dimension names. For ranged data, this
-#' functionality is provided with more control as part of the
-#' \code{RaggedExperiment} features. See
-#' \code{\link[RaggedExperiment]{RaggedExperiment-class}} for more details.
+#' This function processes data from a
+#' \link[RTCGAToolbox:FirehoseData-class]{FirehoseData} object. Raw data is
+#' converted to a conventional Bioconductor object. The function returns either
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}
+#' or \link[RaggedExperiment:RaggedExperiment-class]{RaggedExperiment}. In cases
+#' where there are multiple platforms in a data type, an attempt to consolidate
+#' datasets will be made based on matching dimension names. For ranged data,
+#' this functionality is provided with more control as part of the
+#' \code{RaggedExperiment} features. See the
+#' \link[RaggedExperiment:RaggedExperiment-class]{RaggedExperiment-class} for
+#' more details.
 #'
 #' @details A typical additional argument for this function passed down to
 #' lower level functions is the `names.field` which indicates the row names
@@ -51,8 +53,11 @@ NULL
 #' \code{.makeRangedSummarizedExperimentFromDataFrame} or
 #' \code{.makeRaggedExperimentFromDataFrame}
 #'
-#' @return Either an \linkS4class{SummarizedExperiment} object or a
-#' \linkS4class{RaggedExperiment} object.
+#' @return Either
+#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}
+#' or
+#' \link[RaggedExperiment:RaggedExperiment-class]{RaggedExperiment}
+#' .
 #'
 #' @md
 #'
