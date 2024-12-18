@@ -26,14 +26,12 @@ convert tabular data into Bioconductor object such as
 }
 \value{
 Either
-\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}
-or
-\link[RaggedExperiment:RaggedExperiment-class]{RaggedExperiment}
-.
+\link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment} or
+\link[RaggedExperiment:RaggedExperiment-class]{RaggedExperiment}.
 }
 \description{
 This function processes data from a
-\link[RTCGAToolbox:FirehoseData-class]{FirehoseData} object. Raw data is
+\link[=FirehoseData-class]{FirehoseData} object. Raw data is
 converted to a conventional Bioconductor object. The function returns either
 \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}
 or \link[RaggedExperiment:RaggedExperiment-class]{RaggedExperiment}. In cases
@@ -53,26 +51,26 @@ code that converts \code{data.frame}s to \code{SummarizedExperiment} representat
 }
 \section{type}{
 
-Choices include:
+Choices include the following:
 \itemize{
-\item{clinical} - Get the clinical data slot
-\item{RNASeqGene} - RNASeqGene - RNASeq v1
-\item{RNASeqGene} - RNASeq2Gene - RNASeq v2
-\item{RNASeq2GeneNorm} - RNASeq v2 Normalized
-\item{miRNASeqGene} - micro RNA SeqGene
-\item{CNASNP} - Copy Number Alteration
-\item{CNVSNP} - Copy Number Variation
-\item{CNASeq} - Copy Number Alteration
-\item{CNACGH} - Copy Number Alteration
-\item{Methylation} - Methylation
-\item{mRNAArray} - Messenger RNA
-\item{miRNAArray} - micro RNA
-\item{RPPAArray} - Reverse Phase Protein Array
-\item{Mutation} - Mutations
-\item{GISTICA} - GISTIC v2 ('AllByGene' only)
-\item{GISTICT} - GISTIC v2 ('ThresholdedByGene' only)
-\item{GISTICP} - GISTIC v2 ('Peaks' only)
-\item{GISTIC} - GISTIC v2 scores, probabilities, and peaks
+\item clinical: Get the clinical data slot
+\item RNASeqGene: RNASeqGene, RNASeq v1
+\item RNASeqGene: RNASeq2Gene, RNASeq v2
+\item RNASeq2GeneNorm: RNASeq v2 Normalized
+\item miRNASeqGene: micro RNA SeqGene
+\item CNASNP: Copy Number Alteration
+\item CNVSNP: Copy Number Variation
+\item CNASeq: Copy Number Alteration
+\item CNACGH: Copy Number Alteration
+\item Methylation: Methylation
+\item mRNAArray: Messenger RNA
+\item miRNAArray: micro RNA
+\item RPPAArray: Reverse Phase Protein Array
+\item Mutation: Mutations
+\item GISTICA: GISTIC v2 ('AllByGene' only)
+\item GISTICT: GISTIC v2 ('ThresholdedByGene' only)
+\item GISTICP: GISTIC v2 ('Peaks' only)
+\item GISTIC: GISTIC v2 scores, probabilities, and peaks
 }
 }
 

@@ -1,19 +1,19 @@
 #' @include utils.R
 NULL
 
-#' Extract and convert data from a \code{FirehoseData} object to a
-#' \code{Bioconductor} object
+#' Extract and convert data from a `FirehoseData` object to a
+#' `Bioconductor` object
 #'
 #' This function processes data from a
-#' \link[RTCGAToolbox:FirehoseData-class]{FirehoseData} object. Raw data is
+#' [FirehoseData][FirehoseData-class] object. Raw data is
 #' converted to a conventional Bioconductor object. The function returns either
-#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}
-#' or \link[RaggedExperiment:RaggedExperiment-class]{RaggedExperiment}. In cases
+#' [SummarizedExperiment][SummarizedExperiment::SummarizedExperiment-class]
+#' or [RaggedExperiment][RaggedExperiment::RaggedExperiment-class]. In cases
 #' where there are multiple platforms in a data type, an attempt to consolidate
 #' datasets will be made based on matching dimension names. For ranged data,
 #' this functionality is provided with more control as part of the
-#' \code{RaggedExperiment} features. See the
-#' \link[RaggedExperiment:RaggedExperiment-class]{RaggedExperiment-class} for
+#' `RaggedExperiment` features. See the
+#' [RaggedExperiment-class][RaggedExperiment::RaggedExperiment-class] for
 #' more details.
 #'
 #' @details A typical additional argument for this function passed down to
@@ -23,41 +23,37 @@ NULL
 #' (via the `.makeSummarizedExperimentFromDataFrame` internal function).
 #'
 #' @section type:
-#' Choices include:
-#' \itemize{
-#'     \item{clinical} - Get the clinical data slot
-#'     \item{RNASeqGene} - RNASeqGene - RNASeq v1
-#'     \item{RNASeqGene} - RNASeq2Gene - RNASeq v2
-#'     \item{RNASeq2GeneNorm} - RNASeq v2 Normalized
-#'     \item{miRNASeqGene} - micro RNA SeqGene
-#'     \item{CNASNP} - Copy Number Alteration
-#'     \item{CNVSNP} - Copy Number Variation
-#'     \item{CNASeq} - Copy Number Alteration
-#'     \item{CNACGH} - Copy Number Alteration
-#'     \item{Methylation} - Methylation
-#'     \item{mRNAArray} - Messenger RNA
-#'     \item{miRNAArray} - micro RNA
-#'     \item{RPPAArray} - Reverse Phase Protein Array
-#'     \item{Mutation} - Mutations
-#'     \item{GISTICA} - GISTIC v2 ('AllByGene' only)
-#'     \item{GISTICT} - GISTIC v2 ('ThresholdedByGene' only)
-#'     \item{GISTICP} - GISTIC v2 ('Peaks' only)
-#'     \item{GISTIC} - GISTIC v2 scores, probabilities, and peaks
-#' }
+#' Choices include the following:
+#' * clinical: Get the clinical data slot
+#' * RNASeqGene: RNASeqGene, RNASeq v1
+#' * RNASeqGene: RNASeq2Gene, RNASeq v2
+#' * RNASeq2GeneNorm: RNASeq v2 Normalized
+#' * miRNASeqGene: micro RNA SeqGene
+#' * CNASNP: Copy Number Alteration
+#' * CNVSNP: Copy Number Variation
+#' * CNASeq: Copy Number Alteration
+#' * CNACGH: Copy Number Alteration
+#' * Methylation: Methylation
+#' * mRNAArray: Messenger RNA
+#' * miRNAArray: micro RNA
+#' * RPPAArray: Reverse Phase Protein Array
+#' * Mutation: Mutations
+#' * GISTICA: GISTIC v2 ('AllByGene' only)
+#' * GISTICT: GISTIC v2 ('ThresholdedByGene' only)
+#' * GISTICP: GISTIC v2 ('Peaks' only)
+#' * GISTIC: GISTIC v2 scores, probabilities, and peaks
 #'
-#' @param object A \code{FirehoseData} object from which to extract data.
+#' @param object A `FirehoseData` object from which to extract data.
 #' @param type The type of data to extract from the "FirehoseData" object,
 #' see type section.
 #' @param ... Additional arguments passed to lower level functions that
 #' convert tabular data into Bioconductor object such as
-#' \code{.makeRangedSummarizedExperimentFromDataFrame} or
-#' \code{.makeRaggedExperimentFromDataFrame}
+#' `.makeRangedSummarizedExperimentFromDataFrame` or
+#' `.makeRaggedExperimentFromDataFrame`
 #'
 #' @return Either
-#' \link[SummarizedExperiment:SummarizedExperiment-class]{SummarizedExperiment}
-#' or
-#' \link[RaggedExperiment:RaggedExperiment-class]{RaggedExperiment}
-#' .
+#' [SummarizedExperiment][SummarizedExperiment::SummarizedExperiment-class] or
+#' [RaggedExperiment][RaggedExperiment::RaggedExperiment-class].
 #'
 #' @md
 #'
