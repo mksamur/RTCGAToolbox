@@ -2,6 +2,7 @@
 % Please edit documentation in R/RTCGAToolbox.R
 \docType{package}
 \name{RTCGAToolbox}
+\alias{RTCGAToolbox-package}
 \alias{RTCGAToolbox}
 \title{RTCGAToolbox: A New Tool for Exporting TCGA Firehose Data}
 \description{
@@ -11,6 +12,14 @@ Managing data from large-scale projects (such as The Cancer Genome Atlas (TCGA) 
 The main function you're likely to need from \pkg{RTCGAToolbox} is
 \code{\link{getFirehoseData}}. Otherwise refer to the vignettes to see
 how to use the \pkg{RTCGAToolbox}
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{http://mksamur.github.io/RTCGAToolbox/}
+  \item Report bugs at \url{https://github.com/mksamur/RTCGAToolbox/issues}
+}
+
 }
 \author{
 Mehmet Kemal Samur

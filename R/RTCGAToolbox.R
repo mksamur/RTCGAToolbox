@@ -7,9 +7,8 @@
 #' how to use the \pkg{RTCGAToolbox}
 #'
 #' @author Mehmet Kemal Samur
-#' @docType package
 #' @name RTCGAToolbox
-NULL
+"_PACKAGE"
 
 #' Gene coordinates for circle plot.
 #'
