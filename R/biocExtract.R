@@ -61,7 +61,7 @@ NULL
 #'
 #' @md
 #'
-#' @author Marcel Ramos \email{marcel.ramos@@roswellpark.org}
+#' @author Marcel Ramos \email{marcel.ramos@@sph.cuny.edu}
 #'
 #' @examples
 #'

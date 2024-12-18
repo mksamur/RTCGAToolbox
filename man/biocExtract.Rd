@@ -91,5 +91,5 @@ biocExtract(accmini, "GISTIC")
 
 }
 \author{
-Marcel Ramos \email{marcel.ramos@roswellpark.org}
+Marcel Ramos \email{marcel.ramos@sph.cuny.edu}
 }
