@@ -50,10 +50,12 @@ normalized_count or one of RSEM_normalized_log2, raw_count,
 scaled_estimate)}
 
 \item{CNASNP}{Logical (default FALSE) somatic copy number alterations data
-from SNP array.}
+from SNP array, not filtered for germline CNVs
+(Firehose \code{segmented_scna_hg19}).}
 
-\item{CNVSNP}{Logical (default FALSE) germline copy number variants data from
-SNP array.}
+\item{CNVSNP}{Logical (default FALSE) somatic copy number alterations data
+from SNP array with germline CNVs removed
+(Firehose \code{segmented_scna_minus_germline_cnv_hg19}).}
 
 \item{CNASeq}{Logical (default FALSE) somatic copy number alterations data
 from sequencing.}

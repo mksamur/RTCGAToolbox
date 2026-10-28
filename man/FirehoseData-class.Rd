@@ -78,10 +78,11 @@ the most recent API
 \item{\code{miRNASeqGene}}{miRNA expression data from matrix smallRNAseq}
 
 \item{\code{CNASNP}}{A data frame to store somatic copy number alterations from SNP
-array platform}
+array platform, not filtered for germline CNVs (\code{segmented_scna_hg19})}
 
-\item{\code{CNVSNP}}{A data frame to store germline copy number variants from SNP
-array platform}
+\item{\code{CNVSNP}}{A data frame to store somatic copy number alterations from SNP
+array platform with germline CNVs removed
+(\code{segmented_scna_minus_germline_cnv_hg19})}
 
 \item{\code{CNASeq}}{A data frame to store somatic copy number alterations from
 sequencing platform}

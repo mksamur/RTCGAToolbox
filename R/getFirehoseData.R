@@ -243,9 +243,11 @@
 #'   of data should be pulled from the miRNASeqGene data. Must be one of
 #'   "reads_per_million_miRNA_mapped", "read_count", or "cross-mapped".
 #' @param CNASNP Logical (default FALSE) somatic copy number alterations data
-#'   from SNP array.
-#' @param CNVSNP Logical (default FALSE) germline copy number variants data from
-#'   SNP array.
+#'   from SNP array, not filtered for germline CNVs
+#'   (Firehose `segmented_scna_hg19`).
+#' @param CNVSNP Logical (default FALSE) somatic copy number alterations data
+#'   from SNP array with germline CNVs removed
+#'   (Firehose `segmented_scna_minus_germline_cnv_hg19`).
 #' @param CNASeq Logical (default FALSE) somatic copy number alterations data
 #'   from sequencing.
 #' @param CNACGH Logical (default FALSE) somatic copy number alterations data
