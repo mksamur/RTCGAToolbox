@@ -104,9 +104,10 @@ setMethod("isEmpty", "FirehoseGISTIC", function(x) {
 #' @slot RNASeq2GeneNorm Gene level expression data matrix from RNAseqV2 (RSEM)
 #' @slot miRNASeqGene miRNA expression data from matrix smallRNAseq
 #' @slot CNASNP A data frame to store somatic copy number alterations from SNP
-#'   array platform
-#' @slot CNVSNP A data frame to store germline copy number variants from SNP
-#'   array platform
+#'   array platform, not filtered for germline CNVs (`segmented_scna_hg19`)
+#' @slot CNVSNP A data frame to store somatic copy number alterations from SNP
+#'   array platform with germline CNVs removed
+#'   (`segmented_scna_minus_germline_cnv_hg19`)
 #' @slot CNASeq A data frame to store somatic copy number alterations from
 #'   sequencing platform
 #' @slot CNACGH A list that stores `FirehoseCGHArray` object for somatic

@@ -30,7 +30,7 @@ NULL
 #' * RNASeq2GeneNorm: RNASeq v2 Normalized
 #' * miRNASeqGene: micro RNA SeqGene
 #' * CNASNP: Copy Number Alteration
-#' * CNVSNP: Copy Number Variation
+#' * CNVSNP: Copy Number Alteration (germline CNVs removed)
 #' * CNASeq: Copy Number Alteration
 #' * CNACGH: Copy Number Alteration
 #' * Methylation: Methylation

@@ -59,7 +59,7 @@ Choices include the following:
 \item RNASeq2GeneNorm: RNASeq v2 Normalized
 \item miRNASeqGene: micro RNA SeqGene
 \item CNASNP: Copy Number Alteration
-\item CNVSNP: Copy Number Variation
+\item CNVSNP: Copy Number Alteration (germline CNVs removed)
 \item CNASeq: Copy Number Alteration
 \item CNACGH: Copy Number Alteration
 \item Methylation: Methylation
